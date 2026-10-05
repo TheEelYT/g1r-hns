@@ -305,6 +305,8 @@ return function(mod)
     if world.startup and world.startup.rules then assert(load(mod:read("gameplay.lua"),"@hns/gameplay.lua"))()(mod,world,game) end
     if world.startup and world.pokedex then assert(load(mod:read('battle_mechanics.lua'),'@hns/battle_mechanics.lua'))()(mod,world,game) end
     if world.startup and world.startup.rules then assert(load(mod:read("battle_presentation.lua"),"@hns/battle_presentation.lua"))()(mod,world,game) end
+    if world.battleVisuals then assert(load(mod:read('battle_visuals.lua')))()(mod,world,game) end
+    if world.battleVisuals then assert(load(mod:read('battle_settings.lua')))()(mod,world,game) end
     if world.startup and world.pokedex.registrationEntries then assert(load(mod:read("collection_screens.lua"),"@hns/collection_screens.lua"))()(mod,world,game) end
     if world.services then assert(load(mod:read('bag_services.lua'),'@hns/bag_services.lua'))()(mod,world,game) end
     if world.presentation then assert(load(mod:read("field_presentation.lua"),"@hns/field_presentation.lua"))()(mod,world,game) end

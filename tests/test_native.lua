@@ -149,6 +149,11 @@ run.loader.game=game
 Runtime.emit("game.ready",{game=game})
 T.eq(#run.errors,0,"game.ready installs without errors")
 T.check(game._hnsExploration~=nil,"native integration installed")
+if arg[3]=='expansion' then
+  require('src.core.game3.items_data').installPack({items=data.gen3Items._byId})
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_expansion.lua')(T,game,world,maps)
+  run:release();T.finish('HnS expansion');return
+end
 T.eq(game.boot.hasContinue,false,"vanilla save is not offered as HnS Continue")
 T.eq(Native._cache:read("vanilla"),"unchanged","vanilla cache read preserved")
 local Extract=require("src.import.gba.extract_island1")
@@ -619,4 +624,5 @@ dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_tile_animation.lua')(T,game,w
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_field_services.lua')(T,game,world,maps)
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_engine_options.lua')(T,game,world)
 run.release()
+if world.battleVisuals then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_expansion.lua')(T,game,world,maps)end
 T.finish("HnS native exploration integration")

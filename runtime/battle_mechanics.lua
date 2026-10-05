@@ -20,7 +20,9 @@ return function(mod,w,game)
     local base=meta(id);local r=row(id);if not r or not r.stats then return base end
     local v={};for k,n in pairs(base or {})do v[k]=n end
     for _,k in ipairs({'catchRate','expYield','friendship','eggCycles'})do v[k]=r.stats[k]end
-    v.growthRate=growth[r.growthRate]or v.growthRate;v.genderRatio=r.genderRatio or v.genderRatio
+    v.growthRate=growth[r.growthRate]or v.growthRate
+    if r.femalePercent then v.genderRatio=math.min(254,math.floor(r.femalePercent*255/100))
+    elseif tonumber(r.genderRatio)then v.genderRatio=tonumber(r.genderRatio)end
     if r.evYield then for _,k in ipairs({'hp','atk','def','spe','spa','spd'})do
       v['ev'..k:sub(1,1):upper()..k:sub(2)]=r.evYield[k]
     end end

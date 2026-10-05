@@ -1,0 +1,138 @@
+-- Real engine behavior for the 0.7.3 expansion. Only unavailable ROM text
+-- and the escape effect's graphical handoff are replaced by fixtures.
+return function(T,game,w,maps)
+  local Rt=require('src.core.game3.runtime');local Space=require('src.core.game3.scripting.space')
+  local Flags=require('src.core.game3.scripting.flags');local P=require('src.core.game3.player')
+  local O=require('src.core.game3.objects');local Pokemon=require('src.core.game3.pokemon')
+  local State=require('src.core.game3.battle.state');local Engine=require('src.core.game3.battle.engine')
+  local Adapter=require('src.core.game3.battle.adapter');local Moves=require('src.core.game3.battle.moves')
+  local E=require('src.core.game3.battle.effect_ids');local Rules=require('src.core.game3.battle.rules')
+  local C=require('src.core.game3.constants').of('emerald');local Rtc=require('src.core.game3.rtc')
+  local Bag=require('src.core.game3.bag');local ItemUse=require('src.core.game3.item_use')
+  local Warp=require('src.core.game3.warp');local Map=require('src.core.game3.map')
+  local Msg=require('src.ui.game3.message');local Ui=require('src.core.game3.battle.ui')
+  local B=require('src.core.game3.battle');local Intro=require('src.core.game3.battle.intro_seq')
+  local IR=require('src.core.game3.scripting.text_ir');local Text=require('src.core.game3.rom_text')
+  local Writer=require('src.io.LuaWriter');local Enc=require('src.core.game3.encounters')
+  local H=game._hnsRules.rules;local Time=game._hnsTime.time;local F=game._hnsFollower.follower
+  local V=game._hnsBattleVisuals.visuals;local S=game._hnsBattleSettings.settings
+  local saved={};local function keep(t,keys)for _,key in ipairs(keys)do saved[#saved+1]={t=t,k=key,v=t[key]}end end
+  keep(Rt,{'session','active','_game'});keep(Space,{'store','active','vm','mapId'});keep(game,{'session','currentMap','phase','boot','input'})
+  keep(B,{'_st','_adapter','_phase','_pendingEnd'});keep(Map,{'current'});keep(Warp,{'_pending','_busy','startEscapeRope'})
+  keep(ItemUse,{'setUpOnFieldCallback'});keep(Msg,{'show'});keep(Enc,{'_tables'})
+  Enc._tables={};for k,v in pairs(saved[#saved].v or {})do Enc._tables[k]=v end
+  local s={version='emerald',map='EM_HNS_ROUTE29_HNS',name='GENE',party={},bag=Bag.new(),flags={},vars={}}
+  Rt.active=true;Rt.session=s;Rt._game=game;game.session=s;game.currentMap=s.map;game.phase='field'
+  Space.store=Flags.newStore();Flags.setFlag(Space.store,nil,w.startup.settings.initializedFlag)
+  local rows={};for _,page in ipairs(w.startup.settings.pages)do for _,r in ipairs(page.rows)do rows[r.id]=r;Flags.setVar(Space.store,nil,r.var,r.default)end end
+  local function setting(name,v)Flags.setVar(Space.store,nil,assert(rows[name],name).var,v)end
+  local fixtures={sText_ExclamationMark='!',sText_WildPkmnPrefix='Wild ',sText_FoePkmnPrefix='Foe ',sText_AttackerUsedX='{B_ATK_NAME_WITH_PREFIX} used {B_BUFF2}',
+    STRINGID_PKMNWASPARALYZED='The Pokémon is paralyzed!',STRINGID_BUTNOTHINGHAPPENED='But nothing happened!',
+    gText_PlayerUsedVar2='{PLAYER} used the {STR_VAR_2}.',gText_DadsAdvice='This is not the time.',
+    STRINGID_GOTAWAYSAFELY='Got away safely!',STRINGID_CANTESCAPE="Can't escape!"}
+  for key,text in pairs(fixtures)do keep(Text.overrides,{key});Text.overrides[key]=IR.fromAscii(text)end
+  keep(Moves._rom,{86,150});keep(Pokemon._moveNames,{86,150})
+  Moves._rom[86]={effect=E.PARALYZE,power=0,type=13,accuracy=100,pp=20,target=0,flags=0}
+  Moves._rom[150]={effect=E.SPLASH,power=0,type=0,accuracy=0,pp=40,target=0,flags=0}
+  Pokemon._moveNames[86]='THUNDER WAVE';Pokemon._moveNames[150]='SPLASH'
+  local function mon(sp)
+    return {species=sp or 158,nickname='MON',level=20,hp=100,maxHp=100,attack=60,defense=60,spAtk=60,spDef=60,speed=80,
+      ability=0,otId=12345,otName='GENE',personality=8,moves={86,150},pp={20,40},ivs={},evs={}}
+  end
+  local p,e=mon(),mon(19);s.party={p}
+  local st=State.new({session=s,wild=true,playerParty=s.party,foeParty={e}});st.session=s;st.rng=function(lo,hi)if hi==100 then return 1 end;return hi end
+  local ad=Adapter.new(st);st.player.type1=0;st.player.type2=0;st.enemy.type1=0;st.enemy.type2=0
+  Engine.resolveMove(st.player,st.enemy,86,1,ad,st,{})
+  T.eq(st.enemy.mon.status,'PAR','real Thunder Wave inflicts persistent paralysis')
+  T.eq(Rules.speedOf(st.enemy,st,ad),20,'paralysis quarters speed under HnS source Gen 3 configuration')
+  for turn=1,5 do
+    Engine.clearTurnFlags(st);Engine.resolveMove(st.enemy,st.player,150,2,ad,st,{})
+    Engine.collectResidualEvents(st,ad);T.eq(st.enemy.mon.status,'PAR','paralysis survives end of turn '..turn)
+  end
+  State.syncBattlerToParty(st.enemy,e);local reloaded=assert(load('return '..Writer.encode(e)))()
+  T.eq(reloaded.status,'PAR','paralysis persists through save serialization')
+  ad:clearStatus(st.enemy);T.eq(st.enemy.mon.status,nil,'native cure clears persistent paralysis')
+  local legacy=mon();legacy.status=64;legacy.status1=64
+  local migrated=State.makeBattler(legacy,'player',{st=st});T.eq(legacy.status,'PAR','GBA numeric status migrates');T.eq(legacy.status1,nil,'stale legacy bitfield removed')
+  ad:clearStatus(migrated);State.makeBattler(legacy,'player',{st=st});T.eq(legacy.status,nil,'cured legacy paralysis does not return')
+  local bd=Pokemon.stats(158);T.eq(bd.hp,50,'Totodile source base HP');T.eq(bd.atk,65,'Totodile source base Attack')
+  -- Record escape entry using native Warp.request, then retain it across stairs.
+  Map.current='EM_HNS_VIOLET_CITY_HNS';P.facing='up';Warp._busy=false
+  Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_1F_HNS',8,14,'up',{doorX=19,doorY=6})
+  T.eq(s.escapeWarp.map,'EM_HNS_VIOLET_CITY_HNS','native tower entry saves escape destination')
+  local entrance=s.escapeWarp;Warp._busy=false;Map.current='EM_HNS_SPROUT_TOWER_1F_HNS'
+  Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_2F_HNS',4,4,'up',{})
+  T.eq(s.escapeWarp,entrance,'internal tower stairs retain outdoor escape destination')
+  local escaped;Warp.startEscapeRope=function(_,map,x,y)escaped={map,x,y}end
+  ItemUse.setUpOnFieldCallback=function(_,fn)fn();return true end;Msg.show=function(_,opts)opts.done()end
+  local rope=C:require('items','ITEM_ESCAPE_ROPE')
+  for _,floor in ipairs({'1F','2F','3F'})do
+    s.map='EM_HNS_SPROUT_TOWER_'..floor..'_HNS';Bag.add(s.bag,rope,1)
+    T.eq(maps[s.map].allowEscaping,1,'source escape flag on '..floor)
+    T.eq(ItemUse.useEscapeRope(s,s.bag,rope),true,'native Escape Rope works on tower '..floor)
+    T.eq(Bag.count(s.bag,rope),0,'successful rope consumes one on '..floor)
+    T.eq(escaped[1],entrance.map,'rope returns to saved entrance '..floor)
+  end
+  setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',1);Bag.add(s.bag,rope,1)
+  T.eq(ItemUse.useEscapeRope(s,s.bag,rope),false,'source difficulty option prevents Escape Rope');T.eq(Bag.count(s.bag,rope),1,'forbidden rope not consumed')
+  setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',0)
+  s.map='EM_HNS_ROUTE29_HNS';setting('ITEM_FEATURES_RTC_TYPE',1)
+  Rtc.calcLocalTimeOffset(s,0,18,59,0);for i=1,150 do Time.tick(s,1/60)end
+  T.eq(Time.save(s).seconds,18*3600+59*60+48,'Fake RTC advances 24 game seconds per played second')
+  T.eq(Time.period(Rtc.calcLocalTime(s)),'Evening','encounter evening before 19:00')
+  for i=1,30 do Time.tick(s,1/60)end;T.eq(Time.period(Rtc.calcLocalTime(s)),'Night','night encounters begin at 19:00')
+  T.eq(Flags.getFlag(Space.store,nil,w.fieldPokemon.flags.dayHidden),true,'day Pokémon hidden at night')
+  T.eq(Flags.getFlag(Space.store,nil,w.fieldPokemon.flags.nightHidden),false,'night Pokémon visible at night')
+  local persisted=Flags.serialize(Space.store);s.flags=persisted.flags;s.vars=persisted.vars
+  local copy=assert(load('return '..Writer.encode(s)))();T.eq(Rtc.calcLocalTime(copy).hours,19,'Fake RTC serialized time used on reload')
+  for mid,pools in pairs(w.encounters.timed)do
+    T.eq(Writer.encode(Enc._tables[mid]),Writer.encode(pools.Night or pools.Day),'actual encounter roller gets night pool '..mid)
+  end
+  -- Palette channel arithmetic is checked against the C oracle separately.
+  local a,b,weight=Time.blend({hours=7,minutes=0});T.eq(weight,128,'source halfway morning fade')
+  T.eq(Time.channel(31,a[1],b[1],weight),20,'source integer 5-bit channel blend')
+  setting('ITEM_MAIN_FOLLOWER',0);setting('ITEM_MAIN_LARGE_FOLLOWER',1)
+  local faint=mon(152);faint.hp=0;local egg=mon(175);egg.isEgg=true;local lead=mon(158);s.party={faint,egg,lead}
+  T.eq(F.lead(s),lead,'follower chooses first healthy non-egg')
+  O.loadMap(game,s.map,maps[s.map]);P.reset(9,8,'left');F.actor=nil;F.refresh();T.eq(F.actor.visible,false,'new follower waits for player step')
+  F.step(9,8,16);for i=1,16 do F.tick()end;F.step(8,8,16);for i=1,16 do F.tick()end
+  T.eq(F.actor.cellX,8,'follower reaches previous player cell');T.eq(F.actor.facing,'left','follower faces movement')
+  T.eq(O.walkPhase(F.actor),0,'native follower walking animation accepts actor state')
+  T.eq(O.at(8,8),F.actor,'native talk query finds follower');T.eq(O.blocks(8,8),false,'follower does not block player path')
+  local found=false;for _,actor in ipairs(O.forDraw())do if actor==F.actor then found=true end end;T.check(found,'native renderer gets follower')
+  local Coll=require('src.core.game3.collision');Coll.bindMap(s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
+  T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')
+  lead.isShiny=true;local normal=F.actor.graphicsId;F.refresh();T.neq(F.actor.graphicsId,normal,'shiny follower selects source shiny palette')
+  setting('ITEM_MAIN_FOLLOWER',1);F.refresh();T.eq(F.actor,nil,'Follower OFF removes actor');setting('ITEM_MAIN_FOLLOWER',0)
+  local big=mon(C:require('species','SPECIES_LUGIA'));s.party={big};T.eq(F.allowed(s,big),false,'Big Followers OFF hides 64px Lugia')
+  setting('ITEM_MAIN_LARGE_FOLLOWER',0);T.eq(F.allowed(s,big),true,'Big Followers ON permits outdoors')
+  local indoor;for mid,map in pairs(maps)do if map.mapType==8 then indoor=mid;break end end;s.map=assert(indoor);T.eq(F.allowed(s,big),false,'source MAP_TYPE_INDOOR hides large sprites')
+  s.map='EM_HNS_NEW_BARK_TOWN_LAB_HNS';T.eq(F.allowed(s,big),true,'source MAP_TYPE_NONE lab preserves source large-follower behavior')
+  P.surfing=true;T.eq(F.allowed(s,big),false,'surfing hides follower');P.surfing=false
+  s.map='EM_HNS_ROUTE29_HNS';s.party={lead};setting('ITEM_BATTLE_NEW_BACKGROUNDS',0)
+  local row,key=V.terrain(0,s);T.check(key:find('_old_Night',1,true)~=nil,'old terrain uses night palette')
+  setting('ITEM_BATTLE_NEW_BACKGROUNDS',1);row,key=V.terrain(0,s);T.check(key:find('_modern_Night',1,true)~=nil,'modern terrain selection works')
+  Rtc.calcLocalTimeOffset(s,0,19,0,0);row,key=V.terrain(0,s);T.check(key:find('_Twilight',1,true)~=nil,'battle twilight lasts to 20:00 independently of encounters')
+  setting('ITEM_BATTLE_NEW_BATTLEUI',1);T.eq(V.style(s),'gen4','Gen4 UI option selects source art');setting('ITEM_BATTLE_NEW_BATTLEUI',0);T.eq(V.style(s),'gen3','Gen3 UI option selects HnS art')
+  B._st=st;st.session=s;T.check(pcall(BgDraw or require('src.core.game3.battle.bg').draw,0,0,0,0),'actual battle background draws source terrain')
+  T.check(pcall(require('src.core.game3.battle.healthbox').draw,'player',st.player,{st=st}),'actual source healthbox draws native battler')
+  setting('ITEM_BATTLE_BALL_PROMPT',0);Bag.add(s.bag,4,2);T.check(S.enabled(st),'ball prompt requires usable balls and wild battle')
+  Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);local held='r'
+  local function keys(pressed)return {wasPressed=function(_,k)return k==pressed end,isDown=function(_,k)return held==k end}end
+  Ui.handleInput(keys('r'));held=nil;Ui.handleInput(keys());T.eq(Ui._pendingCommand.itemId,4,'R release sends actual throw command without bag menu')
+  -- Source boot machines complete without Emerald movie/title assets.
+  local Boot=require('src.ui.game3.boot');local boot=Boot.new(game);T.eq(boot.custom.mods.intro,'hns.intro','new boot selects HnS intro')
+  T.eq(boot.custom.mods.title,'hns.title','new boot selects HnS title')
+  local movie=game._hnsBoot.Intro.new();local input=keys();local result
+  for i=1,1400 do result=movie:update(input,1/60);if result then break end end
+  T.eq(result,'title','HnS intro finishes at title without Emerald scene');movie:destroy()
+  local Machine=require('src.ui.game3.rse.gba_machine');local machine=Machine.new()
+  local title=game._hnsBoot.Title.new(machine,{params=boot.custom.mods.params.titleParams})
+  for i=1,2000 do title:update(input,1/60);if title.phase=='phase3'then break end end
+  T.eq(title.phase,'phase3','actual source title reaches input phase');T.eq(machine.ppu.bg[1].layer,nil,'source HnS omits Emerald clouds')
+  title:update(keys('start'),1/60);for i=1,120 do result=title:update(input,1/60);if result then break end end
+  T.eq(result,'menu','START on HnS title enters native main menu');title:destroy()
+  Intro.reset();Ui.reset({headless=true});F.actor=nil;F.mon=nil
+  for i=#saved,1,-1 do local r=saved[i];r.t[r.k]=r.v end
+  print('HnS expansion: persistent status, source stats, tower escape, RTC/time encounters, native followers, terrain/UI options, shortcuts and boot machines')
+end

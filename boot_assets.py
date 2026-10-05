@@ -86,7 +86,7 @@ def build(source,engine,stage):
     a=code.index('      local w = ppu.scanline:initWave');b=code.index('      self.phase = "phase1"',a);code=code[:a]+code[b:]
     code=code.replace('self:createPressStartBanner(START_BANNER_X, 108)','self:createPressStartBanner(START_BANNER_X, 138)')
     code=code.replace('Sprites.startAnim(s, i + NUM_PRESS_START_FRAMES)','Sprites.startAnim(s, i + NUM_PRESS_START_FRAMES)\n    s.data[0] = 1')
-    code=code.replace('Palette.rgb(24, 31, 12)','Palette.rgb(1, 1, 1)').replace('self:updateLegendaryMarkingColor()','-- HnS has no Emerald legendary marking cycle')
+    code=code.replace('Palette.rgb(24, 31, 12)','Palette.rgb(1, 1, 1)').replace('self:updateLegendaryMarkingColor(band(d[0], 0xFF))','-- HnS has no Emerald legendary marking cycle')
     (stage/'hns_title.lua').write_text(code)
     code=(engine/'src/ui/game3/intro_movie.lua').read_text().replace('local IntroMovie = {}','local Source\nlocal IntroMovie = {}\nfunction IntroMovie.configure(s)Source=s end')
     code=code.replace('    self.pal:reset()\n    Bg.initFromTemplates({ { bg = 0','    self.pal:reset()\n    Audio.playSong(Source.song,{restart=true})\n    Bg.initFromTemplates({ { bg = 0',1)
