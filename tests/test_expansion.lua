@@ -13,7 +13,7 @@ return function(T,game,w,maps)
   local Msg=require('src.ui.game3.message');local Ui=require('src.core.game3.battle.ui')
   local B=require('src.core.game3.battle');local Intro=require('src.core.game3.battle.intro_seq')
   local IR=require('src.core.game3.scripting.text_ir');local Text=require('src.core.game3.rom_text')
-  local Writer=require('src.io.LuaWriter');local Enc=require('src.core.game3.encounters')
+  local Writer=require('src.import.LuaWriter');local Enc=require('src.core.game3.encounters')
   local H=game._hnsRules.rules;local Time=game._hnsTime.time;local F=game._hnsFollower.follower
   local V=game._hnsBattleVisuals.visuals;local S=game._hnsBattleSettings.settings
   local saved={};local function keep(t,keys)for _,key in ipairs(keys)do saved[#saved+1]={t=t,k=key,v=t[key]}end end
@@ -23,13 +23,13 @@ return function(T,game,w,maps)
   Enc._tables={};for k,v in pairs(saved[#saved].v or {})do Enc._tables[k]=v end
   local s={version='emerald',map='EM_HNS_ROUTE29_HNS',name='GENE',party={},bag=Bag.new(),flags={},vars={}}
   Rt.active=true;Rt.session=s;Rt._game=game;game.session=s;game.currentMap=s.map;game.phase='field'
-  Space.store=Flags.newStore();Flags.setFlag(Space.store,nil,w.startup.settings.initializedFlag)
+  Space.store=Flags.newStore();Flags.setFlag(Space.store,nil,w.startup.settings.initializedFlag,true)
   local rows={};for _,page in ipairs(w.startup.settings.pages)do for _,r in ipairs(page.rows)do rows[r.id]=r;Flags.setVar(Space.store,nil,r.var,r.default)end end
   local function setting(name,v)Flags.setVar(Space.store,nil,assert(rows[name],name).var,v)end
-  local fixtures={sText_ExclamationMark='!',sText_WildPkmnPrefix='Wild ',sText_FoePkmnPrefix='Foe ',sText_AttackerUsedX='{B_ATK_NAME_WITH_PREFIX} used {B_BUFF2}',
+  local fixtures={sText_ExclamationMark='!',sText_WildPkmnPrefix='Wild ',sText_FoePkmnPrefix='Foe ',STRINGID_SUPEREFFECTIVE='Super effective!',sText_SuperEffective='Super effective!',STRINGID_NOTVERYEFFECTIVE='Not very effective.',sText_NotVeryEffective='Not very effective.',sText_CriticalHit='A critical hit!',sText_AttackerUsedX='{B_ATK_NAME_WITH_PREFIX} used {B_BUFF2}',
     STRINGID_PKMNWASPARALYZED='The Pokémon is paralyzed!',STRINGID_BUTNOTHINGHAPPENED='But nothing happened!',
-    gText_PlayerUsedVar2='{PLAYER} used the {STR_VAR_2}.',gText_DadsAdvice='This is not the time.',
-    STRINGID_GOTAWAYSAFELY='Got away safely!',STRINGID_CANTESCAPE="Can't escape!"}
+    gText_PlayerUsedVar2='{PLAYER} used the {STR_VAR_2}.',gText_DadsAdvice='This is not the time.',gText_CantUseHere='Cannot use that here.',
+    STRINGID_PKMNWASFROZEN='The Pokémon is frozen!',STRINGID_PKMNENERGYDRAINED='Energy drained!',STRINGID_PKMNREGAINEDHEALTH='Health regained!',STRINGID_GOTAWAYSAFELY='Got away safely!',STRINGID_CANTESCAPE="Can't escape!"}
   for key,text in pairs(fixtures)do keep(Text.overrides,{key});Text.overrides[key]=IR.fromAscii(text)end
   keep(Moves._rom,{86,150});keep(Pokemon._moveNames,{86,150})
   Moves._rom[86]={effect=E.PARALYZE,power=0,type=13,accuracy=100,pp=20,target=0,flags=0}
@@ -44,18 +44,38 @@ return function(T,game,w,maps)
   local ad=Adapter.new(st);st.player.type1=0;st.player.type2=0;st.enemy.type1=0;st.enemy.type2=0
   Engine.resolveMove(st.player,st.enemy,86,1,ad,st,{})
   T.eq(st.enemy.mon.status,'PAR','real Thunder Wave inflicts persistent paralysis')
-  T.eq(Rules.speedOf(st.enemy,st,ad),20,'paralysis quarters speed under HnS source Gen 3 configuration')
+  T.eq(Engine.speedOf(st.enemy,st,ad),20,'paralysis quarters speed under HnS source Gen 3 configuration')
   for turn=1,5 do
-    Engine.clearTurnFlags(st);Engine.resolveMove(st.enemy,st.player,150,2,ad,st,{})
+    Engine.clearTurnFlags(st.player);Engine.clearTurnFlags(st.enemy);Engine.resolveMove(st.enemy,st.player,150,2,ad,st,{})
     Engine.collectResidualEvents(st,ad);T.eq(st.enemy.mon.status,'PAR','paralysis survives end of turn '..turn)
   end
-  State.syncBattlerToParty(st.enemy,e);local reloaded=assert(load('return '..Writer.encode(e)))()
+  State.syncBattlerToParty(st.enemy,{e});local reloaded=assert(load(Writer.encode(e)))()
   T.eq(reloaded.status,'PAR','paralysis persists through save serialization')
   ad:clearStatus(st.enemy);T.eq(st.enemy.mon.status,nil,'native cure clears persistent paralysis')
   local legacy=mon();legacy.status=64;legacy.status1=64
   local migrated=State.makeBattler(legacy,'player',{st=st});T.eq(legacy.status,'PAR','GBA numeric status migrates');T.eq(legacy.status1,nil,'stale legacy bitfield removed')
   ad:clearStatus(migrated);State.makeBattler(legacy,'player',{st=st});T.eq(legacy.status,nil,'cured legacy paralysis does not return')
   local bd=Pokemon.stats(158);T.eq(bd.hp,50,'Totodile source base HP');T.eq(bd.atk,65,'Totodile source base Attack')
+  if game._hnsExpandedMoves then
+    local X=game._hnsExpandedMoves.moves
+    local ice=assert(X.id('ICE_FANG'));local drain=assert(X.id('DRAIN_PUNCH'));local tail=assert(X.id('AQUA_TAIL'))
+    setting('ITEM_MODE_MODERN_MOVES',1);setting('ITEM_MODE_SPLIT',1)
+    T.eq(Moves.get(ice).power,65,'expanded Ice Fang uses source power');T.eq(Moves.get(drain).category,'physical','Drain Punch uses source physical category')
+    T.eq(Pokemon.movePp(tail),10,'expanded moves give correct PP');T.eq(Pokemon.moveName(ice),'ICE FANG','expanded names work in native menus')
+    local learnt=Pokemon.learnset(158);local found=false;for _,entry in ipairs(learnt)do if entry[2]==ice then found=true end end
+    T.check(found,'Modern Moves uses source Totodile Ice Fang learnset')
+    setting('ITEM_MODE_MODERN_MOVES',0);local legacy=Pokemon.learnset(158);found=false;for _,entry in ipairs(legacy)do if entry[2]==ice then found=true end end
+    T.eq(found,false,'classic source learnset excludes later Ice Fang');setting('ITEM_MODE_MODERN_MOVES',1)
+    st.player.mon.moves={drain,tail,ice};st.player.mon.pp={10,10,15};st.player.mon.hp=50;st.enemy.mon.hp=100;st.enemy.mon.status=nil;st.enemy.status=nil
+    Engine.resolveMove(st.player,st.enemy,drain,1,ad,st,{})
+    T.check(st.enemy.mon.hp<100,'real Drain Punch deals damage');T.check(st.player.mon.hp>50,'real Drain Punch absorbs HP')
+    st.enemy.mon.hp=100;st.enemy.mon.status=nil;st.enemy.status=nil;st.enemy.expMovedThisTurn=nil
+    local M=Engine.newContext(st.player,st.enemy,ice,3,ad,st,{},{hits={}},{});M.move=Moves.get(ice)
+    local Secondary=require('src.core.game3.battle.effects.secondary');local roll=ad.roll
+    ad.roll=function()return 10 end;Secondary.withChance(M,'HNS_ADDITIONAL_LIST');T.eq(st.enemy.mon.status,nil,'source 10 percent effect excludes roll 10');T.eq(st.enemy.flinched,nil,'independent flinch chance excludes roll 10')
+    ad.roll=function()return 9 end;Secondary.withChance(M,'HNS_ADDITIONAL_LIST');T.eq(st.enemy.mon.status,'FRZ','source Ice Fang freeze chance includes roll 9');T.eq(st.enemy.flinched,true,'source Ice Fang rolls flinch independently')
+    ad.roll=roll
+  end
   -- Record escape entry using native Warp.request, then retain it across stairs.
   Map.current='EM_HNS_VIOLET_CITY_HNS';P.facing='up';Warp._busy=false
   Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_1F_HNS',8,14,'up',{doorX=19,doorY=6})
@@ -64,17 +84,17 @@ return function(T,game,w,maps)
   Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_2F_HNS',4,4,'up',{})
   T.eq(s.escapeWarp,entrance,'internal tower stairs retain outdoor escape destination')
   local escaped;Warp.startEscapeRope=function(_,map,x,y)escaped={map,x,y}end
-  ItemUse.setUpOnFieldCallback=function(_,fn)fn();return true end;Msg.show=function(_,opts)opts.done()end
+  ItemUse.setUpOnFieldCallback=function(fn)fn();return true end;Msg.show=function(_,opts)opts.done()end
   local rope=C:require('items','ITEM_ESCAPE_ROPE')
   for _,floor in ipairs({'1F','2F','3F'})do
     s.map='EM_HNS_SPROUT_TOWER_'..floor..'_HNS';Bag.add(s.bag,rope,1)
     T.eq(maps[s.map].allowEscaping,1,'source escape flag on '..floor)
     T.eq(ItemUse.useEscapeRope(s,s.bag,rope),true,'native Escape Rope works on tower '..floor)
-    T.eq(Bag.count(s.bag,rope),0,'successful rope consumes one on '..floor)
+    T.eq(Bag.get(s.bag,rope),0,'successful rope consumes one on '..floor)
     T.eq(escaped[1],entrance.map,'rope returns to saved entrance '..floor)
   end
   setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',1);Bag.add(s.bag,rope,1)
-  T.eq(ItemUse.useEscapeRope(s,s.bag,rope),false,'source difficulty option prevents Escape Rope');T.eq(Bag.count(s.bag,rope),1,'forbidden rope not consumed')
+  T.eq(ItemUse.useEscapeRope(s,s.bag,rope),false,'source difficulty option prevents Escape Rope');T.eq(Bag.get(s.bag,rope),1,'forbidden rope not consumed')
   setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',0)
   s.map='EM_HNS_ROUTE29_HNS';setting('ITEM_FEATURES_RTC_TYPE',1)
   Rtc.calcLocalTimeOffset(s,0,18,59,0);for i=1,150 do Time.tick(s,1/60)end
@@ -84,7 +104,7 @@ return function(T,game,w,maps)
   T.eq(Flags.getFlag(Space.store,nil,w.fieldPokemon.flags.dayHidden),true,'day Pokémon hidden at night')
   T.eq(Flags.getFlag(Space.store,nil,w.fieldPokemon.flags.nightHidden),false,'night Pokémon visible at night')
   local persisted=Flags.serialize(Space.store);s.flags=persisted.flags;s.vars=persisted.vars
-  local copy=assert(load('return '..Writer.encode(s)))();T.eq(Rtc.calcLocalTime(copy).hours,19,'Fake RTC serialized time used on reload')
+  local copy=assert(load(Writer.encode(s)))();T.eq(Rtc.calcLocalTime(copy).hours,19,'Fake RTC serialized time used on reload')
   for mid,pools in pairs(w.encounters.timed)do
     T.eq(Writer.encode(Enc._tables[mid]),Writer.encode(pools.Night or pools.Day),'actual encounter roller gets night pool '..mid)
   end
@@ -100,7 +120,7 @@ return function(T,game,w,maps)
   T.eq(O.walkPhase(F.actor),0,'native follower walking animation accepts actor state')
   T.eq(O.at(8,8),F.actor,'native talk query finds follower');T.eq(O.blocks(8,8),false,'follower does not block player path')
   local found=false;for _,actor in ipairs(O.forDraw())do if actor==F.actor then found=true end end;T.check(found,'native renderer gets follower')
-  local Coll=require('src.core.game3.collision');Coll.bindMap(s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
+  local Coll=require('src.core.game3.collision');Coll.bindMap(game,s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
   T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')
   lead.isShiny=true;local normal=F.actor.graphicsId;F.refresh();T.neq(F.actor.graphicsId,normal,'shiny follower selects source shiny palette')
   setting('ITEM_MAIN_FOLLOWER',1);F.refresh();T.eq(F.actor,nil,'Follower OFF removes actor');setting('ITEM_MAIN_FOLLOWER',0)
@@ -109,7 +129,7 @@ return function(T,game,w,maps)
   local indoor;for mid,map in pairs(maps)do if map.mapType==8 then indoor=mid;break end end;s.map=assert(indoor);T.eq(F.allowed(s,big),false,'source MAP_TYPE_INDOOR hides large sprites')
   s.map='EM_HNS_NEW_BARK_TOWN_LAB_HNS';T.eq(F.allowed(s,big),true,'source MAP_TYPE_NONE lab preserves source large-follower behavior')
   P.surfing=true;T.eq(F.allowed(s,big),false,'surfing hides follower');P.surfing=false
-  s.map='EM_HNS_ROUTE29_HNS';s.party={lead};setting('ITEM_BATTLE_NEW_BACKGROUNDS',0)
+  s.map='EM_HNS_ROUTE29_HNS';s.party={lead};Rtc.calcLocalTimeOffset(s,0,20,0,0);setting('ITEM_BATTLE_NEW_BACKGROUNDS',0)
   local row,key=V.terrain(0,s);T.check(key:find('_old_Night',1,true)~=nil,'old terrain uses night palette')
   setting('ITEM_BATTLE_NEW_BACKGROUNDS',1);row,key=V.terrain(0,s);T.check(key:find('_modern_Night',1,true)~=nil,'modern terrain selection works')
   Rtc.calcLocalTimeOffset(s,0,19,0,0);row,key=V.terrain(0,s);T.check(key:find('_Twilight',1,true)~=nil,'battle twilight lasts to 20:00 independently of encounters')

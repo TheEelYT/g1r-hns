@@ -99,6 +99,8 @@ return function(mod,w,game)
     if S.ballX>-18 and game._hnsBattleVisuals then
       local row=game._hnsBattleVisuals.visuals.row();local a=row.ballPrompt
       love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(a.file,a.width,a.height),S.ballX-16,(Ui._st.double and 78 or 68)-16)
+      local balls=S.balls(Ui._st);local id=S.ball or (Ui._st.session.modData or {}).hnsLastBall or balls[1]
+      require('src.ui.game3.rse.bag_chrome').drawItemIcon(id,S.ballX-12,(Ui._st.double and 78 or 68)-12)
     end
     if S.quickWindow()and H.value('ITEM_BATTLE_LR_RUN',Intro._st.session)==0 then
       local kind=H.value('ITEM_BATTLE_RUN_TYPE',Intro._st.session)

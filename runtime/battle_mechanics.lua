@@ -74,7 +74,8 @@ return function(mod,w,game)
       and not ctx.battle.pyramid then
       -- Preserve the pinned source's Random() & 512 two-valued threshold.
       local threshold=require('bit').band(ctx.rng(0,65535),512)
-      return math.floor(ctx.pSpd*128/math.max(1,ctx.eSpd))+ctx.attempts*30>threshold
+      local speedVar=(math.floor(ctx.pSpd*128/math.max(1,ctx.eSpd))+ctx.attempts*30)%256
+      return speedVar>threshold
     end
     return next(ctx)
   end)end

@@ -14,6 +14,8 @@ return function(mod,w,game)
     s=s or Rt.getSession();local env=ids[(tonumber(id)or Bg.terrainId())+1]or 'BUILDING'
     local m=s and w.maps[s.map]
     if m and env~='LEADER'and env~='CHAMPION'and env~='FRONTIER'then env=w.battleVisuals.scenes[m.hnsBattleScene]or env end
+    local trainer=B._st and B._st.trainerId;local record=trainer and w.trainers.records[tostring(trainer)]
+    if record and (record.source=='TRAINER_CLAIR_1_HNS'or record.source=='TRAINER_BLAINE_HNS')then env='VOLCANO_CAVE'end
     local t=Rtc.calcLocalTime(s);local h=t.hours
     local period=(h<6 or h>=20)and 'Night'or (h<10 or h>=18)and 'Twilight'or 'Day'
     local style=H.value('ITEM_BATTLE_NEW_BACKGROUNDS',s)==1 and 'modern'or 'old'
@@ -49,8 +51,8 @@ return function(mod,w,game)
     local p=V.row().palette;return color(p[V.style()=='gen4'and 4 or 3]),{fg=color(p[2]),shadow=color(p[4])},{fg=color(p[12]),shadow=color(p[4])},{fg=color(p[11]),shadow=color(p[4])}
   end
   function source.name(name,gender,x,y)
-    local p,fg,sh=palettes();U.text(name,x,y,fg,sh,'small')
-    local pos=x+U.width(name,'small');if gender=='male'or gender=='M'then Font.drawGlyph(0xB5,pos,y,{colors={fg=color(p[12]),shadow=sh}})
+    local p,fg,sh=palettes();local font=U.width(name,'small')>55 and 'small_narrower'or 'small';U.text(name,x,y,fg,sh,font)
+    local pos=x+U.width(name,font);if gender=='male'or gender=='M'then Font.drawGlyph(0xB5,pos,y,{colors={fg=color(p[12]),shadow=sh}})
     elseif gender=='female'or gender=='F'then Font.drawGlyph(0xB6,pos,y,{colors={fg=color(p[11]),shadow=sh}})end
   end
   function source.hp(cur,max,x,y)

@@ -58,6 +58,7 @@ import startup
 import followers
 import boot_assets
 import battle_assets
+import expanded_moves
 
 
 def write_json(path, value):
@@ -504,6 +505,7 @@ def build(args):
         presentation_data=field_presentation.build(source,stage,packed_maps,source_maps,layouts,parse_palette)
         import service_assets
         services=service_assets.build(source,engine,stage,pairs,packed_maps,source_maps,text,scripts,opening_data,lua,parse_palette)
+        expanded_data=expanded_moves.build(source,engine)
         battle_data=battle_assets.build(source,engine,stage,packed_maps,source_maps)
         boot_data=boot_assets.build(source,engine,stage)
         follower_data=followers.build(source,engine,stage,opening_data,scripts,parse_palette)
@@ -513,7 +515,7 @@ def build(args):
         events_data["spriteCount"]=len(opening_data["sprites"])
         data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
-                "battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
+                "expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent
         # top-level datasets in their own functions as this port grows.
         world_lua="-- Private source-converted data. Rebuild with build_port.py.\nlocal world={}\n"

@@ -57,7 +57,7 @@ return function(mod,w,game)
       local f=w.fieldPokemon.flags;local changed=false
       for id,value in pairs({[f.dayHidden]=period=='Night',[f.nightHidden]=period~='Night'})do
         if Flags.getFlag(Space.store,nil,id)~=value then
-          if value then Flags.setFlag(Space.store,nil,id)else Flags.clearFlag(Space.store,nil,id)end;changed=true
+          Flags.setFlag(Space.store,nil,id,value);changed=true
         end
       end
       if changed then O.refreshVisibility()end
