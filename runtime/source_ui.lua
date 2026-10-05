@@ -21,10 +21,13 @@ return function(mod,spec)
     local im=U.image(f.fg,f.width,f.height);local sh=U.image(f.shadow,f.width,f.height)
     for c in U.chars(s)do
       if c=='\n' then x=start;y=y+(pitch or 16) else
-        local id=spec.glyphs[c] or spec.glyphs['?'];local q=love.graphics.newQuad(id%16*16,math.floor(id/16)*16,16,16,f.width,f.height)
+        -- Source CopyGlyphToWindow copies the glyph width, not its full cell.
+        -- Narrow S has unused ink beyond that width which overlaps the next letter.
+        local id=spec.glyphs[c] or spec.glyphs['?'];local advance=f.widths[id+1] or 6
+        local q=love.graphics.newQuad(id%16*16,math.floor(id/16)*16,advance,16,f.width,f.height)
         love.graphics.setColor(unpack(shadow or spec.colors[4]));love.graphics.draw(sh,q,x,y)
         love.graphics.setColor(unpack(fg or spec.colors[3]));love.graphics.draw(im,q,x,y)
-        x=x+(f.widths[id+1] or 6)
+        x=x+advance
       end
     end
     love.graphics.setColor(1,1,1,1)
@@ -81,7 +84,7 @@ return function(mod,spec)
   function U.glyph(name,x,y,font,fg,shadow)
     if spec.art[name]then local im,a=U.art(name);love.graphics.setColor(1,1,1,1);love.graphics.draw(im,love.graphics.newQuad(0,0,a.width,a.height,a.width,a.height),x,y);return end
     local id=assert(spec.tokens[name]or(name=='MN'and spec.tokens.PK+1),name);local f=spec.fonts[font or 'small']
-    local q=love.graphics.newQuad(id%16*16,math.floor(id/16)*16,16,16,f.width,f.height)
+    local q=love.graphics.newQuad(id%16*16,math.floor(id/16)*16,f.widths[id+1]or 6,16,f.width,f.height)
     love.graphics.setColor(unpack(shadow or spec.colors[4]));love.graphics.draw(U.image(f.shadow,f.width,f.height),q,x,y)
     love.graphics.setColor(unpack(fg or spec.colors[3]));love.graphics.draw(U.image(f.fg,f.width,f.height),q,x,y)
     love.graphics.setColor(1,1,1,1)

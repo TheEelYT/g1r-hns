@@ -467,7 +467,7 @@ def build(args):
                 "environment":"INDOOR" if mt in (4,8,9) else "ROUTE" if mt in (3,5,6) else "TOWN",
                 "native":True,"pair":pairid,"warps":warps,"connections":conns,"objects":[],"bgEvents":bg,
                 "coordEvents":[],"mapScripts":{},"music":0,"weather":0,"mapType":mt,
-                "allowRunning":int(m["allow_running"]),"allowEscaping":0,"bikingAllowed":int(m["allow_cycling"]),
+                "allowRunning":int(m["allow_running"]),"allowEscaping":int(m["allow_escaping"]),"bikingAllowed":int(m["allow_cycling"]),
                 "showMapName":0,"borderWidth":2,"borderHeight":2,"hnsLayoutFile":rel}
             packed_maps[mapid]["hnsSourceId"] = m["id"]
             packed_maps[mapid]["hnsRegion"] = m.get("region", "REGION_HOENN")
