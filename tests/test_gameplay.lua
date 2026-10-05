@@ -35,7 +35,8 @@ return function(T,game,world,maps)
   local function mode(id,value)option('ITEM_MODE_'..id,value)end
   local function difficulty(id,value)option('ITEM_DIFFICULTY_'..id,value)end
   for _,id in ipairs(Q.rules.implemented)do T.eq(settings[id].implemented,true,'active rule no longer marked pending '..id)end
-  T.eq(settings.ITEM_MODE_MODERN_MOVES.implemented,false,'expanded learnsets stay visibly pending')
+  T.eq(settings.ITEM_MODE_MODERN_MOVES.implemented,true,'compatible source expanded learnsets are active')
+  T.check(#world.expandedMoves.omitted>0,'unsupported expanded move effects remain explicitly tracked')
   local function fixture(id,name,row)
     keep(Moves._rom,{id});keep(Pokemon._moveNames,{id});Moves._rom[id]=row;Pokemon._moveNames[id]=name;Moves._numByName=nil
   end

@@ -623,6 +623,6 @@ dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_collection_screens.lua')(T,ga
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_tile_animation.lua')(T,game,world)
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_field_services.lua')(T,game,world,maps)
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_engine_options.lua')(T,game,world)
-run.release()
 if world.battleVisuals then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_expansion.lua')(T,game,world,maps)end
+run.release()
 T.finish("HnS native exploration integration")

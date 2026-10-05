@@ -26,10 +26,10 @@ return function(T,game,w,maps)
   Space.store=Flags.newStore();Flags.setFlag(Space.store,nil,w.startup.settings.initializedFlag,true)
   local rows={};for _,page in ipairs(w.startup.settings.pages)do for _,r in ipairs(page.rows)do rows[r.id]=r;Flags.setVar(Space.store,nil,r.var,r.default)end end
   local function setting(name,v)Flags.setVar(Space.store,nil,assert(rows[name],name).var,v)end
-  local fixtures={sText_ExclamationMark='!',sText_WildPkmnPrefix='Wild ',sText_FoePkmnPrefix='Foe ',STRINGID_SUPEREFFECTIVE='Super effective!',sText_SuperEffective='Super effective!',STRINGID_NOTVERYEFFECTIVE='Not very effective.',sText_NotVeryEffective='Not very effective.',sText_CriticalHit='A critical hit!',sText_AttackerUsedX='{B_ATK_NAME_WITH_PREFIX} used {B_BUFF2}',
+  local fixtures={sText_WildPkmnAppeared='A wild Pokémon appeared!',sText_GoPkmn='Go Pokémon!',sText_ExclamationMark='!',sText_WildPkmnPrefix='Wild ',sText_FoePkmnPrefix='Foe ',STRINGID_SUPEREFFECTIVE='Super effective!',sText_SuperEffective='Super effective!',STRINGID_NOTVERYEFFECTIVE='Not very effective.',sText_NotVeryEffective='Not very effective.',sText_CriticalHit='A critical hit!',sText_AttackerUsedX='{B_ATK_NAME_WITH_PREFIX} used {B_BUFF2}',
     STRINGID_PKMNWASPARALYZED='The Pokémon is paralyzed!',STRINGID_BUTNOTHINGHAPPENED='But nothing happened!',
     gText_PlayerUsedVar2='{PLAYER} used the {STR_VAR_2}.',gText_DadsAdvice='This is not the time.',gText_CantUseHere='Cannot use that here.',
-    STRINGID_PKMNWASFROZEN='The Pokémon is frozen!',STRINGID_PKMNENERGYDRAINED='Energy drained!',STRINGID_PKMNREGAINEDHEALTH='Health regained!',STRINGID_GOTAWAYSAFELY='Got away safely!',STRINGID_CANTESCAPE="Can't escape!"}
+    STRINGID_PKMNWASFROZEN='The Pokémon is frozen!',STRINGID_PKMNENERGYDRAINED='Energy drained!',STRINGID_PKMNREGAINEDHEALTH='Health regained!',STRINGID_GOTAWAYSAFELY='Got away safely!',STRINGID_CANTESCAPE="Can't escape!",STRINGID_CANTESCAPE2="Can't escape!"}
   for key,text in pairs(fixtures)do keep(Text.overrides,{key});Text.overrides[key]=IR.fromAscii(text)end
   keep(Moves._rom,{86,150});keep(Pokemon._moveNames,{86,150})
   Moves._rom[86]={effect=E.PARALYZE,power=0,type=13,accuracy=100,pp=20,target=0,flags=0}
@@ -96,6 +96,14 @@ return function(T,game,w,maps)
   setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',1);Bag.add(s.bag,rope,1)
   T.eq(ItemUse.useEscapeRope(s,s.bag,rope),false,'source difficulty option prevents Escape Rope');T.eq(Bag.get(s.bag,rope),1,'forbidden rope not consumed')
   setting('ITEM_DIFFICULTY_ESCAPE_ROPE_DIG',0)
+  setting('ITEM_DIFFICULTY_LESS_ESCAPES',1)
+  local rng=ad.rng;ad.rng=function()return function()return 0 end end
+  st.player.mon.speed=200;st.enemy.mon.speed=100;st.fleeAttempts=0
+  T.eq(Engine.tryFlee(st,ad,st.player),false,'Less Escapes preserves source byte wrap at 256')
+  st.player.mon.speed=80;st.fleeAttempts=0;T.eq(Engine.tryFlee(st,ad,st.player),true,'Less Escapes succeeds with zero source threshold')
+  ad.rng=function()return function()return 512 end end;st.fleeAttempts=0
+  T.eq(Engine.tryFlee(st,ad,st.player),false,'Less Escapes fails with source threshold 512')
+  ad.rng=rng;setting('ITEM_DIFFICULTY_LESS_ESCAPES',0)
   s.map='EM_HNS_ROUTE29_HNS';setting('ITEM_FEATURES_RTC_TYPE',1)
   Rtc.calcLocalTimeOffset(s,0,18,59,0);for i=1,150 do Time.tick(s,1/60)end
   T.eq(Time.save(s).seconds,18*3600+59*60+48,'Fake RTC advances 24 game seconds per played second')
@@ -140,6 +148,14 @@ return function(T,game,w,maps)
   Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);local held='r'
   local function keys(pressed)return {wasPressed=function(_,k)return k==pressed end,isDown=function(_,k)return held==k end}end
   Ui.handleInput(keys('r'));held=nil;Ui.handleInput(keys());T.eq(Ui._pendingCommand.itemId,4,'R release sends actual throw command without bag menu')
+  Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);setting('ITEM_BATTLE_RUN_TYPE',2)
+  Ui.handleInput(keys('b'));T.eq(Ui._menuIndex,4,'Run Type B highlights native RUN command')
+  setting('ITEM_BATTLE_FAST_INTRO',0);Intro.begin(st,{})
+  local quick=true;for _,step in ipairs(Intro._steps)do if step.kind=='bgslide'then quick=quick and step.data.frames==1 end end
+  T.check(quick,'Fast Intro shortens the actual background slide')
+  Intro.reset();Ui.reset({headless=true});st.player.mon.speed=100;st.enemy.mon.speed=80;st.over=nil;st.result=nil
+  B._st=st;B._adapter=ad;T.eq(S.quickRun(),true,'quick-run shortcut uses native successful escape')
+  T.eq(st.result,'run','quick-run resolves the real battle outcome');T.eq(B._phase,'ending','quick-run enters native battle completion')
   -- Source boot machines complete without Emerald movie/title assets.
   local Boot=require('src.ui.game3.boot');local boot=Boot.new(game);T.eq(boot.custom.mods.intro,'hns.intro','new boot selects HnS intro')
   T.eq(boot.custom.mods.title,'hns.title','new boot selects HnS title')

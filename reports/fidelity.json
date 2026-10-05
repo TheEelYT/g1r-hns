@@ -1,0 +1,17 @@
+{
+  "result": "pass",
+  "counts": {
+    "source_settings_pages": 9,
+    "source_settings_rows": 88,
+    "source_portrait_back_pixels": 36864,
+    "source_backdrop_pixels": 368640,
+    "source_banner_themes": 14,
+    "source_gear_map_pixels": 76800,
+    "source_map_sections": 262,
+    "source_font_pixels": 524288,
+    "source_keypad_pixels": 1664,
+    "source_field_ui_art": 6,
+    "source_starter_preview_pixels": 12288,
+    "source_gear_battle_ui_pixels": 167680
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "result": "pass",
+  "counts": {
+    "source_move_rows": 354,
+    "source_matchups": 361,
+    "source_contest_move_rows": 354,
+    "source_move_descriptions": 934,
+    "source_display_move_rows": 934,
+    "source_critical_stages": 5,
+    "source_fairy_species": 18,
+    "implemented_settings": 23,
+    "egg_handoff_paths": 2
+  }
+}

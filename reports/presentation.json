@@ -1,0 +1,17 @@
+{
+  "result": "pass",
+  "counts": {
+    "dex_background_pixels": 230400,
+    "dex_list_layer_pixels": 76800,
+    "dex_obj_pixels": 7616,
+    "source_screen_pixels": 1403072,
+    "registration_portrait_pixels": 1581056,
+    "registration_footprint_pixels": 98816,
+    "stats_icon_pixels": 790528,
+    "move_item_and_unknown_pixels": 26560,
+    "gear_glow_pixels": 98304,
+    "callback_events": 3200,
+    "callback_banks": 124,
+    "animated_pairs": 69
+  }
+}

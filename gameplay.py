@@ -96,7 +96,7 @@ def metadata(source,engine):
     odds=[int(n) for n in re.findall(r'\d+',odds)]
     assert odds==[24,8,2,1,1],odds
     return {'moves':moves,'species':species,'chart':chart,'criticalOdds':{str(i):n for i,n in enumerate(odds)},'fixedConfig':fixed,'fairyType':18,'implemented':sorted(IMPLEMENTED),'momFarewellFlag':MOM_FAREWELL,
-            'limits':['Expanded species/moves/abilities, modern learnsets, randomizer, Nuzlocke and remaining challenge effects still need bridges.','Native battle UI/animation remains in use; this is the first mechanics batch, not full expansion parity.']}
+            'limits':['Native species use source stats; compatible expanded level/egg moves are active. Unsupported moves/abilities, TM/tutor learning, randomizer, Nuzlocke and remaining challenge effects need bridges.','Source selectable terrain and healthboxes are active; battle orchestration and most move animations remain native. Full expansion parity is unfinished.']}
 
 def derivatives(engine,stage):
     src=(engine/'src/core/game3/battle/damage.lua').read_text()

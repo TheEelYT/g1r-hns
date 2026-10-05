@@ -83,6 +83,7 @@ def build(source,engine,stage):
     code=code.replace('self.clouds = self:layer("clouds")','self.clouds = nil').replace('local song = songId(self.params.song)','local song = Source.song').replace('Title.songFrames(song)','Source.songFrames')
     # The function declaration itself must retain its original name.
     code=code.replace('function Source.songFrames','function Title.songFrames')
+    a=code.index('function Title.songFrames');b=code.index('function Title.new',a);code=code[:a]+'function Title.songFrames()return Source.songFrames end\n\n'+code[b:]
     a=code.index('      local w = ppu.scanline:initWave');b=code.index('      self.phase = "phase1"',a);code=code[:a]+code[b:]
     code=code.replace('self:createPressStartBanner(START_BANNER_X, 108)','self:createPressStartBanner(START_BANNER_X, 138)')
     code=code.replace('Sprites.startAnim(s, i + NUM_PRESS_START_FRAMES)','Sprites.startAnim(s, i + NUM_PRESS_START_FRAMES)\n    s.data[0] = 1')

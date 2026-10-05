@@ -63,7 +63,7 @@ jobs:
           MODKIT_LUAJIT=/usr/bin/luajit python3 tools/modkit.py validate "$project_root/build/hns_exploration" --strict --base fixture --json
       - name: Compare pixels, move lists and gameplay with source
         run: |
-          for audit in world fidelity gameplay presentation services dex_moves; do
+          for audit in world fidelity gameplay presentation services dex_moves expansion; do
             python3 "tests/check_${audit}.py" --source build/source --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --report "reports/${audit}.json"
           done
           test -z "$(git -C build/source status --porcelain)"

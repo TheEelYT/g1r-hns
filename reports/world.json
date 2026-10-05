@@ -1,0 +1,41 @@
+{
+  "result": "pass",
+  "map_count": 564,
+  "regions": {
+    "REGION_ALOLA": 20,
+    "unspecified/shared": 105,
+    "REGION_JOHTO": 261,
+    "REGION_KANTO": 157,
+    "REGION_HISUI": 21
+  },
+  "counts": {
+    "layout_cells": 550536,
+    "static_warps": 1419,
+    "connections": 219,
+    "objects": 2204,
+    "dynamic_warps": 11,
+    "audited_source_warp_omissions": 12,
+    "audited_field_pokemon_omissions": 208,
+    "restored_field_pokemon": 1368,
+    "source_field_pokemon_pixel_samples": 1302081,
+    "source_field_pokemon_sheets": 1142,
+    "source_healing_pixel_samples": 2048,
+    "source_wooper_pixel_samples": 9216,
+    "campaign_objects": 8,
+    "campaign_battles": 2,
+    "source_map_music": 564,
+    "source_songs": 150,
+    "source_instrument_samples": 402,
+    "source_wild_areas": 316,
+    "source_wild_slots": 2795,
+    "wild_maps": 150,
+    "source_encounter_music": 232,
+    "source_trainer_mons": 502,
+    "source_trainer_rosters": 232,
+    "trainer_maps": 72,
+    "trainer_portraits": 37,
+    "source_johto_numbers": 282,
+    "supported_johto_species": 253,
+    "source_pokedex_pixel_samples": 3072
+  }
+}

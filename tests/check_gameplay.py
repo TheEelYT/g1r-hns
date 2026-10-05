@@ -100,11 +100,11 @@ def check(source, engine, mod, luajit):
     assert rules['criticalOdds']=={str(i):int(n)for i,n in enumerate(re.findall(r'\d+',odds))}
     for name,value in rules['fixedConfig'].items():assert re.search(r'#define '+name+r'\s+'+value+r'\b',(source/'include/config/battle.h').read_text())
     assert len(rules['species'])==18
-    assert len(rules['implemented'])==9
+    expected_active={'ITEM_MODE_MODERN_MOVES','ITEM_MODE_SPLIT','ITEM_MODE_FAIRY_TYPES','ITEM_MODE_STURDY','ITEM_MODE_NEW_CITRUS','ITEM_MODE_SURVIVE_POISON','ITEM_DIFFICULTY_EXP_MULTIPLIER','ITEM_DIFFICULTY_NO_EVS','ITEM_DIFFICULTY_ITEM_PLAYER','ITEM_DIFFICULTY_ITEM_TRAINER','ITEM_MAIN_FOLLOWER','ITEM_MAIN_LARGE_FOLLOWER','ITEM_FEATURES_RTC_TYPE','ITEM_BATTLE_FAST_INTRO','ITEM_BATTLE_FAST_BATTLES','ITEM_BATTLE_NEW_BACKGROUNDS','ITEM_BATTLE_NEW_BATTLEUI','ITEM_BATTLE_BALL_PROMPT','ITEM_BATTLE_RUN_TYPE','ITEM_BATTLE_LR_RUN','ITEM_MODE_GEN_ONE_RECHARGE','ITEM_DIFFICULTY_LESS_ESCAPES','ITEM_DIFFICULTY_ESCAPE_ROPE_DIG'}
+    assert set(rules['implemented'])==expected_active
     for page in world['startup']['settings']['pages']:
         for row in page['rows']:
             if row['id'] in rules['implemented']:assert row['implemented']
-            if row['id']=='ITEM_MODE_MODERN_MOVES':assert not row['implemented']
     source_lab=(source/'data/maps/NewBarkTown_Lab_hns/scripts.inc').read_text()
     police=re.search(r'NewBarkTown_Lab_EventScript_PoliceYes::\n(.*?)(?=^\w+::)',source_lab,re.M|re.S)[1]
     assert 'MUS_LEVEL_UP' in police
@@ -117,7 +117,7 @@ def check(source, engine, mod, luajit):
     script=world['scripts']['HNS_RULES_MOM']
     assert {'op':'setflag','flag':0x602D}in script
     assert {'op':'playbgm','songName':'MUS_HG_FOLLOW_ME_1'}in script
-    counts.update(source_critical_stages=5,source_fairy_species=18,implemented_settings=9,egg_handoff_paths=2)
+    counts.update(source_critical_stages=5,source_fairy_species=18,implemented_settings=len(expected_active),egg_handoff_paths=2)
     return {'result':'pass','counts':counts}
 
 

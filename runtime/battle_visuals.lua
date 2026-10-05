@@ -60,15 +60,16 @@ return function(mod,w,game)
     U.text(text,x+96-U.width(text,'small'),y+21,fg,color(p[5]),'small')
   end
   function source.statusIcon(x,y,ailment)
-    local n=({PSN=0,TOX=0,PAR=1,SLP=2,FRZ=3,BRN=4})[ailment];if not n then return end
-    local row=V.row();local im=image(row.elementsExp)
-    for i=0,2 do local tid=21+n*3+i;local q=love.graphics.newQuad(tid%40*8,math.floor(tid/40)*8,8,8,320,24)
-      love.graphics.setColor(1,1,1,1);love.graphics.draw(im,q,x+6+i*8,y)end
+    local n=tonumber(ailment)or({PSN=1,TOX=1,PAR=2,SLP=3,FRZ=4,BRN=5})[ailment]
+    if not n or n<1 or n>5 then return end
+    local a=V.row().statusIcons[(V.battler or 0)+1][n]
+    love.graphics.setColor(1,1,1,1);love.graphics.draw(image(a),x+6,y)
   end
   Owned.configure(source)
   local hb=old.hb or HB.draw
   HB.draw=function(...)
     if not H.battle(B._st)then return hb(...)end
+    local side=select(1,...);V.battler=tonumber(side)or(side=='player'and 0 or 1)
     local row=V.row();local keys={_playerBox='healthbox_singles_player',_enemyBox='healthbox_singles_opponent',_doublesPlayerBox='healthbox_doubles_player',_doublesOpponentBox='healthbox_doubles_opponent',_elements='elements',_elementsExp='elementsExp'}
     local original={};for key,name in pairs(keys)do original[key]=Chrome[key];Chrome[key]=image(row[name])end
     local tried=Chrome._doublesTried;Chrome._doublesTried=true

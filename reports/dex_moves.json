@@ -1,0 +1,10 @@
+{
+  "result": "pass",
+  "counts": {
+    "teachable_rows": 20095,
+    "egg_rows": 3036,
+    "level_rows": 10498,
+    "learnset_arrays": 1487,
+    "totodile_modern_moves": 87
+  }
+}

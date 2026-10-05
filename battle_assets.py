@@ -84,6 +84,16 @@ def build(source,engine,stage,maps,source_maps):
             for y in range(8):
                 for x in range(8):idx[(n//40*8+y)*320+n%40*8+x]=tile[y*8+x]&15
         ui['elements']=save(style+'_elements',320,24,rgba(idx,hpPal,True));ui['elementsExp']=save(style+'_elementsExp',320,24,rgba(idx,pal,True))
+        ui['statusIcons']=[]
+        status_colors=[(24,12,24),(23,23,3),(20,20,17),(17,22,28),(28,14,10)]
+        for battler,start in enumerate((21,74,92,110)):
+            icons=[]
+            for status,(r,g,b) in enumerate(status_colors):
+                colors=pal.copy();colors[12+battler]=r|(g<<5)|(b<<10);pixels=bytearray(24*8)
+                for y in range(8):
+                    for x in range(24):pixels[y*24+x]=td[start+status*3+x//8][y*8+x%8]&15
+                icons.append(save(f'{style}_status_{battler}_{status}',24,8,rgba(pixels,colors,True)))
+            ui['statusIcons'].append(icons)
         ui['ballPrompt']=save(style+'_ballPrompt',32,32,rgba(bytes(v&15 for tile in tiles(d/'last_used_ball_r_cycle.png')[:16]for v in tile),palette(d/'ability_pop_up.pal'),True))
         # Re-layout the R-prompt's OAM tile stream into one 32px frame.
         td=tiles(d/'last_used_ball_r_cycle.png');idx=bytearray(1024)
