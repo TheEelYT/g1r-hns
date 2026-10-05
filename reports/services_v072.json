@@ -1,0 +1,12 @@
+{
+  "result": "pass",
+  "counts": {
+    "bag_background_pixels": 76800,
+    "source_sprite_pixels": 54016,
+    "door_frames": 1329,
+    "door_pixels": 377856,
+    "berry_objects": 35,
+    "berry_pixels": 61440,
+    "c_berry_stat_rows": 16
+  }
+}

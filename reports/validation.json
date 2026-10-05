@@ -1,0 +1,144 @@
+{
+  "version": "0.7.2",
+  "native_checks": {
+    "default": 79901,
+    "mounted": 79901
+  },
+  "converter_tests": 19,
+  "modkit": {
+    "ok": true,
+    "findings": [],
+    "notes": []
+  },
+  "cpu_ui_captures": 64,
+  "windows_gpu_verified": false,
+  "cart_version": "1.0.1",
+  "repo": "TheEelYT/g1r-hns",
+  "audits": {
+    "world": {
+      "result": "pass",
+      "map_count": 564,
+      "regions": {
+        "REGION_ALOLA": 20,
+        "unspecified/shared": 105,
+        "REGION_JOHTO": 261,
+        "REGION_KANTO": 157,
+        "REGION_HISUI": 21
+      },
+      "counts": {
+        "layout_cells": 550536,
+        "static_warps": 1419,
+        "connections": 219,
+        "objects": 2204,
+        "dynamic_warps": 11,
+        "audited_source_warp_omissions": 12,
+        "audited_field_pokemon_omissions": 208,
+        "restored_field_pokemon": 1368,
+        "source_field_pokemon_pixel_samples": 357555,
+        "source_field_pokemon_sheets": 316,
+        "source_healing_pixel_samples": 2048,
+        "source_wooper_pixel_samples": 9216,
+        "campaign_objects": 8,
+        "campaign_battles": 2,
+        "source_map_music": 564,
+        "source_songs": 148,
+        "source_instrument_samples": 402,
+        "source_wild_areas": 316,
+        "source_wild_slots": 2795,
+        "wild_maps": 150,
+        "source_encounter_music": 232,
+        "source_trainer_mons": 502,
+        "source_trainer_rosters": 232,
+        "trainer_maps": 72,
+        "trainer_portraits": 37,
+        "source_johto_numbers": 282,
+        "supported_johto_species": 253,
+        "source_pokedex_pixel_samples": 3072
+      }
+    },
+    "fidelity": {
+      "result": "pass",
+      "counts": {
+        "source_settings_pages": 9,
+        "source_settings_rows": 88,
+        "source_portrait_back_pixels": 36864,
+        "source_backdrop_pixels": 368640,
+        "source_banner_themes": 14,
+        "source_gear_map_pixels": 76800,
+        "source_map_sections": 262,
+        "source_font_pixels": 524288,
+        "source_keypad_pixels": 1664,
+        "source_field_ui_art": 6,
+        "source_starter_preview_pixels": 12288,
+        "source_gear_battle_ui_pixels": 167680
+      }
+    },
+    "gameplay": {
+      "result": "pass",
+      "counts": {
+        "source_move_rows": 354,
+        "source_matchups": 361,
+        "source_contest_move_rows": 354,
+        "source_move_descriptions": 934,
+        "source_display_move_rows": 934,
+        "source_critical_stages": 5,
+        "source_fairy_species": 18,
+        "implemented_settings": 9,
+        "egg_handoff_paths": 2
+      }
+    },
+    "presentation": {
+      "result": "pass",
+      "counts": {
+        "dex_background_pixels": 230400,
+        "dex_list_layer_pixels": 76800,
+        "dex_obj_pixels": 7616,
+        "source_screen_pixels": 1403072,
+        "registration_portrait_pixels": 1581056,
+        "registration_footprint_pixels": 98816,
+        "stats_icon_pixels": 790528,
+        "move_item_and_unknown_pixels": 26560,
+        "gear_glow_pixels": 98304,
+        "callback_events": 3200,
+        "callback_banks": 124,
+        "animated_pairs": 69
+      }
+    },
+    "services": {
+      "result": "pass",
+      "counts": {
+        "bag_background_pixels": 76800,
+        "source_sprite_pixels": 54016,
+        "door_frames": 1329,
+        "door_pixels": 377856,
+        "berry_objects": 35,
+        "berry_pixels": 61440,
+        "c_berry_stat_rows": 16
+      }
+    },
+    "dex_moves": {
+      "result": "pass",
+      "counts": {
+        "teachable_rows": 20095,
+        "egg_rows": 3036,
+        "level_rows": 10498,
+        "learnset_arrays": 1487,
+        "totodile_modern_moves": 87
+      }
+    },
+    "preservation": {
+      "result": "pass",
+      "prior_non_code_files": 4279,
+      "prior_maps": 564,
+      "prior_scripts": 1752,
+      "prior_texts": 2000,
+      "new_non_code_files": 4785
+    },
+    "animation": {
+      "stats_icon_changed_pixels": 137,
+      "gear_glow_changed_pixels": 971,
+      "result": "pass",
+      "screens": 64
+    }
+  }
+}

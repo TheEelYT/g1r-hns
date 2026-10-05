@@ -1,0 +1,15 @@
+{
+  "author": "TheEelYT",
+  "base": "emerald",
+  "finish": "sparkle+holo",
+  "id": "pokemon_heart_soul",
+  "load_order": [
+    "hns_exploration"
+  ],
+  "seal": "sealed",
+  "shell": "#d9d8d7",
+  "title": "Pokemon Heart & Soul",
+  "repo": "TheEelYT/g1r-hns",
+  "summary": "Pok\u00e9mon Heart & Soul port for Gen1Recomp. Development build; campaign and expanded rules in progress.",
+  "version": "1.0.1"
+}

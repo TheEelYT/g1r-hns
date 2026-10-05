@@ -1,0 +1,22 @@
+{
+  "id": "hns_exploration",
+  "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
+  "version": "0.7.2",
+  "api": 2,
+  "entry": "main.lua",
+  "games": [
+    "emerald"
+  ],
+  "profile": "overhaul",
+  "category": "TOTAL_CONVERSION",
+  "game_version": ">=0.0.0-0 <1.0.0",
+  "priority": 900,
+  "permissions": [
+    "engine_internals"
+  ],
+  "dependencies": [],
+  "optional_dependencies": [],
+  "conflicts": [],
+  "description": "HnS v2.0.6 port: complete source Dex egg/level-up/TM/tutor browsing, animated stats icons, source list arrows and unseen portraits; Pok\u00e9gear footer and selection glow; corrected PC Game Modes controls and party Condition access. Prior world, story, native settings, music, battles and saves retained. Expanded battle effects and later campaign remain in progress. Requires imported vanilla Emerald.",
+  "github": "TheEelYT/g1r-hns"
+}

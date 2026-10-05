@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [runtime/manifest.json]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Mod version already committed in runtime/manifest.json
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hns-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read and check versions
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          v=json.loads(Path('runtime/manifest.json').read_text())['version']
+          assert json.loads(Path('manifest.json').read_text())==json.loads(Path('runtime/manifest.json').read_text())
+          assert re.fullmatch(r'\d+\.\d+\.\d+',v)
+          assert not os.environ['REQUESTED_VERSION'] or os.environ['REQUESTED_VERSION']==v
+          with open(os.environ['GITHUB_OUTPUT'],'a')as f:f.write('mod='+v+'\n')
+          PY
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit gcc g++ binutils
+          python3 -m pip install 'Pillow>=12,<13'
+      - name: Get pinned source checkouts
+        run: |
+          git clone https://github.com/PokemonHnS-Development/pokehns-expansion.git build/source
+          git -C build/source checkout 167aa6d537b109bb229c231ddce4616974c4da71
+          git clone https://github.com/bryanthaboi/gen1recomp.git build/engine
+          git -C build/engine checkout 20ab97abf8092c37344d108f2136ec4e5d131500
+      - name: Build without a ROM
+        run: |
+          mkdir -p reports
+          export HNS_LUAJIT=/usr/bin/luajit
+          python3 build_port.py --source build/source --engine build/engine --out build/hns_exploration
+      - name: Validate converter and actual native integration
+        run: |
+          python3 tests/test_converter.py
+          project_root="$GITHUB_WORKSPACE"
+          cd build/engine
+          /usr/bin/luajit "$project_root/tests/test_native.lua" "$project_root/build/hns_exploration" default
+          /usr/bin/luajit "$project_root/tests/test_native.lua" "$project_root/build/hns_exploration"
+          MODKIT_LUAJIT=/usr/bin/luajit python3 tools/modkit.py validate "$project_root/build/hns_exploration" --strict --base fixture --json
+      - name: Compare pixels, move lists and gameplay with source
+        run: |
+          for audit in world fidelity gameplay presentation services dex_moves; do
+            python3 "tests/check_${audit}.py" --source build/source --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --report "reports/${audit}.json"
+          done
+          test -z "$(git -C build/source status --porcelain)"
+          test -z "$(git -C build/engine status --porcelain)"
+      - name: Package mod and sealed cart
+        run: |
+          python3 release.py --mod build/hns_exploration --out dist --engine build/engine --luajit /usr/bin/luajit
+      - name: Keep validated downloads as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hns-${{ steps.version.outputs.mod }}
+          path: |
+            dist/*.zip
+            dist/*.g1rcart
+            dist/SHA256SUMS
+          if-no-files-found: error
+      - name: Publish immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MOD_VERSION: ${{ steps.version.outputs.mod }}
+        run: |
+          tag="v${MOD_VERSION}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; refusing to replace a pinned ZIP. Bump the versions for a new release."
+            exit 1
+          fi
+          gh release create "$tag" dist/*.g1rcart dist/*.zip dist/SHA256SUMS --target "$GITHUB_SHA" --title "Pokémon Heart & Soul ${MOD_VERSION}" --notes-file dist/release-notes.md --latest
