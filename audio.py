@@ -91,6 +91,7 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
         for row in rows:
             if row.get('songName'):selected.add(names[row['songName']])
     selected.add(names['MUS_HG_OAK'])
+    selected.update(names[n]for n in ('MUS_HG_INTRO','MUS_HG_TITLE'))
     for name in names:
         if name in ('MUS_HG_NEW_GAME','MUS_HG_FOLLOW_ME_2') or name.startswith('MUS_HG_RADIO_'):selected.add(names[name])
     for tid,record in trainers['records'].items():

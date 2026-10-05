@@ -301,6 +301,7 @@ return function(mod)
     if world.audio then assert(load(mod:read("hns_audio.lua"),"@hns/hns_audio.lua"))()(mod,world,game) end
     if world.campaign then assert(load(mod:read("campaign.lua"),"@hns/campaign.lua"))()(mod,world,game) end
     if world.startup then assert(load(mod:read("startup.lua"),"@hns/startup.lua"))()(mod,world,game) end
+    if world.bootPresentation then assert(load(mod:read("boot_presentation.lua")))()(mod,world,game) end
     if world.startup and world.startup.rules then assert(load(mod:read("gameplay.lua"),"@hns/gameplay.lua"))()(mod,world,game) end
     if world.startup and world.pokedex then assert(load(mod:read('battle_mechanics.lua'),'@hns/battle_mechanics.lua'))()(mod,world,game) end
     if world.startup and world.startup.rules then assert(load(mod:read("battle_presentation.lua"),"@hns/battle_presentation.lua"))()(mod,world,game) end
@@ -308,6 +309,8 @@ return function(mod)
     if world.services then assert(load(mod:read('bag_services.lua'),'@hns/bag_services.lua'))()(mod,world,game) end
     if world.presentation then assert(load(mod:read("field_presentation.lua"),"@hns/field_presentation.lua"))()(mod,world,game) end
     if world.services then assert(load(mod:read('field_services.lua'),'@hns/field_services.lua'))()(mod,world,game) end
+    if world.followers then assert(load(mod:read('followers.lua')))()(mod,world,game) end
+    if world.encounters.timed then assert(load(mod:read('time_cycle.lua')))()(mod,world,game) end
     local Marts = require("src.core.game3.marts")
     Marts.ensure()
     local marts = world.worldEvents and world.worldEvents.marts
