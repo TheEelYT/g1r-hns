@@ -143,6 +143,8 @@ return function(T,game,w,maps)
   Rtc.calcLocalTimeOffset(s,0,19,0,0);row,key=V.terrain(0,s);T.check(key:find('_Twilight',1,true)~=nil,'battle twilight lasts to 20:00 independently of encounters')
   setting('ITEM_BATTLE_NEW_BATTLEUI',1);T.eq(V.style(s),'gen4','Gen4 UI option selects source art');setting('ITEM_BATTLE_NEW_BATTLEUI',0);T.eq(V.style(s),'gen3','Gen3 UI option selects HnS art')
   B._st=st;st.session=s;T.check(pcall(BgDraw or require('src.core.game3.battle.bg').draw,0,0,0,0),'actual battle background draws source terrain')
+  local stage=require('src.core.game3.battle.anim').stage();stage.healthbox.player.visible=true;stage.healthbox.enemy.visible=true
+  st.player.mon.status='PAR';st.player.status='PAR'
   T.check(pcall(require('src.core.game3.battle.healthbox').draw,'player',st.player,{st=st}),'actual source healthbox draws native battler')
   setting('ITEM_BATTLE_BALL_PROMPT',0);Bag.add(s.bag,4,2);T.check(S.enabled(st),'ball prompt requires usable balls and wild battle')
   Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);local held='r'
@@ -156,6 +158,7 @@ return function(T,game,w,maps)
   Intro.reset();Ui.reset({headless=true});st.player.mon.speed=100;st.enemy.mon.speed=80;st.over=nil;st.result=nil
   B._st=st;B._adapter=ad;T.eq(S.quickRun(),true,'quick-run shortcut uses native successful escape')
   T.eq(st.result,'run','quick-run resolves the real battle outcome');T.eq(B._phase,'ending','quick-run enters native battle completion')
+  Ui.reset({headless=true});S.ballX=14;T.check(pcall(S.drawPrompt),'closing a battle cannot leave a nil-state ball prompt')
   -- Source boot machines complete without Emerald movie/title assets.
   local Boot=require('src.ui.game3.boot');local boot=Boot.new(game);T.eq(boot.custom.mods.intro,'hns.intro','new boot selects HnS intro')
   T.eq(boot.custom.mods.title,'hns.title','new boot selects HnS title')

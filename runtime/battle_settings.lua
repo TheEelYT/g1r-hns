@@ -11,7 +11,7 @@ return function(mod,w,game)
     return rows
   end
   function S.enabled(st)
-    return H.battle(st)and st.wild and not(st.safari or st.oldManTutorial or st.pokedude or st.kinds and(st.kinds.tutorial or st.kinds.frontier))
+    return st and H.battle(st)and st.wild and not(st.safari or st.oldManTutorial or st.pokedude or st.kinds and(st.kinds.tutorial or st.kinds.frontier))
       and H.value('ITEM_BATTLE_BALL_PROMPT',st.session)==0 and #S.balls(st)>0
   end
   local begin=old.begin or Intro.begin
@@ -37,7 +37,7 @@ return function(mod,w,game)
   end
   function S.quickWindow()
     local st=Intro._st
-    if S.quickTried or not H.battle(st)or not st.wild or st.oldManTutorial or st.pokedude or not Intro._waitingMsg then return false end
+    if not st or S.quickTried or not H.battle(st)or not st.wild or st.oldManTutorial or st.pokedude or not Intro._waitingMsg then return false end
     local first
     for i,step in ipairs(Intro._steps or {})do if step.kind=='msg'then first=i;break end end
     return first==Intro._i
@@ -94,9 +94,8 @@ return function(mod,w,game)
     S.ballX=enabled and math.min(14,S.ballX+1)or math.max(-18,S.ballX-1);if not enabled then S.ball=nil end
     return result
   end
-  Ui.draw=function(...)
-    local result=draw(...)
-    if S.ballX>-18 and game._hnsBattleVisuals then
+  function S.drawPrompt()
+    if S.ballX>-18 and Ui._st and H.battle(Ui._st)and game._hnsBattleVisuals then
       local row=game._hnsBattleVisuals.visuals.row();local a=row.ballPrompt
       love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(a.file,a.width,a.height),S.ballX-16,(Ui._st.double and 78 or 68)-16)
       local balls=S.balls(Ui._st);local id=S.ball or (Ui._st.session.modData or {}).hnsLastBall or balls[1]
@@ -106,8 +105,8 @@ return function(mod,w,game)
       local kind=H.value('ITEM_BATTLE_RUN_TYPE',Intro._st.session)
       if kind==1 then U.text('L+R: RUN',170,96,nil,nil,'small')end
     end
-    return result
   end
+  Ui.draw=function(...)local result=draw(...);S.drawPrompt();return result end
   local use=old.use or Items.use
   Items.use=function(st,ad,bag,s,id,...)
     local a,b,consumed,d,e=use(st,ad,bag,s,id,...)

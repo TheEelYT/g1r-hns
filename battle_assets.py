@@ -65,7 +65,11 @@ def build(source,engine,stage,maps,source_maps):
         for name,w,h in [('healthbox_singles_player',128,64),('healthbox_singles_opponent',128,32),('healthbox_doubles_player',128,32),('healthbox_doubles_opponent',128,32),('healthbox_safari',128,64)]:
             td=tiles(d/(name+'.png'));idx=bytearray(w*h)
             for y in range(h):
-                for x in range(w):idx[y*w+x]=td[(y//8)*(w//8)+x//8][y%8*8+x%8]&15
+                for x in range(w):
+                    # Two separate 64px OAM sprites, with the right half's
+                    # tile stream after all left-half rows (source callback).
+                    tile=(x//64)*(h//8*8)+(y//8)*8+(x%64)//8
+                    idx[y*w+x]=td[tile][y%8*8+x%8]&15
             # Source windows erase placeholder letters with their palette BG.
             player='player'in name;bg=3 if style=='gen4'else 2
             for y in range(5,16):

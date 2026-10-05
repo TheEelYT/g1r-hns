@@ -541,6 +541,7 @@ def build(args):
                        "audio":{"song_count":audio_data["songCount"],"sample_bytes":audio_data["sampleBytes"],"source_fingerprint":audio_data["sourceFingerprint"],"sound_mode":audio_data["soundMode"],"format":"native M4A source sequences and instruments"},
                        "campaign":{"battles":campaign_data["battles"],"objects":campaign_data["objects"],"pickups":campaign_data["pickups"],"flags":campaign_data["flags"],"vars":campaign_data["vars"],"roost_item":campaign_data["roostItem"],"roost_move":campaign_data["roostMove"]},
                        "quest_limits":quest_data["limits"],
+                       "expansion":{"compatible_expanded_moves":len(expanded_data['moves']),"unsupported_expanded_moves":len(expanded_data['omitted']),"follower_species_forms":len(follower_data['species']),"follower_sheets":len(follower_data['species'])*2,"battle_terrain_configurations":len(battle_data['terrains']),"active_rule_feature_settings":len(startup_data['rules']['implemented']),"timed_encounter_maps":len(encounter_data['timed']),"battle_limits":expanded_data['limits'],"follower_limits":follower_data['limits'],"tint_limits":"Ordinary 5-bit outdoor field tint; source palette-bank light immunity and alternate-light high bits remain pending."},
                        "omitted_world_objects":events_data["omittedObjects"],
                        "excluded_maps":exclusions,"omitted_slice_events":omitted,"ups":ups_info(args.ups) if args.ups else None})
         write_json(stage / "build_report.json",report)

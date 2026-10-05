@@ -1,8 +1,8 @@
 {
-  "version": "0.7.2",
+  "version": "0.7.3",
   "native_checks": {
-    "default": 79901,
-    "mounted": 79901
+    "default": 94318,
+    "mounted": 94318
   },
   "converter_tests": 19,
   "modkit": {
@@ -10,9 +10,9 @@
     "findings": [],
     "notes": []
   },
-  "cpu_ui_captures": 64,
+  "cpu_ui_captures": 68,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.1",
+  "cart_version": "1.0.2",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -34,14 +34,14 @@
         "audited_source_warp_omissions": 12,
         "audited_field_pokemon_omissions": 208,
         "restored_field_pokemon": 1368,
-        "source_field_pokemon_pixel_samples": 357555,
-        "source_field_pokemon_sheets": 316,
+        "source_field_pokemon_pixel_samples": 1302081,
+        "source_field_pokemon_sheets": 1142,
         "source_healing_pixel_samples": 2048,
         "source_wooper_pixel_samples": 9216,
         "campaign_objects": 8,
         "campaign_battles": 2,
         "source_map_music": 564,
-        "source_songs": 148,
+        "source_songs": 150,
         "source_instrument_samples": 402,
         "source_wild_areas": 316,
         "source_wild_slots": 2795,
@@ -83,7 +83,7 @@
         "source_display_move_rows": 934,
         "source_critical_stages": 5,
         "source_fairy_species": 18,
-        "implemented_settings": 9,
+        "implemented_settings": 23,
         "egg_handoff_paths": 2
       }
     },
@@ -126,19 +126,31 @@
         "totodile_modern_moves": 87
       }
     },
-    "preservation": {
+    "expansion": {
       "result": "pass",
-      "prior_non_code_files": 4279,
-      "prior_maps": 564,
-      "prior_scripts": 1752,
-      "prior_texts": 2000,
-      "new_non_code_files": 4785
-    },
-    "animation": {
-      "stats_icon_changed_pixels": 137,
-      "gear_glow_changed_pixels": 971,
-      "result": "pass",
-      "screens": 64
+      "counts": {
+        "battle_terrain_configurations": 210,
+        "battle_terrain_pixels": 8601600,
+        "source_status_strips": 40,
+        "source_healthbox_composites": 10,
+        "source_title_pixels": 106496,
+        "source_escape_flags": 564,
+        "follower_species_and_forms": 413,
+        "follower_normal_shiny_sheets": 826,
+        "source_c_tint_colors": 196608,
+        "expanded_supported_moves": 159,
+        "expanded_explicit_omissions": 420
+      },
+      "limits": [
+        "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
+        "Source battle entry choreography and distinct expanded move animations remain native; full expanded effects/abilities are unfinished."
+      ]
     }
-  }
+  },
+  "limitations": [
+    "Full enhanced battle mechanics/abilities/species/items, expanded TM/tutor teaching, remaining challenge effects and later campaign are unfinished.",
+    "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
+    "Native battle entry/attack choreography remains; conditional follower emotes/emerge/retract and female-specific sprites remain pending.",
+    "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
+  ]
 }

@@ -39,6 +39,15 @@ def check(source,engine,mod,luajit):
     status_colors=[(24,12,24),(23,23,3),(20,20,17),(17,22,28),(28,14,10)]
     for style,d in [('gen3','hns'),('gen4','gen4')]:
         root=source/'graphics/battle_interface'/d;pal=colors(root/'healthbox_singles_player.pal')[:16]
+        for name,h in [('healthbox_singles_player',64),('healthbox_singles_opponent',32),('healthbox_doubles_player',32),('healthbox_doubles_opponent',32),('healthbox_safari',64)]:
+            im=Image.open(root/(name+'.png'));raw=bytearray();bg=3 if style=='gen4'else 2
+            for y in range(h):
+                for x in range(128):
+                    tile=(x//64)*(h//8*8)+(y//8)*8+(x%64)//8;n=tile_pixel(im,tile,x%8,y%8)&15
+                    if 5<=y<16 and (16 if 'player'in name else 8)<=x<96:n=bg
+                    if name=='healthbox_singles_player'and 24<=y<32 and 40<=x<96:n=bg
+                    raw.extend(pal[n]+(255 if n else 0,))
+            a=world['battleVisuals']['ui'][style][name];assert (mod/a['file']).read_bytes()==raw,(style,name)
         for battler in range(4):
             im=Image.open(root/('status'+('' if battler==0 else str(battler+1))+'.png'))
             for status,c in enumerate(status_colors):
@@ -49,6 +58,7 @@ def check(source,engine,mod,luajit):
                 a=world['battleVisuals']['ui'][style]['statusIcons'][battler][status]
                 assert (mod/a['file']).read_bytes()==raw,(style,battler,status)
     count['source_status_strips']=40
+    count['source_healthbox_composites']=10
     # Full affine logo and normal backdrop indices, independent of converter.
     root=source/'graphics/title_screen/hns';title=world['boot']['title'] if 'boot' in world else world['bootPresentation']['title']
     for name,png,binfile,w,h,affine in [('logo','pokemon_logo.png','pokemon_logo.bin',256,256,True),('rayquaza','rayquaza.png','rayquaza.bin',256,160,False)]:

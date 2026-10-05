@@ -4,6 +4,7 @@
     "battle_terrain_configurations": 210,
     "battle_terrain_pixels": 8601600,
     "source_status_strips": 40,
+    "source_healthbox_composites": 10,
     "source_title_pixels": 106496,
     "source_escape_flags": 564,
     "follower_species_and_forms": 413,

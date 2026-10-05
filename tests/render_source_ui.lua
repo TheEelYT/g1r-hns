@@ -120,13 +120,37 @@ local bagUi=collection._hnsBag.ui;local imageB=bagUi.image
 bagUi.image=function(file,x,y)local im=imageB(file,x,y);im.file=file;return im end
 local Menu=require('src.ui.game3.bag_menu');local Skin=require('src.ui.game3.rse.bag_menu');local Items=require('src.core.game3.items_data');local Bag=require('src.core.game3.bag')
 local IR=require('src.core.game3.scripting.text_ir')
-for k,t in pairs({gText_CloseBag='CLOSE BAG',gText_xVar1='×{STR_VAR_1}',gText_ReturnToVar1='Return to the field.',gText_NumberItem_TMBerry='{STR_VAR_1} {STR_VAR_2}'})do RomText.overrides[k]=IR.fromAscii(t)end
+for k,t in pairs({gMenuText_Use='USE',gMenuText_Toss='TOSS',gMenuText_Give='GIVE',gText_Cancel2='CANCEL',gText_Var1IsSelected='{STR_VAR_1} is selected.',gText_CloseBag='CLOSE BAG',gText_xVar1='×{STR_VAR_1}',gText_ReturnToVar1='Return to the field.',gText_NumberItem_TMBerry='{STR_VAR_1} {STR_VAR_2}'})do RomText.overrides[k]=IR.fromAscii(t)end
 Items._byId={[13]={name='POTION',pocket='ITEMS',description='Restores HP.'},[86]={name='REPEL',pocket='ITEMS',description='Repels wild Pokémon.'},[139]={name='ORAN BERRY',pocket='BERRY_POUCH',description='Restores HP.'},[902]={name='GB SOUNDS',pocket='KEY_ITEMS',importance=1},[903]={name='EXP. SHARE',pocket='KEY_ITEMS',importance=1}}
 require('src.core.game3.runtime').session=session;session.bag=Bag.new()
 for _,id in ipairs({13,86,139,902,903})do Bag.add(session.bag,id,1)end
 for _,p in ipairs({'ITEMS','MEDICINE','BERRY_POUCH','KEY_ITEMS'})do
   Menu.show(session.bag,{session=session,pocket=p});Menu._open=nil
   snap('bag_'..p:lower(),function()Skin.draw(Menu)end);Menu.close()
+end
+Menu.show(session.bag,{session=session,pocket='ITEMS'});Menu._open=nil;Menu.mode='action';Menu.ACTIONS={'USE','GIVE','TOSS','CANCEL'}
+local Window=require('src.ui.game3.window');local stdFrame=Window.stdFrame
+Window.stdFrame=function(t)U.box(t.left*8,t.top*8,t.width*8,t.height*8)end
+snap('bag_actions',function()Skin.draw(Menu)end);Menu.close();Window.stdFrame=stdFrame
+snap('bag_escape_label',function()U.text('ESCAPE ROPE',8,16,nil,nil,'narrow')end)
+-- Draw the actual source battle background/healthbox modules. Only imported
+-- ROM names/gender and the clock are fixtures, as in the other CPU captures.
+if w.battleVisuals then
+  local choices={ITEM_BATTLE_NEW_BATTLEUI=0,ITEM_BATTLE_NEW_BACKGROUNDS=0}
+  collection._hnsRules={rules={own=function()return true end,battle=function()return true end,value=function(id)return choices[id]or 0 end}}
+  local Rtc=require('src.core.game3.rtc');local calc=Rtc.calcLocalTime;Rtc.calcLocalTime=function()return {hours=12,minutes=0}end
+  assert(load(mod:read('battle_visuals.lua')))()(mod,w,collection)
+  local V=collection._hnsBattleVisuals.visuals;local imageV=V.ui.image
+  V.ui.image=function(file,x,y)local im=imageV(file,x,y);im.file=file;return im end
+  local Battle=require('src.core.game3.battle');Battle._st={session=session,wild=true}
+  local stage=require('src.core.game3.battle.anim').stage();stage.healthbox.player.visible=true;stage.healthbox.enemy.visible=true
+  local p={species=158,mon={species=158,nickname='TOTODILE',gender='M',level=20,hp=40,maxHp=60,status='PAR',experience=8000}}
+  local e={species=161,mon={species=161,nickname='SENTRET',gender='F',level=18,hp=40,maxHp=60,status='PSN'}}
+  for _,style in ipairs({'gen3','gen4'})do
+    choices.ITEM_BATTLE_NEW_BATTLEUI=style=='gen4'and 1 or 0
+    snap('battle_'..style,function()require('src.core.game3.battle.bg').draw(0,0,0,0);require('src.core.game3.battle.healthbox').draw('player',p);require('src.core.game3.battle.healthbox').draw('enemy',e)end)
+  end
+  Battle._st=nil;Rtc.calcLocalTime=calc
 end
 -- Door frames and gold flash are native drawing routines with source buffers.
 collection.data={maps=w.maps}
