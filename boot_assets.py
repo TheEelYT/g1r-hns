@@ -59,7 +59,13 @@ def build(source,engine,stage):
     for name,bpp in [('powered_by',4),('rhh_credits',8)]:
         raw=(root/(name+'.bin')).read_bytes();words=list(struct.unpack('<'+str(len(raw)//2)+'H',raw))
         # Both BGs are 256x512; display begins at their top-left.
-        credits[name]=rgba('credits_'+name,256,160,text_map(tiles(root/(name+'.png'),bpp),words,256,160,colors,bpp))
+        td=tiles(root/(name+'.png'),bpp);pixels=text_map(td,words,256,160,colors,bpp)
+        if bpp==8:
+            # BG2 index zero is transparent; keep the BG3 POWERED BY line.
+            indices=text_map(td,words,256,160,None,bpp)
+            for i,n in enumerate(indices):
+                if n==0:pixels[i*4+3]=0
+        credits[name]=rgba('credits_'+name,256,160,pixels)
     for name,w,h,frames in [('dizzy_egg',32,32,8),('porygon',64,64,3)]:
         td=tiles(root/'sprites'/(name+'.png'));colors=palette(root/'sprites'/(name+'.pal'));data=bytearray()
         for y in range(h*frames):
@@ -123,6 +129,7 @@ def build(source,engine,stage):
     code=code.replace('      self.phase = "setup"','      self.phase = "expansion"\n      self.credits = Source.credits.new()')
     code=code.replace('  elseif self.phase == "setup" then','  elseif self.phase == "expansion" then\n    if self.credits:frame(self.pendingSkip)then self.phase="setup";self.state=0;self.pendingSkip=false end\n    return\n  elseif self.phase == "setup" then')
     code=code.replace('    if self.phase ~= "intro" then self.pendingSkip = false end','    if self.phase ~= "intro" and self.phase ~= "expansion" then self.pendingSkip = false end')
+    code=code.replace('  self.accum = self.accum + (dt or 1 / 60)','  if self.phase=="expansion" and input and input.wasPressed then\n    for _,key in ipairs({"b","up","down","left","right","l","r"})do if input:wasPressed(key)then self.pendingSkip=true end end\n  end\n  self.accum = self.accum + (dt or 1 / 60)')
     code=code.replace('function IntroMovie:draw()', 'function IntroMovie:draw()\n  if self.phase=="expansion" then return self.credits:draw() end')
     a=code.index('    -- pokefirered/src/intro.c:2108');b=code.index('    p.timer = 0',a);code=code[:a]+code[b:]
     a=code.index('function IntroMovie.IntroCB_GF_RevealLogo');b=code.index('-- Scene 1',a)

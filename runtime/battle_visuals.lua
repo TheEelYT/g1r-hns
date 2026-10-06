@@ -49,6 +49,11 @@ return function(mod,w,game)
     local r=assert(w.battleVisuals.windows[(tonumber(id)or 0)+1])
     return {left=r.left,top=r.top%20,w=r.w,h=r.h,x=r.left*8,y=r.top%20*8}
   end
+  local origin=old.origin or Chrome.messageOrigin
+  Chrome.messageOrigin=function()
+    if not H.battle(B._st)then return origin()end
+    return Chrome.textOrigin(Chrome.WIN.MSG)
+  end
   local colors=old.colors or Chrome.textboxColors
   Chrome.textboxColors=function(fg,shadow)
     if not H.battle(B._st)then return colors(fg,shadow)end
@@ -58,6 +63,14 @@ return function(mod,w,game)
   -- Native battle messages use a fixed FRLG origin. Shift the printer to the
   -- source B_WIN_MSG while retaining its control-code/reveal/input machinery.
   local Msg=require('src.ui.game3.message');local msg=old.msg or Msg.drawText
+  local show=old.show or Msg.show
+  Msg.show=function(text,opts)
+    if not H.battle(B._st)or not(opts and(opts.battle or opts.frame=='battle'))then return show(text,opts)end
+    local o={};for k,v in pairs(opts)do o[k]=v end
+    local ctx={};for k,v in pairs(opts.ctx or {})do ctx[k]=v end
+    local _,_,width=Chrome.messageOrigin();ctx.maxWidth=ctx.maxWidth or width;o.ctx=ctx
+    return show(text,o)
+  end
   Msg.drawText=function(...)
     if not H.battle(B._st)or Msg._frame~='battle'then return msg(...)end
     local F=require('src.ui.game3.frlg_font');local fd=F.draw
@@ -109,5 +122,5 @@ return function(mod,w,game)
     for key in pairs(keys)do Chrome[key]=original[key]end;Chrome._doublesTried=tried
     if not ok then error(result)end;return result
   end
-  game._hnsBattleVisuals={draw=draw,panel=panel,frames=frames,window=window,colors=colors,msg=msg,hb=hb,visuals=V}
+  game._hnsBattleVisuals={draw=draw,panel=panel,frames=frames,window=window,origin=origin,colors=colors,msg=msg,show=show,hb=hb,visuals=V}
 end

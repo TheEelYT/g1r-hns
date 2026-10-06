@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development port: corrected timed encounters, full night-tint viewport, title backdrop and Quick Run glyphs; source follower ball effects and named emotes; visible settings coverage and permanent progress checklist. Enhanced battle mechanics and later campaign remain in progress. Requires imported vanilla Emerald.",
+  "description": "HnS v2.0.6 development port: corrected source battle panels/message windows, full sliding R-ball prompt and Modern grass terrain; restored source PRET/RHH credits animation before Game Freak. Enhanced battle mechanics and later campaign remain in progress. Requires imported vanilla Emerald.",
   "github": "TheEelYT/g1r-hns"
 }

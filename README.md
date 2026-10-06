@@ -1,23 +1,23 @@
-# Pokémon Heart & Soul → Gen1Recomp 0.7.4
+# Pokémon Heart & Soul → Gen1Recomp 0.7.5
 
-A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.4 repairs the night-tint viewport, timed wild encounters, missing title backdrop and Quick Run control glyphs. Followers gain source Poké Ball recall/release effects and named dialogue preceded by an animated emote. Settings now identify unimplemented and partial features, and the permanent checklist below tracks completed and remaining work.
+A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.5 repairs battle action/move frames and message placement in both UI styles, restores the complete sliding R-ball prompt, and fixes Modern grass terrain. The original source PRET/RHH credits sequence now plays between copyright and Game Freak. Settings retain visible pending/partial support notices; the permanent checklist tracks completed and remaining work.
 
-**Download `pokemon_heart_soul-1.0.3.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.4.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
+**Download `pokemon_heart_soul-1.0.4.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.5.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
 
 ## Install and test
 
-Use Gen1Recomp **v0.3.44**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.4** and the cart version is **1.0.3**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
+Use Gen1Recomp **v0.3.44**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.5** and the cart version is **1.0.4**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
 
 Suggested checks for this update:
 
-- Set Fake RTC to 07:00, 12:00, 18:30 and 21:00. Walk in Route 29 grass at each time; wild encounters should occur. Zoom outdoors during morning/evening/night tint: the complete viewport should remain visible. Enter and leave a building at night.
-- Wait for the complete title screen: its HnS background should appear behind the logo. Check all four Quick Run choices; the arrow between B and A should be a glyph, with no literal control-code text.
-- With a follower enabled, enter/leave a building, then take a step. Its recall/release effect should show the Poké Ball and white shrinking/growing sprite. Talk to an unnamed and nicknamed Pokémon: the animated emotion bubble completes before its named dialogue opens.
-- Browse OPTIONS and PC Game Modes. A red **!** marks incomplete settings. Their description explicitly says **NOT IMPLEMENTED YET** or **PARTLY IMPLEMENTED**. Unimplemented choices are saved but have no gameplay effect. Recommended Game Mode retains presets/dependencies while some underlying rules are pending.
+- Launch from a closed game. Copyright should lead into the source POWERED BY / PRET × RHH credits, including Dizzy Egg and Porygon animation, then Game Freak and the HnS title. Any game button can skip the credits after their initial fade.
+- In a grass encounter, select OLD and MODERN terrain separately. MODERN should show the source forest/grass backdrop instead of the generic striped building background. Repeat at morning, day, evening and night.
+- Check the action menu, move menu and ordinary battle messages under both GEN 3 and GEN 4 UI. Source window borders, message origin/width, move names and PP/type panels should remain aligned. Check another user-selected window frame too.
+- With Poké Balls in the bag, watch the R prompt slide in. Its full window and source ball icon should align; arrows appear while R is held and disappear on release. Hold R with a direction to cycle, then release without cycling to throw. Continue into the bag, moves and message states and check that the prompt slides away.
 
-- Launch through the HnS Game Freak introduction and title, then press Start. EXIT → New Game must still show Oak and Wooper. The intro/title songs are the source `HG_INTRO` and `HG_TITLE`; Oak retains `HG_NEW_GAME`.
+- Launch through the source credits, HnS Game Freak introduction and title, then press Start. EXIT → New Game must still show Oak and Wooper. The intro/title songs are the source `HG_INTRO` and `HG_TITLE`; Oak retains `HG_NEW_GAME`.
 - In OPTIONS, enable Follower and, if desired, Big Followers. Walk a few steps with a healthy non-egg party member; the source sprite follows one cell behind and can be spoken to. Shiny palettes and walking frames are imported. Large followers use the source indoor restrictions; surfing, biking and forced travel hide followers. These options retain the source defaults, which can leave followers disabled.
 - Select FAKE RTC and set the clock at a Pokémon Center. Time advances **24 game seconds per played second**, retains its value in saves and does not advance while the game is closed. Check morning/evening/night encounters and ambient Pokémon visibility. Outdoor colors transition at 06:00–10:00 and 18:00–20:00. Encounter night starts at 19:00; battle palettes deliberately retain the source's separate 20:00 night boundary.
 - Switch Battle Terrain between OLD and MODERN and Battle UI between GEN 3 and GEN 4. Check Fast Intro, Fast Battles, R-ball selection and Quick Run. Hold R with a direction to select another available ball; release R without cycling to throw the selected ball. Run Type B selects RUN from the menu; the source L+R/B shortcuts can escape during the opening wild message before sending out the player Pokémon. The run prompt option controls the hint separately from the shortcut.
@@ -55,7 +55,7 @@ Outdoor tint uses the source's 5-bit arithmetic and time transitions. **Palette-
 
 ## Validation and rebuilding
 
-Version 0.7.4 passes the native regression suite under both cache roots, 19 converter tests, strict Modkit validation and 73 CPU UI captures. Validation uses the real pinned native Lua modules with controlled boundaries for unavailable ROM data, GPU uploads and graphical effect handoffs. It exercises persistent status, source stats, all tower escape floors, saved Fake RTC, real grass-step encounter rolls in four time periods, changing tint viewports/error cleanup, follower emotes and door recall, source terrain/healthbox draws, shortcuts and intro/title completion alongside the retained campaign/UI/audio regressions. Seven independent audits compare world/presentation/gameplay/services/Dex data and the new expansion with source; the tint oracle compiles the actual HnS `TimeMixPalettes` function and compares every ordinary 15-bit color at six transition points. CPU UI captures rasterize actual Lua draw calls and enforce source-sheet bounds.
+Version 0.7.5 passes the native regression suite under both cache roots, 19 converter tests, strict Modkit validation and 92 CPU UI captures. Validation uses the real pinned native Lua modules with controlled boundaries for unavailable ROM data, GPU uploads and graphical effect handoffs. It exercises persistent status, source stats, all tower escape floors, saved Fake RTC, real grass-step encounter rolls in four time periods, changing tint viewports/error cleanup, follower emotes and door recall, complete native action/move/message battle draws, source terrain/healthboxes, full R prompt, shortcuts and credits/intro/title completion alongside the retained campaign/UI/audio regressions. Seven independent audits compare world/presentation/gameplay/services/Dex data and the new expansion with source; the tint oracle compiles the actual HnS `TimeMixPalettes` function and compares every ordinary 15-bit color at six transition points. CPU UI captures rasterize actual Lua draw calls and enforce source-sheet bounds.
 
 **No graphical LÖVE runtime or imported Emerald ROM/cache is available here.** Windows gameplay, listening and live GPU rendering require a player check. CPU previews are not running-game screenshots. Detailed results and limitations are recorded under `reports/`.
 
@@ -107,6 +107,7 @@ This list is kept in every update. Checked entries stay struck through. A checke
 - [x] ~~Implement pause clock font, PC/pause settings controls and native GEN1RECOMP options tab.~~
 - [x] ~~Identify unimplemented/partial settings inside OPTIONS and Game Modes.~~
 - [x] ~~Import HnS Game Freak introduction, title background and source opening songs.~~
+- [x] ~~Restore the original source PRET/RHH credits artwork and animated sequence.~~
 - [x] ~~Implement saved Fake RTC, time transitions and native-species time encounter pools.~~
 - [x] ~~Fix outdoor time tint across changing world viewports and zoom levels.~~
 - [x] ~~Implement native-species followers, shiny palettes and trailing movement.~~
@@ -115,6 +116,7 @@ This list is kept in every update. Checked entries stay struck through. A checke
 - [x] ~~Implement EXP. SHARE using the pinned source EXP ratios.~~
 - [x] ~~Implement reviewed modern level-up/egg moves, Roost and battle move details prompt.~~
 - [x] ~~Import selectable source battle terrain and Gen 3/4 healthboxes/status strips.~~
+- [x] ~~Repair actual Modern grass selection, source battle frames/message windows and full R-ball prompt.~~
 - [x] ~~Implement fast battle/intro, ball selection and Quick Run controls.~~
 - [x] ~~Implement persistent status migration and source Escape Rope/Dig restrictions.~~
 - [x] ~~Publish deterministic ZIP and sealed, save-isolated, hash-pinned custom cart.~~

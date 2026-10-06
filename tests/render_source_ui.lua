@@ -55,7 +55,7 @@ local game={};assert(load(mod:read('battle_presentation.lua')))()(mod,w,game)
 local P=game._hnsBattlePresentation.presentation
 -- Use the source metadata at the missing imported-ROM move boundary.
 local Moves=require('src.core.game3.battle.moves');local row=w.startup.rules.moves.TACKLE
-Moves.get=function(id)return {numId=id,power=row.power,accuracy=row.accuracy,category=row.category}end
+Moves.get=function(id)return {numId=id,power=row.power,accuracy=row.accuracy,category=row.category,type=0,pp=35}end
 local Bu=require('src.core.game3.battle.ui');Bu.reset({headless=true})
 Bu._st={session={map=w.startup.start.map},player={mon={moves={33}}}};Bu._mode='moves'
 local imgP=P.ui.image
@@ -157,14 +157,18 @@ if w.battleVisuals then
   -- prompt installed after it. Absent ROM font/text/sprites are source fixtures.
   local Chrome=require('src.ui.game3.battle_chrome');Chrome._manifest={layout='rse',windowTextPal=w.battleVisuals.windowTextPalette,ppTextPal=w.battleVisuals.windowTextPalette}
   local Font=require('src.ui.game3.frlg_font');local fd,fg=Font.draw,Font.drawGlyph
+  local FieldChrome=require('src.ui.game3.chrome');local arrowSpec=FieldChrome.arrowSpec
+  FieldChrome.arrowSpec=function()return {delay=0,lastPage=false}end
   Font.draw=function(text,x,y,o)
     o=o or {};local c=o.colors or Font.COLOR.NORMAL
     U.text(text,x,y,c.fg,c.shadow,o.font=='narrow'and 'narrow'or o.small and 'small'or 'normal')
     return #text,x+U.width(text),y
   end
   Font.drawGlyph=function(id,x,y,o)local c=o and o.colors or Font.COLOR.NORMAL;U.glyph('RIGHT_ARROW',x,y,'normal',c.fg,c.shadow)end
-  for name,text in pairs({gText_BattleMenu='FIGHT\nBAG\nPOKéMON\nRUN',gText_WhatWillPkmnDo='What will\nTOTODILE do?',gText_Pp='PP',gText_Type='TYPE/'})do RomText.overrides[name]=IR.fromAscii(text)end
-  Pokemon.backPic=Pokemon.frontPic;Pokemon._moveNames[33]='TACKLE';p.mon.moves={33,33,33,33};p.mon.pp={20,20,20,20}
+  for name,text in pairs({gText_BattleMenu='FIGHT\nBAG\nPOKéMON\nRUN',gText_WhatWillPkmnDo='What will\nTOTODILE do?',gText_MoveInterfacePP='PP',gText_MoveInterfaceType='TYPE/'})do RomText.overrides[name]=IR.fromAscii(text)end
+  RomText.overrides['gTypeNames[0]']=IR.fromAscii('NORMAL')
+  Pokemon.backPic=Pokemon.frontPic;Pokemon.moveName=function()return 'TACKLE'end;p.mon.moves={33,33,33,33};p.mon.pp={20,20,20,20}
+  local Coords=require('src.core.game3.battle.pic_coords');Coords.front={[158]=0,[161]=0};Coords.back={[158]=0,[161]=0};Coords.elev={}
   Battle._st.player=p;Battle._st.enemy=e;Bu.reset({headless=true});Bu._st=Battle._st;Bu._session=session;Bu._menuIndex=1
   Bag.add(session.bag,4,3);Items._byId[4]={name='POKé BALL',pocket='POKE_BALLS'}
   require('src.core.game3.runtime').session=session
@@ -176,18 +180,18 @@ if w.battleVisuals then
     for _,terrain in ipairs({'old','modern'})do
       choices.ITEM_BATTLE_NEW_BACKGROUNDS=terrain=='modern'and 1 or 0
       for _,mode in ipairs({'menu','moves','none'})do
-        Bu._mode=mode
+        Bu._mode=mode;shortcut.ballX=mode=='menu'and 14 or -14
         snap('battle_full_'..style..'_'..terrain..'_'..mode,function()
           Bu.draw(240,160)
-          if mode=='none'then local Message=require('src.ui.game3.message');Message.show('TOTODILE used TACKLE!',{frame='battle',battle=true});Message._revealed=999;Message.draw();Message.close()end
+          if mode=='none'then local Message=require('src.ui.game3.message');Message.show('TOTODILE used TACKLE!',{frame='battle',battle=true});Message._revealed=999;Message._waiting=false;Message.draw();Message.close()end
         end)
       end
     end
   end
-  Bu._mode='menu';shortcut.rHeld=true
+  Bu._mode='menu';shortcut.ballX=14;shortcut.rHeld=true
   snap('battle_ball_cycle',function()Bu.draw(240,160)end)
   shortcut.rHeld=false;shortcut.ballX=0;snap('battle_ball_slide',function()Bu.draw(240,160)end)
-  Font.draw,Font.drawGlyph=fd,fg;Bu.reset({headless=true})
+  Font.draw,Font.drawGlyph=fd,fg;FieldChrome.arrowSpec=arrowSpec;Bu.reset({headless=true})
   Battle._st=nil;Rtc.calcLocalTime=calc
 end
 local Credits=assert(load(mod:read('intro_credits.lua')))()(U,w.bootPresentation.credits)

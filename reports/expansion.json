@@ -5,6 +5,8 @@
     "battle_terrain_pixels": 8601600,
     "source_status_strips": 40,
     "source_healthbox_composites": 10,
+    "source_ball_prompt_pixels": 8192,
+    "source_credits_pixels": 114688,
     "source_title_pixels": 106496,
     "source_escape_flags": 564,
     "follower_species_and_forms": 413,

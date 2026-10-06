@@ -32,8 +32,9 @@ def check(source,engine,mod,luajit):
     # Audit the source entry set independently, rather than only comparing
     # pixels for whatever subset the importer happened to emit.
     envcode=(source/'src/data/battle_environment.h').read_text().split('static const struct ModernBattleGfx sModernBattleGfx',1)[0]
-    environments=set(re.findall(r'^    \[BATTLE_ENVIRONMENT_(\w+)\]',envcode,re.M))
-    assert len(environments)==36 and 'GRASS' in environments and 'COUNT' not in environments
+    entries=re.findall(r'^    \[BATTLE_ENVIRONMENT_(\w+)\]\s*=\s*\{(.*?)\n    \}',envcode,re.S|re.M)
+    environments={name for name,body in entries if '.background' in body}
+    assert len(environments)==35 and 'GRASS' in environments and 'COUNT' not in environments
     assert set(terrains)=={e+'_'+s+'_'+t for e in environments for s in ('old','modern')for t in ('Day','Twilight','Night')}
     assert terrains['GRASS_modern_Day']['sourceTiles']=='graphics/battle_environment/tall_grass_modern/tiles.png'
     for key,row in terrains.items():
@@ -84,7 +85,7 @@ def check(source,engine,mod,luajit):
         for y in range(160):
             for x in range(256):
                 word=words[y//8*32+x//8];px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
-                n=tile_pixel(im,word&1023,px,py)+(word>>12)*16*(bpp==4);raw.extend(p[n]+(255,))
+                n=tile_pixel(im,word&1023,px,py)+(word>>12)*16*(bpp==4);raw.extend(p[n]+(0 if bpp==8 and n==0 else 255,))
         assert (mod/credits[name]['file']).read_bytes()==raw,name
     for name,size,num,palette in [('dizzy_egg',32,8,'dizzy_egg'),('porygon',64,3,'porygon'),('porygon_shiny',64,3,'shiny')]:
         im=Image.open(root/'sprites'/('porygon.png'if name=='porygon_shiny'else name+'.png'));p=colors(root/'sprites'/(palette+'.pal'));raw=bytearray()

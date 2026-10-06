@@ -1,8 +1,8 @@
 {
-  "version": "0.7.4",
+  "version": "0.7.5",
   "native_checks": {
-    "default": 96865,
-    "mounted": 96865
+    "default": 96876,
+    "mounted": 96876
   },
   "converter_tests": 19,
   "modkit": {
@@ -10,9 +10,9 @@
     "findings": [],
     "notes": []
   },
-  "cpu_ui_captures": 73,
+  "cpu_ui_captures": 92,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.3",
+  "cart_version": "1.0.4",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -133,6 +133,8 @@
         "battle_terrain_pixels": 8601600,
         "source_status_strips": 40,
         "source_healthbox_composites": 10,
+        "source_ball_prompt_pixels": 8192,
+        "source_credits_pixels": 114688,
         "source_title_pixels": 106496,
         "source_escape_flags": 564,
         "follower_species_and_forms": 413,
@@ -159,6 +161,10 @@
     "Changing outdoor tint viewport and inherited graphics state/error cleanup",
     "Title backdrop palette in BG bank 14 and native BG enable",
     "Empty follower nickname fallback, emote before dialogue, ball pose timing and actual door recall handoff",
-    "Source Quick Run arrow tokens and pending/partial settings notices"
+    "Source Quick Run arrow tokens and pending/partial settings notices",
+    "Source environment entry set includes real GRASS and excludes enclosing COUNT declaration",
+    "Complete native action/move/message battle draws in Gen 3/4 under OLD/MODERN terrain",
+    "Full 32x64 R prompt, source ball icon origin and held/idle cycle arrows",
+    "Actual boot traverses original credits before Game Freak; source Egg/Porygon collision timing and credits pixels"
   ]
 }

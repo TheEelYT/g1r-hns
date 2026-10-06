@@ -6,6 +6,23 @@ p=argparse.ArgumentParser();p.add_argument('--engine',type=Path,required=True);p
 a.out.mkdir(parents=True,exist_ok=True);capture=a.out/'source_ui_draws.lua'
 subprocess.check_call([str(a.luajit.resolve()),str(Path(__file__).with_suffix('.lua').resolve()),str(a.mod.resolve()),str(capture.resolve())],cwd=a.engine)
 frames=json.loads(subprocess.check_output([str(a.luajit.resolve()),str(a.engine.resolve()/'tools/lua_to_json.lua'),str(capture.resolve())]))
+# Check the complete native draw route, not only the terrain resolver/helper.
+for frame in frames:
+    name=frame['name'];calls=frame['draws']
+    if name.startswith('battle_full_'):
+        _,_,style,terrain,mode=name.split('_')
+        first=next(c for c in calls if c['op']=='image')
+        assert first['file']==f'battle/GRASS_{terrain}_Day.rgba',name
+        if mode in ('menu','moves'):
+            assert any(c['op']=='image'and c['file']=='ui/frame.rgba'for c in calls),name
+        if mode=='menu':
+            prompt=next(c for c in calls if c['op']=='image'and c['file']==f'battle/{style}_ballPrompt.rgba')
+            assert prompt['ih']==64 and prompt['x']==-2 and prompt['y']==28,name
+            assert any(c['op']=='image'and c['file']=='services/item_4.rgba'and c['x']==-2 and c['y']==52 for c in calls),name
+        else:
+            assert not any(c['op']=='image'and 'ballPrompt'in c['file']for c in calls),name
+        if mode=='none':
+            assert any(c['op']=='image'and c['y']==121 and c['x']==16 and 'normal' in c['file']for c in calls),name
 cache={}
 for frame in frames:
     im=Image.new('RGBA',(240,160),(107,170,107,255));d=ImageDraw.Draw(im)
