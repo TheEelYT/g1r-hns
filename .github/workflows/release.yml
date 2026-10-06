@@ -66,6 +66,7 @@ jobs:
           for audit in world fidelity gameplay presentation services dex_moves expansion; do
             python3 "tests/check_${audit}.py" --source build/source --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --report "reports/${audit}.json"
           done
+          python3 tests/render_source_ui.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --out build/ui-captures
           test -z "$(git -C build/source status --porcelain)"
           test -z "$(git -C build/engine status --porcelain)"
       - name: Package mod and sealed cart

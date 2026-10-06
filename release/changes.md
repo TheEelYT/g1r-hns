@@ -1,9 +1,8 @@
-Changes in 0.7.5:
+Changes in 0.7.6:
 
-- Fixes Modern grass terrain: the enclosing table declaration no longer consumes the source GRASS entry or sends grass battles to the building fallback.
-- Repairs source battle action/move borders and message placement/width in both Gen 3 and Gen 4 UI. User-selected source window frames remain supported.
-- Restores the full 32×64 R-ball prompt, source icon placement and idle/held cycle-arrow colors.
-- Adds the original source POWERED BY / PRET × RHH credits with Dizzy Egg/Porygon animation before the Game Freak screen.
-- Updates the permanent README progress checklist and focused player checks.
+- Replaces Modern terrain tile guessing with source BG3 screen blocks and the separate BG1 entry map, including wraparound, scanline scroll and source entry progression. OLD terrain keeps its existing path.
+- Fixes opponent name/level fill extending eight pixels past its source border in both battle UI styles.
+- Uses the source light background palette for GEN 4 names/levels, while retaining the darker HP-number strip.
+- Moves focused player checks into TESTING.md, removes the confirmed R-ball prompt check, and removes publishing from the port progress checklist.
 
-Validated with both native cache roots, converter tests, strict Modkit validation, independent source audits and complete native battle CPU captures. No live Windows/GPU gameplay was available. Full enhanced battle mechanics and later campaign remain pending; incomplete settings retain their red ! notices.
+Validation uses both native cache roots, converter tests, strict Modkit validation, independent source audits, a compiled source C entry oracle and native battle CPU captures. No live Windows/GPU gameplay is available here. Sprite orchestration and remaining enhanced battle mechanics/campaign work remain in progress.

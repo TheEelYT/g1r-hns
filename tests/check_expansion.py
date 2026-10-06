@@ -2,6 +2,7 @@
 import argparse,json,re,struct,subprocess,tempfile
 from pathlib import Path
 from PIL import Image
+from check_battle_entry import check_entry
 
 
 def colors(path):
@@ -16,12 +17,14 @@ def tile_pixel(im,tile,x,y):
     return im.getpixel(((tile%(im.width//8))*8+x,(tile//(im.width//8))*8+y))
 
 
-def map_pixels(im,words,pal,w,h,bank=0):
+def map_pixels(im,words,pal,w,h,bank=0,nibble=False):
     raw=bytearray(w*h*4)
     for y in range(h):
         for x in range(w):
             word=words[y//8*32+x//8];px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
-            n=tile_pixel(im,word&1023,px,py)+max(0,(word>>12)-bank)*16
+            n=tile_pixel(im,word&1023,px,py)
+            if nibble:n &= 15
+            n+=max(0,(word>>12)-bank)*16
             raw[(y*w+x)*4:(y*w+x+1)*4]=bytes(pal[n]+(255,))
     return raw
 
@@ -42,18 +45,40 @@ def check(source,engine,mod,luajit):
         pal=colors(source/row['sourcePalette']);pal += [(0,0,0)]*max(0,48-len(pal))
         expected=map_pixels(Image.open(source/row['sourceTiles']),words,pal,256,160,2)
         assert (mod/row['full']['file']).read_bytes()==expected,key
+        if 'entry' in row:
+            raw=(source/row['sourceEntryMap']).read_bytes();words=struct.unpack('<'+str(len(raw)//2)+'H',raw)
+            im=Image.open(source/row['sourceEntryTiles']);expected=map_pixels(im,words,pal,256,256,2,True)
+            for y in range(256):
+                for x in range(256):
+                    word=words[y//8*32+x//8];px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
+                    if tile_pixel(im,word&1023,px,py)%16==0:expected[(y*256+x)*4+3]=0
+            assert (mod/row['entry']['file']).read_bytes()==expected,key
+            raw=(source/row['sourceMap']).read_bytes();words=struct.unpack('<'+str(len(raw)//2)+'H',raw)
+            im=Image.open(source/row['sourceTiles']);global_pal=colors(source/'graphics/battle_interface/hns/textbox.pal')[:16]*2+pal;expected=bytearray()
+            for y in range(160):
+                for x in range(512):
+                    word=words[x//256*1024+y//8*32+(x%256)//8];px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
+                    n=tile_pixel(im,word&1023,px,py)+(word>>12)*16
+                    expected.extend(global_pal[n]+(255 if n%16 else 0,))
+            assert (mod/row['introBackground']['file']).read_bytes()==expected,key
     count.update(battle_terrain_configurations=len(terrains),battle_terrain_pixels=len(terrains)*256*160)
+    count['source_modern_entry_pixels']=sum('entry' in row for row in terrains.values())*256*256
+    count['source_modern_scroll_pixels']=sum('entry' in row for row in terrains.values())*512*160
+    count['source_c_entry_frames']=check_entry(source,mod,luajit)
     # Reconstruct status strips from the source OAM stream and dynamic palettes.
     status_colors=[(24,12,24),(23,23,3),(20,20,17),(17,22,28),(28,14,10)]
     for style,d in [('gen3','hns'),('gen4','gen4')]:
         root=source/'graphics/battle_interface'/d;pal=colors(root/'healthbox_singles_player.pal')[:16]
         for name,h in [('healthbox_singles_player',64),('healthbox_singles_opponent',32),('healthbox_doubles_player',32),('healthbox_doubles_opponent',32),('healthbox_safari',64)]:
-            im=Image.open(root/(name+'.png'));raw=bytearray();bg=3 if style=='gen4'else 2
+            im=Image.open(root/(name+'.png'));raw=bytearray();bg=2
             for y in range(h):
                 for x in range(128):
                     tile=(x//64)*(h//8*8)+(y//8)*8+(x%64)//8;n=tile_pixel(im,tile,x%8,y%8)&15
-                    if 5<=y<16 and (16 if 'player'in name else 8)<=x<96:n=bg
-                    if name=='healthbox_singles_player'and 24<=y<32 and 40<=x<96:n=bg
+                    # Source writes 55px nickname + 24px level; opponent
+                    # windows end at x=88, player windows at x=96. Gen4
+                    # TextIntoHealthboxObject uses BG index 2, not HP BG 3.
+                    if 5<=y<16 and (16 if 'player'in name else 8)<=x<(96 if 'player'in name else 88):n=bg
+                    if name=='healthbox_singles_player'and 24<=y<32 and 40<=x<96:n=3 if style=='gen4'else bg
                     raw.extend(pal[n]+(255 if n else 0,))
             a=world['battleVisuals']['ui'][style][name];assert (mod/a['file']).read_bytes()==raw,(style,name)
         for battler in range(4):
@@ -159,7 +184,7 @@ def check(source,engine,mod,luajit):
         assert m['power']==display['power'] and m['accuracy']==display['accuracy'] and m['category']==display['category'],name
         assert m['description']==display['description'],name
     count['expanded_supported_moves']=len(moves);count['expanded_explicit_omissions']=len(omitted)
-    return {'result':'pass','counts':count,'limits':['Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Source battle entry choreography and distinct expanded move animations remain native; full expanded effects/abilities are unfinished.']}
+    return {'result':'pass','counts':count,'limits':['Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)

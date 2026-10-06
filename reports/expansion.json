@@ -3,6 +3,9 @@
   "counts": {
     "battle_terrain_configurations": 210,
     "battle_terrain_pixels": 8601600,
+    "source_modern_entry_pixels": 6881280,
+    "source_modern_scroll_pixels": 8601600,
+    "source_c_entry_frames": 1078,
     "source_status_strips": 40,
     "source_healthbox_composites": 10,
     "source_ball_prompt_pixels": 8192,
@@ -18,6 +21,6 @@
   },
   "limits": [
     "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
-    "Source battle entry choreography and distinct expanded move animations remain native; full expanded effects/abilities are unfinished."
+    "Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished."
   ]
 }

@@ -6,6 +6,8 @@ return function(mod,w,game)
   local B=require('src.core.game3.battle');local Rtc=require('src.core.game3.rtc')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui);V.ui=U
   local Owned=assert(load(mod:read('hns_healthbox.lua')))()
+  local Entry=assert(load(mod:read('terrain_entry.lua')))()(w.bootPresentation.credits.sineDegrees)
+  V.entryState=Entry
   local function color(c)return {(c%32)/31,(math.floor(c/32)%32)/31,(math.floor(c/1024)%32)/31,1}end
   function V.style(s)return H.value('ITEM_BATTLE_NEW_BATTLEUI',s)==1 and 'gen4'or 'gen3'end
   function V.row(s)return w.battleVisuals.ui[V.style(s)]end
@@ -27,6 +29,39 @@ return function(mod,w,game)
   Bg.draw=function(id,eo,po,bo)
     if not H.battle(B._st)then return draw(id,eo,po,bo)end
     local row,key=V.terrain(id);local own='hns_'..key
+    if row.entry then
+      local Intro=require('src.core.game3.battle.intro_seq');local step=Intro._steps and Intro._steps[Intro._i]
+      if Intro._st==B._st and step and step.kind=='bgslide'and H.value('ITEM_BATTLE_FAST_INTRO',B._st.session)~=0 then
+        local stage=require('src.core.game3.battle.anim').stage()
+        local state=Entry(math.floor((stage.slide or 0)*154+.5),row.entryKind,row.environment)
+        local function strip(a,sx,sy,y,h)
+          if h<=0 then return end
+          local im=image(a);sx=sx%a.width
+          local n=math.min(240,a.width-sx)
+          love.graphics.draw(im,love.graphics.newQuad(sx,sy,n,h,a.width,a.height),0,y)
+          if n<240 then love.graphics.draw(im,love.graphics.newQuad(0,sy,240-n,h,a.width,a.height),n,y)end
+        end
+        love.graphics.setColor(0,0,0,1);love.graphics.rectangle('fill',0,0,240,112)
+        love.graphics.setColor(1,1,1,1)
+        local top,bottom=math.max(0,state.top),math.min(112,state.bottom)
+        -- The source HBlank DMA targets BG3, not the BG1 entry layer.
+        strip(row.introBackground,state.scan,top,top,math.max(0,math.min(80,bottom)-top))
+        local lower=math.max(80,top)
+        strip(row.introBackground,-state.scan,lower,lower,bottom-lower)
+        if state.visible then
+          -- BG1 has an independent scroll and a 256px blank second screen
+          -- block. Quads preserve the caller's GPU scissor and zoom.
+          love.graphics.setColor(1,1,1,state.alpha/16)
+          local y=math.max(top,-state.y);local h=math.min(bottom,256-state.y)-y
+          strip(row.entry,state.x,y+state.y,y,h)
+        end
+      else
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.draw(image(row.full),love.graphics.newQuad(0,0,240,160,row.full.width,row.full.height),0,0)
+      end
+      love.graphics.setColor(1,1,1,1)
+      return true
+    end
     if not Chrome._terrains[own]then Chrome._terrains[own]={image=image(row.full),w=256,h=160,bgImage=image(row.wallpaper),enemyPlat=image(row.enemy),playerPlat=image(row.player)}end
     return Chrome.drawTerrain(own,eo,po,bo)
   end
@@ -93,10 +128,10 @@ return function(mod,w,game)
   end
   local source={font=Font}
   function source.textColors()
-    local p=V.row().palette;return color(p[V.style()=='gen4'and 4 or 3]),{fg=color(p[2]),shadow=color(p[4])},{fg=color(p[12]),shadow=color(p[4])},{fg=color(p[11]),shadow=color(p[4])}
+    local p=V.row().palette;return color(p[3]),{fg=color(p[2]),shadow=color(p[4])},{fg=color(p[12]),shadow=color(p[4])},{fg=color(p[11]),shadow=color(p[4])}
   end
   function source.name(name,gender,x,y)
-    local p,fg,sh=palettes();local font=U.width(name,'small')>55 and 'small_narrower'or 'small';U.text(name,x,y,fg,sh,font)
+    local p,fg,sh=palettes();local font=U.width(name,'small')+(gender and Font.advance(0xB5)or 0)>55 and 'small_narrower'or 'small';U.text(name,x,y,fg,sh,font)
     local pos=x+U.width(name,font);if gender=='male'or gender=='M'then Font.drawGlyph(0xB5,pos,y,{colors={fg=color(p[12]),shadow=sh}})
     elseif gender=='female'or gender=='F'then Font.drawGlyph(0xB6,pos,y,{colors={fg=color(p[11]),shadow=sh}})end
   end

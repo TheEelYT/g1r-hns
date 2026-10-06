@@ -1,12 +1,12 @@
-# Pokémon Heart & Soul → Gen1Recomp 0.7.5
+# Pokémon Heart & Soul → Gen1Recomp 0.7.6
 
-A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.5 repairs battle action/move frames and message placement in both UI styles, restores the complete sliding R-ball prompt, and fixes Modern grass terrain. The original source PRET/RHH credits sequence now plays between copyright and Game Freak. Settings retain visible pending/partial support notices; the permanent checklist tracks completed and remaining work.
+A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.6 fixes Modern terrain entry rendering using the source maps and scroll progression, removes opponent healthbox text overflow, and corrects the Gen 4 name/level background color. The full R-ball prompt is player-confirmed. Settings retain visible pending/partial support notices; the permanent checklist tracks completed and remaining work.
 
-**Download `pokemon_heart_soul-1.0.4.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.5.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
+**Download `pokemon_heart_soul-1.0.5.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.6.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
 
 ## Install
 
-Use Gen1Recomp **v0.3.44**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.5** and the cart version is **1.0.4**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
+Use Gen1Recomp **v0.3.44**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.6** and the cart version is **1.0.5**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
 
@@ -36,11 +36,11 @@ The 23 reviewed rule/feature settings are recorded in `world.startup.rules.imple
 
 EXP. SHARE uses the pinned source ratios: active participants split 2/3 of the base award, each eligible reserve receives 7/25, and one eligible party Pokémon receives the full award. Eggs/fainted members are excluded. Source `B_SCALED_EXP = GEN_3` does not weight awards by recipient level. Disabled mode delegates to native experience, and old bag-held EXP. SHARE migrates to the key item.
 
-Outdoor tint uses the source's 5-bit arithmetic and time transitions. **Palette-bank light immunity and alternate-light high-bit behavior remain pending**; the current shader tints the outdoor field as a whole. Source battle terrain pixels and status strips are imported, while platform entry motion and battle orchestration remain native. Basic named follower dialogue and source emotes/ball transitions are active; full conditional interaction scripts, caught-ball variants and female-specific graphics remain pending. This release does **not** complete the entire enhanced battle system.
+Outdoor tint uses the source's 5-bit arithmetic and time transitions. **Palette-bank light immunity and alternate-light high-bit behavior remain pending**; the current shader tints the outdoor field as a whole. Source battle terrain pixels, Modern entry layers/scroll progression and status strips are imported; battler/sprite orchestration and blend effects retain native integration. Basic named follower dialogue and source emotes/ball transitions are active; full conditional interaction scripts, caught-ball variants and female-specific graphics remain pending. This release does **not** complete the entire enhanced battle system.
 
 ## Validation and rebuilding
 
-Version 0.7.5 passes the native regression suite under both cache roots, 19 converter tests, strict Modkit validation and 92 CPU UI captures. Validation uses the real pinned native Lua modules with controlled boundaries for unavailable ROM data, GPU uploads and graphical effect handoffs. It exercises persistent status, source stats, all tower escape floors, saved Fake RTC, real grass-step encounter rolls in four time periods, changing tint viewports/error cleanup, follower emotes and door recall, complete native action/move/message battle draws, source terrain/healthboxes, full R prompt, shortcuts and credits/intro/title completion alongside the retained campaign/UI/audio regressions. Seven independent audits compare world/presentation/gameplay/services/Dex data and the new expansion with source; the tint oracle compiles the actual HnS `TimeMixPalettes` function and compares every ordinary 15-bit color at six transition points. CPU UI captures rasterize actual Lua draw calls and enforce source-sheet bounds.
+Version 0.7.6 passes the native regression suite under both cache roots, 19 converter tests, strict Modkit validation and 108 CPU UI captures. Validation uses the real pinned native Lua modules with controlled boundaries for unavailable ROM data, GPU uploads and graphical effect handoffs. It exercises persistent status, source stats, all tower escape floors, saved Fake RTC, real grass-step encounter rolls in four time periods, changing tint viewports/error cleanup, follower emotes and door recall, complete native action/move/message battle draws, source terrain/healthboxes, full R prompt, shortcuts and credits/intro/title completion alongside the retained campaign/UI/audio regressions. Seven independent audits compare world/presentation/gameplay/services/Dex data and the new expansion with source. A compiled oracle checks 1,078 frames of the actual source battle-entry C tasks; the tint oracle compiles HnS `TimeMixPalettes` and compares every ordinary 15-bit color at six transition points. CPU UI captures rasterize actual Lua draw calls, enforce source-sheet bounds and verify Modern BG3/BG1 source scroll coordinates.
 
 **No graphical LÖVE runtime or imported Emerald ROM/cache is available here.** Windows gameplay, listening and live GPU rendering require a player check. CPU previews are not running-game screenshots. Detailed results and limitations are recorded under `reports/`.
 
@@ -102,16 +102,16 @@ This list is kept in every update. Checked entries stay struck through. A checke
 - [x] ~~Implement reviewed modern level-up/egg moves, Roost and battle move details prompt.~~
 - [x] ~~Import selectable source battle terrain and Gen 3/4 healthboxes/status strips.~~
 - [x] ~~Repair actual Modern grass selection, source battle frames/message windows and full R-ball prompt.~~
+- [x] ~~Import source Modern entry layers/scroll progression and fix healthbox text bounds/palettes.~~
 - [x] ~~Implement fast battle/intro, ball selection and Quick Run controls.~~
 - [x] ~~Implement persistent status migration and source Escape Rope/Dig restrictions.~~
-- [x] ~~Publish deterministic ZIP and sealed, save-isolated, hash-pinned custom cart.~~
 - [ ] Finish enhanced battle effects, expanded abilities/items/species and distinct move animations.
 - [ ] Finish expanded TM/HM/tutor learning, breeding and evolution behavior.
 - [ ] Implement remaining Custom Game Mode rules and settings; retain visible pending notices until connected.
 - [ ] Implement Randomizer settings and deterministic saved randomization.
 - [ ] Implement Nuzlocke rules/clauses and remaining challenge restrictions.
 - [ ] Finish difficulty/features/fishing/audio settings, including alternate GB SOUNDS playback.
-- [ ] Match source battle platform entry motion and remaining battle presentation.
+- [ ] Finish source battler/sprite entry orchestration, blend effects and remaining battle presentation.
 - [ ] Finish time palette-bank light immunity, alternate lights, swarms and expanded encounter species.
 - [ ] Finish conditional follower reactions/scripts, caught-ball variants and female-specific graphics.
 - [ ] Complete later Johto story scripts, gyms, puzzles, NPCs, items and rewards.

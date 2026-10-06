@@ -33,6 +33,11 @@ def build(source,engine,stage,maps,source_maps):
             b=new.get(env,'')if style=='modern'else '';gfx=re.search(r'\.background\s*=\s*MODERN_BACKGROUND\((\w+)\)',b)
             name=gfx[1]if gfx else m[1];basepal=re.search(r'\.palette\s*=\s*(\w+)',b)
             td=tiles(path('gBattleEnvironmentTiles_'+name,'.png'));raw=path('gBattleEnvironmentTilemap_'+name,'.bin').read_bytes();words=list(struct.unpack('<'+str(len(raw)//2)+'H',raw))
+            entry=re.search(r'\.entry\s*=\s*(?:MODERN|ENVIRONMENT)_ENTRY\((\w+)\)',b if style=='modern'else '')or re.search(r'\.entry\s*=\s*ENVIRONMENT_ENTRY\((\w+)\)',body)
+            entry_td=[[n&15 for n in tile]for tile in tiles(path('gBattleEnvironmentAnimTiles_'+entry[1],'.png'))]
+            entry_map=path('gBattleEnvironmentAnimTilemap_'+entry[1],'.bin')
+            entry_words=struct.unpack('<'+str(entry_map.stat().st_size//2)+'H',entry_map.read_bytes())
+            entry_index=text_map(entry_td,[(v&4095)|max(0,(v>>12)-2)<<12 for v in entry_words],256,256)
             for period in ('Day','Twilight','Night'):
                 pal=re.search(r'\.palette'+(period if period!='Day'else '')+r'\s*=\s*(\w+)',b)
                 palname=pal[1]if pal else basepal[1]if basepal else p[1]
@@ -58,6 +63,21 @@ def build(source,engine,stage,maps,source_maps):
                                 px=7-x if bg&1024 else x;py=7-y if bg&2048 else y
                                 wallpaper[pos]=td[bg&1023][py*8+px]+(bg>>12)*16
                 row['wallpaper']=save(key+'_wall',256,160,rgba(wallpaper,colors));row['enemy']=save(key+'_enemy',256,160,enemy);row['player']=save(key+'_player',256,160,player)
+                if style=='modern':
+                    # Source BG3 is 512x256, with two 32x32 screen blocks.
+                    # Its scanline scroll must wrap into the real right block.
+                    wide=bytearray(512*160)
+                    for y in range(160):
+                        for x in range(512):
+                            word=words[(x//256)*1024+(y//8)*32+(x%256)//8]
+                            px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
+                            wide[y*512+x]=td[word&1023][py*8+px]+(word>>12)*16
+                    global_colors=palette(source/'graphics/battle_interface/hns/textbox.pal')[:16]*2+colors
+                    row['introBackground']=save(key+'_intro_bg',512,160,rgba(wide,global_colors,True))
+                    slide=re.search(r'\.battleIntroSlide\s*=\s*(\w+)',body)[1]
+                    kind=2 if slide=='BattleIntroSlide2'else 3 if slide in ('BattleIntroSlide3','BUILDING_BATTLE_INTRO_SLIDE','PLAIN_BATTLE_INTRO_SLIDE')else 1
+                    row['entry']=save(key+'_entry',256,256,rgba(entry_index,colors,True))
+                    row.update(entryKind=kind,environment=env,sourceEntryTiles=str(path('gBattleEnvironmentAnimTiles_'+entry[1],'.png').relative_to(source)),sourceEntryMap=str(entry_map.relative_to(source)))
                 out['terrains'][key]=row
     out['scenes']=dict(re.findall(r'\{(MAP_BATTLE_SCENE_\w+),\s*BATTLE_ENVIRONMENT_(\w+)\}',code))
     for mid,m in maps.items():m['hnsBattleScene']=source_maps[m['hnsSourceId']]['battle_scene']
@@ -74,12 +94,12 @@ def build(source,engine,stage,maps,source_maps):
                     tile=(x//64)*(h//8*8)+(y//8)*8+(x%64)//8
                     idx[y*w+x]=td[tile][y%8*8+x%8]&15
             # Source windows erase placeholder letters with their palette BG.
-            player='player'in name;bg=3 if style=='gen4'else 2
+            player='player'in name;bg=2
             for y in range(5,16):
-                for x in range(16 if player else 8,96):idx[y*w+x]=bg
+                for x in range(16 if player else 8,96 if player else 88):idx[y*w+x]=bg
             if name=='healthbox_singles_player':
                 for y in range(24,32):
-                    for x in range(40,96):idx[y*w+x]=bg
+                    for x in range(40,96):idx[y*w+x]=3 if style=='gen4'else bg
             ui[name]=save(style+'_'+name,w,h,rgba(idx,pal,True))
         pattern=r'gHealthboxElementsGfxTableGen'+('4'if style=='gen4'else'3')+r'\[\]\[32\]\s*=\s*INCBIN_U8\((.*?)\);'
         body=re.search(pattern,graphics,re.S)[1];files=re.findall(r'"([^\"]+)"',body);td=[]

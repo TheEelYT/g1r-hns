@@ -188,6 +188,29 @@ if w.battleVisuals then
       end
     end
   end
+  -- Source entry timing while retaining complete native battle drawing. The
+  -- current bgslide phase/progress is a controlled animation-clock boundary.
+  local Intro=require('src.core.game3.battle.intro_seq')
+  local steps,index,introSt=Intro._steps,Intro._i,Intro._st
+  Intro._steps={{kind='bgslide',data={frames=154}}};Intro._i=1;Intro._st=Battle._st
+  choices.ITEM_BATTLE_FAST_INTRO=1;choices.ITEM_BATTLE_NEW_BACKGROUNDS=1;Bu._mode='none';shortcut.ballX=-14
+  stage.healthbox.player.visible=false;stage.healthbox.enemy.visible=false
+  for _,style in ipairs({'gen3','gen4'})do
+    choices.ITEM_BATTLE_NEW_BATTLEUI=style=='gen4'and 1 or 0
+    for _,frame in ipairs({0,12,34,68,100,140,154})do
+      stage.slide=frame/154
+      local offset=240*(1-math.max(0,frame-35)/120)
+      stage.bgSlide={enemyOx=-offset,playerOx=offset}
+      snap('battle_entry_'..style..'_'..frame,function()Bu.draw(240,160)end)
+      frames[#frames].entryState=V.entryState(frame,1,'GRASS')
+    end
+  end
+  choices.ITEM_BATTLE_FAST_INTRO=0
+  snap('battle_entry_fast',function()Bu.draw(240,160)end)
+  choices.ITEM_BATTLE_NEW_BACKGROUNDS=0;choices.ITEM_BATTLE_FAST_INTRO=1;stage.slide=68/154;stage.bgSlide={enemyOx=-174,playerOx=174}
+  snap('battle_entry_old',function()Bu.draw(240,160)end)
+  Intro._steps,Intro._i,Intro._st=steps,index,introSt
+  stage.slide=1;stage.bgSlide={enemyOx=0,playerOx=0};stage.healthbox.player.visible=true;stage.healthbox.enemy.visible=true
   Bu._mode='menu';shortcut.ballX=14;shortcut.rHeld=true
   snap('battle_ball_cycle',function()Bu.draw(240,160)end)
   shortcut.rHeld=false;shortcut.ballX=0;snap('battle_ball_slide',function()Bu.draw(240,160)end)

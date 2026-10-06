@@ -1,5 +1,5 @@
 {
-  "version": "0.7.5",
+  "version": "0.7.6",
   "native_checks": {
     "default": 96876,
     "mounted": 96876
@@ -10,9 +10,9 @@
     "findings": [],
     "notes": []
   },
-  "cpu_ui_captures": 92,
+  "cpu_ui_captures": 108,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.4",
+  "cart_version": "1.0.5",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -131,6 +131,9 @@
       "counts": {
         "battle_terrain_configurations": 210,
         "battle_terrain_pixels": 8601600,
+        "source_modern_entry_pixels": 6881280,
+        "source_modern_scroll_pixels": 8601600,
+        "source_c_entry_frames": 1078,
         "source_status_strips": 40,
         "source_healthbox_composites": 10,
         "source_ball_prompt_pixels": 8192,
@@ -146,14 +149,14 @@
       },
       "limits": [
         "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
-        "Source battle entry choreography and distinct expanded move animations remain native; full expanded effects/abilities are unfinished."
+        "Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished."
       ]
     }
   },
   "limitations": [
     "Full enhanced battle mechanics/abilities/species/items, expanded TM/tutor teaching, remaining challenge effects and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
-    "Native battle entry/attack choreography remains; full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
+    "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
   ],
   "targeted_regressions": [
@@ -165,6 +168,34 @@
     "Source environment entry set includes real GRASS and excludes enclosing COUNT declaration",
     "Complete native action/move/message battle draws in Gen 3/4 under OLD/MODERN terrain",
     "Full 32x64 R prompt, source ball icon origin and held/idle cycle arrows",
-    "Actual boot traverses original credits before Game Freak; source Egg/Porygon collision timing and credits pixels"
-  ]
+    "Actual boot traverses original credits before Game Freak; source Egg/Porygon collision timing and credits pixels",
+    "Modern BG3 uses both real source screen blocks with 512-pixel wrap; HBlank scroll targets BG3 independently of BG1",
+    "1078 source C task frames across grass/long grass/sand/water/underwater/Kyogre/building match Lua register traces",
+    "Modern entry CPU draw calls match source BG3 scanline and independent BG1 scroll coordinates; FAST INTRO bypass and OLD terrain retained",
+    "Opponent text fill ends at x=88; source Gen4 name/level BG index 2 and HP-number BG index 3 preserved"
+  ],
+  "tested_build_content_equivalence": {
+    "files": 7689,
+    "differences": [
+      "README.md"
+    ],
+    "release_readme_matches_repository": true
+  },
+  "release_artifacts": {
+    "mod_version": "0.7.6",
+    "cart_version": "1.0.5",
+    "repo": "TheEelYT/g1r-hns",
+    "files": [
+      {
+        "name": "pokemon_heart_soul-1.0.5.g1rcart",
+        "bytes": 1028179,
+        "sha256": "0401bcf46dcd3a7db2974080c84484d1603a1d27a7e35970e5b31a3acbbc39d5"
+      },
+      {
+        "name": "hns_exploration-0.7.6.zip",
+        "bytes": 9887167,
+        "sha256": "1a3e9fa5f70c3cd59c5658fc667aaee6fab7070a353c193256160276d90d5f3c"
+      }
+    ]
+  }
 }

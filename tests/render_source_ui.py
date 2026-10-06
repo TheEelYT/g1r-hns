@@ -23,6 +23,25 @@ for frame in frames:
             assert not any(c['op']=='image'and 'ballPrompt'in c['file']for c in calls),name
         if mode=='none':
             assert any(c['op']=='image'and c['y']==121 and c['x']==16 and 'normal' in c['file']for c in calls),name
+    elif name.startswith('battle_entry_gen'):
+        background=[c for c in calls if c['op']=='image'and c['file']=='battle/GRASS_modern_Day_intro_bg.rgba']
+        assert background and all(c['iw']==512 for c in background),name
+        state=frame['entryState']
+        for y in range(max(0,state['top']),min(112,state['bottom'])):
+            for x in range(240):
+                matches=[c for c in background if c['x']<=x<c['x']+c['q'][2]and c['y']<=y<c['y']+c['q'][3]]
+                assert len(matches)==1,(name,x,y)
+                c=matches[0]
+                assert c['q'][0]+x-c['x']==(x+(state['scan']if y<80 else -state['scan']))%512,(name,x,y)
+                assert c['q'][1]+y-c['y']==y,(name,x,y)
+        for c in (c for c in calls if c['op']=='image'and c['file']=='battle/GRASS_modern_Day_entry.rgba'):
+            assert c['q'][0]==(c['x']+state['x'])%256,name
+            assert c['q'][1]==c['y']+state['y'],name
+            assert c['color'][3]==state['alpha']/16,name
+        assert not any(c['op']=='image'and any(c['file'].endswith('_'+suffix+'.rgba')for suffix in ('wall','enemy','player'))for c in calls),name
+        assert any(c['op']=='image'and c['file']=='battle/GRASS_modern_Day_entry.rgba'for c in calls)==(not name.endswith('_154')),name
+    elif name=='battle_entry_fast':
+        assert not any(c['op']=='image'and c['file'].endswith(('_entry.rgba','_intro_bg.rgba'))for c in calls),name
 cache={}
 for frame in frames:
     im=Image.new('RGBA',(240,160),(107,170,107,255));d=ImageDraw.Draw(im)
