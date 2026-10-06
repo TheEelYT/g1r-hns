@@ -1,6 +1,6 @@
 # Pokémon Heart & Soul → Gen1Recomp 0.7.6
 
-NOTE: Does not currently work on later gen1recomp versions without manually overwriting the mod with the mod zip after installation. One of the updates after g1r v0.3.44 added compression to mod files on mod import or auto-download, but the hope is to have this fixed in the next release. 
+NOTE: Does not currently work on later gen1recomp versions without manually overwriting the mod with the mod zip after installation. One of the updates after g1r v0.3.44 added compression to mod files on mod import or auto-download, and the mod hasn't been updated to support it. The hope is to have this fixed in the next release. 
 
 A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.6 fixes Modern terrain entry rendering using the source maps and scroll progression, removes opponent healthbox text overflow, and corrects the Gen 4 name/level background color. The full R-ball prompt is player-confirmed. Settings retain visible pending/partial support notices; the permanent checklist tracks completed and remaining work.
 
