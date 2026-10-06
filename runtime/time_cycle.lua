@@ -5,6 +5,23 @@ return function(mod,w,game)
   local Rtc=require('src.core.game3.rtc');local Space=require('src.core.game3.scripting.space')
   local Flags=require('src.core.game3.scripting.flags');local O=require('src.core.game3.objects')
   local Enc=require('src.core.game3.encounters');local Field=require('src.core.game3.field_view')
+  -- Content registration resolves species names to native IDs. Timed pools
+  -- bypass that registry, so resolve them once before handing them to RSE.
+  local Pokemon=require('src.core.game3.pokemon');local timed={}
+  for id,pools in pairs(w.encounters.timed or {})do
+    timed[id]={}
+    for period,pool in pairs(pools)do
+      local out={};timed[id][period]=out
+      for kind,area in pairs(pool)do
+        local slots={};out[kind]={rate=area.rate,slots=slots}
+        for i,entry in ipairs(area.slots)do
+          local copy={};for k,v in pairs(entry)do copy[k]=v end
+          copy.species=assert(tonumber(entry.species)or Pokemon.speciesFromName(entry.species),'unresolved timed encounter species '..tostring(entry.species))
+          slots[i]=copy
+        end
+      end
+    end
+  end
   local function fake(s)return H.own(s)and H.value('ITEM_FEATURES_RTC_TYPE',s)==1 end
   function Time.save(s)
     s.modData=s.modData or {};local t=s.modData.hnsTime
@@ -63,16 +80,16 @@ return function(mod,w,game)
       if changed then O.refreshVisibility()end
     end
     Enc.ensureLoaded()
-    for id,pools in pairs(w.encounters.timed or {})do Enc._tables[id]=pools[period]or pools.Day end
+    for id,pools in pairs(timed)do Enc._tables[id]=pools[period]or pools.Day end
     Time.currentPeriod=period
   end
   local draw=old.draw or Field.draw
-  Field.draw=function(...)
+  Field.draw=function(g,vw,vh,opts)
     local s=Rt.getSession();local m=H.own(s)and w.maps[s.map]
     local outdoors=m and ({[1]=true,[2]=true,[3]=true,[6]=true})[m.mapType]
-    if not outdoors or not love.graphics.newShader or not love.graphics.getCanvas then return draw(...)end
+    if not outdoors or not love.graphics.newShader or not love.graphics.getCanvas then return draw(g,vw,vh,opts)end
     local t=Rtc.calcLocalTime(s);local a,b,weight=Time.blend(t)
-    if a[1]==256 and b[1]==256 then return draw(...)end
+    if a[1]==256 and b[1]==256 then return draw(g,vw,vh,opts)end
     local lg=love.graphics
     if not Time.shader then Time.shader=lg.newShader([[extern vec3 lut[32];
       vec4 effect(vec4 c,Image tex,vec2 uv,vec2 sc){vec4 p=Texel(tex,uv);
@@ -80,13 +97,17 @@ return function(mod,w,game)
       return vec4(lut[n.r].r,lut[n.g].g,lut[n.b].b,p.a)*c;}]])end
     local lut={};for c=0,31 do local r={};for k=1,3 do r[k]=Time.channel(c,a[k],b[k],weight)/31 end;lut[c+1]=r end
     Time.shader:send('lut',unpack(lut))
-    Time.canvas=Time.canvas or lg.newCanvas(240,160);Time.canvas:setFilter('nearest','nearest')
-    lg.push('all');lg.setCanvas(Time.canvas);lg.clear(0,0,0,0)
-    local ok,result=pcall(draw,...);lg.pop();if not ok then error(result)end
+    local cw,ch=math.ceil(vw or 240),math.ceil(vh or 160)
+    if not Time.canvas or Time.canvas:getWidth()~=cw or Time.canvas:getHeight()~=ch then
+      if Time.canvas then Time.canvas:release()end
+      Time.canvas=lg.newCanvas(cw,ch,{dpiscale=1});Time.canvas:setFilter('nearest','nearest')
+    end
+    lg.push('all');lg.setCanvas(Time.canvas);lg.origin();lg.setScissor();lg.clear(0,0,0,0)
+    local ok,result=pcall(draw,g,vw,vh,opts);lg.pop();if not ok then error(result)end
     lg.push('all');lg.setShader(Time.shader);lg.setColor(1,1,1,1);lg.draw(Time.canvas,0,0);lg.pop();return result
   end
   if not old.hook then mod.hooks:wrap('input.step',function(next,g,dt)
     if g==game and g.phase~='boot'then Time.tick(Rt.getSession(),dt)end;return next(g,dt)
   end)end
-  game._hnsTime={time=Time,info=info,calc=calc,offset=offset,draw=draw,hook=true}
+  game._hnsTime={time=Time,timed=timed,info=info,calc=calc,offset=offset,draw=draw,hook=true}
 end

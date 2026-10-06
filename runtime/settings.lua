@@ -98,10 +98,10 @@ return function(spec,U)
       local left=r.id=='ITEM_MODE_GAMEMODE' and 90 or 120
       for j,index in ipairs(orders)do
         local value=r.choices[index+1];local x=left
-        if #orders==1 or j==#orders then x=214-U.width(value)
-        elseif j==2 then x=120+(U.width(r.choices[orders[1]+1])-U.width(value)-U.width(r.choices[orders[3]+1])+94)/2 end
+        if #orders==1 or j==#orders then x=214-U.tokenWidth(value,'normal')
+        elseif j==2 then x=120+(U.tokenWidth(r.choices[orders[1]+1],'normal')-U.tokenWidth(value,'normal')-U.tokenWidth(r.choices[orders[3]+1],'normal')+94)/2 end
         local chosen=index==selected
-        U.text(value,x,y,active and (chosen and c[8] or c[3]) or (chosen and c[14] or c[5]),active and chosen and c[9] or not active and chosen and c[15] or c[4])
+        U.tokenText(value,x,y,'normal',active and (chosen and c[8] or c[3]) or (chosen and c[14] or c[5]),active and chosen and c[9] or not active and chosen and c[15] or c[4])
       end
     end
     if s.confirm then
@@ -111,6 +111,8 @@ return function(spec,U)
     else
       U.box(16,120,208,32,frame)
       local r=p.rows[s.cursor];local desc=r.descriptions[s.values[r.id]+1] or r.descriptions[1] or ''
+      if #r.choices>0 and not r.implemented then desc='NOT IMPLEMENTED YET.\nChoice saved; has no effect.'
+      elseif r.partial then desc=r.partial end
       desc=desc:gsub('{([ABLR])_BUTTON}','%1')
       U.text(desc,24,121)
     end

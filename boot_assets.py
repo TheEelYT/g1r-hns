@@ -51,7 +51,10 @@ def build(source,engine,stage):
         colors=palette(root/(rel+'.pal'));colors=colors+[0]*(256-len(colors))
         intro[name]=rgba(name,256,160,text_map(tiles(root/(rel+'.png')),words,256,160,colors))
     root=source/'graphics/title_screen/hns'
-    bg=palette(root/'pokemon_logo.pal')+palette(root/'rayquaza_and_clouds.pal');title['palettes']['bg']=bg
+    # Logo is 8bpp, but banks 14/15 belong to the 4bpp backdrop/clouds.
+    # The PNG palette is padded to 256; appending would place the backdrop
+    # beyond BG palette RAM and leave indices 225..239 black.
+    bg=palette(root/'pokemon_logo.pal')[:224]+palette(root/'rayquaza_and_clouds.pal');title['palettes']['bg']=bg
     def index(name,w,h,data,bpp):
         raw=bytearray();
         for n in data:raw.extend((n,0,0,255))

@@ -57,12 +57,12 @@ return function(mod,w,game)
     end
   end
   function F.message(mon)
-    local name=mon.nickname or Pokemon.name(Pokemon.speciesOf(mon));local key='sHappyMsg02'
+    local name=Pokemon.displayName(mon);local key='sHappyMsg02'
     if mon.status=='BRN'then key='sCondMsg42'
     elseif (mon.hp or 0)*4<(mon.maxHp or 1)then key='sSadMsg00'
     elseif (mon.friendship or 70)<50 then key='sNeutralMsg00'end
     local text=w.followers.messages[key]or w.followers.messages.sHappyMsg02
-    return text:gsub('{STR_VAR_1}',name)
+    return text:gsub('{STR_VAR_1}',function()return name end)
   end
   local move=old.move or P.tryMove
   P.tryMove=function(dir,g,run)
