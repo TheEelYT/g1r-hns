@@ -4,26 +4,11 @@ A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.44. Version 0.7.5 r
 
 **Download `pokemon_heart_soul-1.0.4.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.5.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
 
-## Install and test
+## Install
 
 Use Gen1Recomp **v0.3.44**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.5** and the cart version is **1.0.4**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
-
-Suggested checks for this update:
-
-- Launch from a closed game. Copyright should lead into the source POWERED BY / PRET × RHH credits, including Dizzy Egg and Porygon animation, then Game Freak and the HnS title. Any game button can skip the credits after their initial fade.
-- In a grass encounter, select OLD and MODERN terrain separately. MODERN should show the source forest/grass backdrop instead of the generic striped building background. Repeat at morning, day, evening and night.
-- Check the action menu, move menu and ordinary battle messages under both GEN 3 and GEN 4 UI. Source window borders, message origin/width, move names and PP/type panels should remain aligned. Check another user-selected window frame too.
-- With Poké Balls in the bag, watch the R prompt slide in. Its full window and source ball icon should align; arrows appear while R is held and disappear on release. Hold R with a direction to cycle, then release without cycling to throw. Continue into the bag, moves and message states and check that the prompt slides away.
-
-- Launch through the source credits, HnS Game Freak introduction and title, then press Start. EXIT → New Game must still show Oak and Wooper. The intro/title songs are the source `HG_INTRO` and `HG_TITLE`; Oak retains `HG_NEW_GAME`.
-- In OPTIONS, enable Follower and, if desired, Big Followers. Walk a few steps with a healthy non-egg party member; the source sprite follows one cell behind and can be spoken to. Shiny palettes and walking frames are imported. Large followers use the source indoor restrictions; surfing, biking and forced travel hide followers. These options retain the source defaults, which can leave followers disabled.
-- Select FAKE RTC and set the clock at a Pokémon Center. Time advances **24 game seconds per played second**, retains its value in saves and does not advance while the game is closed. Check morning/evening/night encounters and ambient Pokémon visibility. Outdoor colors transition at 06:00–10:00 and 18:00–20:00. Encounter night starts at 19:00; battle palettes deliberately retain the source's separate 20:00 night boundary.
-- Switch Battle Terrain between OLD and MODERN and Battle UI between GEN 3 and GEN 4. Check Fast Intro, Fast Battles, R-ball selection and Quick Run. Hold R with a direction to select another available ball; release R without cycling to throw the selected ball. Run Type B selects RUN from the menu; the source L+R/B shortcuts can escape during the opening wild message before sending out the player Pokémon. The run prompt option controls the hint separately from the shortcut.
-- Check CLOSE, USE, TOSS and ESCAPE labels in the bag. Use Escape Rope from each Sprout Tower floor; it should consume one and return to the recorded outdoor entrance. The Escape Rope/Dig difficulty restriction prevents use without consuming the item.
-- Inflict paralysis, complete several turns, save and reload. Paralysis should persist until cured; the native engine passes numeric status IDs to the imported healthboxes. Older GBA numeric status fields are normalized once, with stale fields removed after migration.
-- With Modern Moves enabled, compatible expanded moves appear in the source level-up/egg learnsets. Ice Fang has separate freeze/flinch chances and Drain Punch heals from damage dealt. START move details also supports the new IDs. Modern Moves OFF uses the source Gen 3 lists. Existing saved moves remain intact.
 
 Arrow keys/WASD move; Z/Enter is A. Gen1Recomp's native key bindings apply.
 
@@ -78,7 +63,7 @@ python3 release.py --mod /absolute/build/hns_exploration --out /absolute/dist --
 
 ## Releases and remaining work
 
-Every release must update this README, the checklist and testing notes. Completed checklist entries remain visible with strikethrough; split partially completed work into completed and pending entries. Both manifests must match. Increment their mod version and `release/cart.json`'s cart version before publishing. The workflow builds from pinned source, validates and publishes the deterministic ZIP, sealed cart and SHA256SUMS. Cart tests use the native parser/importer to verify the GitHub pin, label, 1.0.0 upgrade, isolated save namespace and disabled mod edits. Published ZIP assets are immutable; never overwrite an existing version or change the stable cart ID.
+Every release must update this README, the progress checklist and the separate [player testing notes](TESTING.md). Completed checklist entries remain visible with strikethrough; split partially completed work into completed and pending entries. Both manifests must match. Increment their mod version and `release/cart.json`'s cart version before publishing. The workflow builds from pinned source, validates and publishes the deterministic ZIP, sealed cart and SHA256SUMS. Cart tests use the native parser/importer to verify the GitHub pin, label, 1.0.0 upgrade, isolated save namespace and disabled mod edits. Published ZIP assets are immutable; never overwrite an existing version or change the stable cart ID.
 
 Continue the unsupported enhanced battle mechanics/settings and expanded teaching paths, then later campaign scripts, puzzles, travel, contacts and rewards. The **final** campaign milestone remains the missing-trainer/Cut-tree/progression-blocker audit requested by the user. Keep testing travel open until that work is ready; do not invent new progression gates.
 
