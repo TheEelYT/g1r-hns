@@ -114,11 +114,39 @@ return function(T,game,w,maps)
   local persisted=Flags.serialize(Space.store);s.flags=persisted.flags;s.vars=persisted.vars
   local copy=assert(load(Writer.encode(s)))();T.eq(Rtc.calcLocalTime(copy).hours,19,'Fake RTC serialized time used on reload')
   for mid,pools in pairs(w.encounters.timed)do
-    T.eq(Writer.encode(Enc._tables[mid]),Writer.encode(pools.Night or pools.Day),'actual encounter roller gets night pool '..mid)
+    local expected=pools.Night or pools.Day;local actual=Enc._tables[mid]
+    for kind,area in pairs(expected)do
+      T.eq(actual[kind].rate,area.rate,'timed native encounter rate '..mid..kind)
+      for i,entry in ipairs(area.slots)do
+        T.eq(actual[kind].slots[i].species,C:require('species','SPECIES_'..entry.species),'timed species resolves to native ID '..mid..kind..i)
+      end
+    end
+  end
+  -- Exercise the real RSE grass-step path, not merely its table assignment.
+  local Rng=require('src.core.game3.rng');Rng.SeedRng(12345)
+  local MB=require('src.core.game3.mb');local behavior=MB.require('TALL_GRASS')
+  for _,hour in ipairs({7,12,18,21})do
+    Rtc.calcLocalTimeOffset(s,0,hour,0,0);Time.tick(s,0)
+    local pool=Enc.tableFor(s.map).land;local encounters=0
+    for i=1,1000 do
+      local enc=Enc.onStep(s.map,'land',{behavior=behavior,x=9,y=8})
+      if enc then
+        encounters=encounters+1;T.check(type(enc.species)=='number','native grass step produces numeric species')
+        local found=false;for _,entry in ipairs(pool.slots)do
+          if enc.species==entry.species and enc.level>=entry.minLevel and enc.level<=entry.maxLevel then found=true end
+        end
+        T.check(found,'actual wild encounter belongs to current source time pool')
+      end
+    end
+    T.check(encounters>0,'wild battles roll in source grass at hour '..hour)
   end
   -- Palette channel arithmetic is checked against the C oracle separately.
   local a,b,weight=Time.blend({hours=7,minutes=0});T.eq(weight,128,'source halfway morning fade')
   T.eq(Time.channel(31,a[1],b[1],weight),20,'source integer 5-bit channel blend')
+  local fixtureMod={hooks={wrap=function()end},read=function(_,file)
+    local f=assert(io.open(arg[1]..'/'..file,'rb'));local text=f:read('*a');f:close();return text
+  end}
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_render_regressions.lua')(T,fixtureMod,w,game,s)
   setting('ITEM_MAIN_FOLLOWER',0);setting('ITEM_MAIN_LARGE_FOLLOWER',1)
   local faint=mon(152);faint.hp=0;local egg=mon(175);egg.isEgg=true;local lead=mon(158);s.party={faint,egg,lead}
   T.eq(F.lead(s),lead,'follower chooses first healthy non-egg')
@@ -130,6 +158,33 @@ return function(T,game,w,maps)
   local found=false;for _,actor in ipairs(O.forDraw())do if actor==F.actor then found=true end end;T.check(found,'native renderer gets follower')
   local Coll=require('src.core.game3.collision');Coll.bindMap(game,s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
   T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')
+  lead.nickname='';T.check(F.message(lead):find(Pokemon.name(158),1,true)~=nil,'unnicknamed follower shows species name');lead.nickname='MON'
+  local Field=require('src.core.game3.field');local Hud=require('src.ui.game3.hud');local ModRt=require('src.mods.Runtime')
+  keep(Hud,{'openMessage'});local said;Hud.openMessage=function(_,text,opts)said=text;opts.done()end
+  ModRt.call('world.talk',function()error('follower talk fell through')end,game,F.actor)
+  T.eq(said,nil,'follower dialogue waits for source emote');T.check(Field._locks.hnsFollowerTalk,'follower interaction locks movement')
+  local actors={};require('src.core.game3.field_effects').collectActors(actors)
+  local bubble;for _,a in ipairs(actors)do if a.i==92000 then bubble=a end end
+  T.check(bubble,'source emote is in native sorted actor pass');T.check(pcall(bubble.draw,bubble,0,0),'source emote draws before message')
+  for i=1,85 do F.tick()end
+  T.check(said:find('MON',1,true)~=nil,'named dialogue opens after complete emote');T.eq(Field._locks.hnsFollowerTalk,nil,'closing follower dialog releases lock')
+  F.beginBall('enter');T.eq(F.ballPose(),'mon','source recall starts with normal follower')
+  for i=1,5 do F.tick()end;T.eq(F.ballPose(),'white','source recall whitens at remaining frame 11')
+  for i=1,4 do F.tick()end;T.eq(F.ballPose(),'ball','source recall switches to ball at frame 7')
+  for i=1,7 do F.tick()end;T.eq(F.actor.visible,false,'completed recall hides follower')
+  F.step(8,8,16);T.eq(F.ballPose(),'ball','first step releases follower from ball')
+  for i=1,9 do F.tick()end;T.eq(F.ballPose(),'white','source release grows white follower')
+  for i=1,7 do F.tick()end;T.eq(F.transition,nil,'source release restores palette and actor')
+  -- Native door warp is delayed until the visible follower has been recalled.
+  keep(Field,{'_locks'});Field._locks={};Warp._busy=false
+  Warp.startDoorEntrance(nil,game,'EM_HNS_NEW_BARK_TOWN_LAB_HNS',7,11,8,8)
+  T.eq(F.transition.kind,'enter','door entrance starts follower recall')
+  T.eq(Warp.isBusy(),false,'native door fade waits for follower recall')
+  T.check(Field._locks.hnsFollowerWarp,'recall prevents a second player step')
+  for i=1,16 do F.tick()end
+  T.eq(Field._locks.hnsFollowerWarp,nil,'recall releases its own movement lock')
+  T.eq(Warp.isBusy(),true,'finished recall resumes actual native door sequence')
+  Warp.clear();Field._locks={};F.step(8,8,16);for i=1,16 do F.tick()end
   lead.isShiny=true;local normal=F.actor.graphicsId;F.refresh();T.neq(F.actor.graphicsId,normal,'shiny follower selects source shiny palette')
   setting('ITEM_MAIN_FOLLOWER',1);F.refresh();T.eq(F.actor,nil,'Follower OFF removes actor');setting('ITEM_MAIN_FOLLOWER',0)
   local big=mon(C:require('species','SPECIES_LUGIA'));s.party={big};T.eq(F.allowed(s,big),false,'Big Followers OFF hides 64px Lugia')
@@ -169,6 +224,8 @@ return function(T,game,w,maps)
   local title=game._hnsBoot.Title.new(machine,{params=boot.custom.mods.params.titleParams})
   for i=1,2000 do title:update(input,1/60);if title.phase=='phase3'then break end end
   T.eq(title.phase,'phase3','actual source title reaches input phase');T.eq(machine.ppu.bg[1].layer,nil,'source HnS omits Emerald clouds')
+  T.check(machine.ppu:_bgEnabled(0),'actual title enables source backdrop')
+  T.eq(machine.ppu.palette.pltt[225],32767,'title bank 14 contains source white instead of PNG padding')
   title:update(keys('start'),1/60);for i=1,120 do result=title:update(input,1/60);if result then break end end
   T.eq(result,'menu','START on HnS title enters native main menu');title:destroy()
   Intro.reset();Ui.reset({headless=true});F.actor=nil;F.mon=nil

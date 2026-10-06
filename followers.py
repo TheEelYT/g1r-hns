@@ -2,6 +2,7 @@
 import json
 import re
 import opening
+from PIL import Image
 
 
 def build(source,engine,stage,opening_data,scripts,palette_parser):
@@ -25,5 +26,13 @@ def build(source,engine,stage,opening_data,scripts,palette_parser):
         chunks=re.findall(r'"(?:[^"\\]|\\.)*"',body)
         if chunks:messages[name]=''.join(json.loads(c)for c in chunks).replace('{PKMN}','POKéMON')
     scripts['HNS_FOLLOWER_TALK']=[{'op':'end'}]
-    return {'species':species,'messages':messages,'disabledFlag':0x6060,
-            'limits':'Native species, shiny palettes, trailing steps and basic source dialogue. Conditional emotes, emerge/retract effects and female-specific graphics remain pending.'}
+    ball=opening.sprite(source,'OBJ_EVENT_GFX_POKE_BALL',59999,stage,palette_parser)
+    opening_data['sprites']['59999']=ball
+    im=Image.open(source/'graphics/misc/emotes.png');colors=palette_parser(source/'graphics/misc/emotes.pal')
+    raw=bytearray()
+    for n in im.tobytes():
+        c=colors[n];raw.extend((round((c&31)*255/31),round((c>>5&31)*255/31),round((c>>10&31)*255/31),255 if n else 0))
+    file='ow/follower_emotes.rgba';(stage/file).write_bytes(raw)
+    return {'species':species,'messages':messages,'disabledFlag':0x6060,'ball':ball,
+            'emotes':{'file':file,'width':im.width,'height':im.height,'durations':[30,25,30]},
+            'limits':'Native species, shiny palettes, trailing steps, source ball transitions and basic named dialogue/emotes. Full conditional interaction scripts, caught-ball variants and female-specific graphics remain pending.'}

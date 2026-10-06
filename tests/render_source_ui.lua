@@ -29,6 +29,9 @@ local pc=M.new('challenge',nil,false);pc.tab=#pc.pages
 snap('pc_last_challenges',function()M.draw(pc)end)
 local loaded=M.new('option',nil,false);loaded.tab=#loaded.pages;snap('loaded_last_options',function()M.draw(loaded)end)
 local options=M.new('option');options.tab=3;snap('options_sound',function()M.draw(options)end)
+options.tab=2;options.cursor=6
+for value=0,3 do options.values.ITEM_BATTLE_RUN_TYPE=value;snap('quick_run_'..value,function()M.draw(options)end)end
+options.tab=1;options.cursor=7;snap('pending_option',function()M.draw(options)end)
 snap('mode_recommended',function()M.draw(m)end)
 m.values.ITEM_MODE_GAMEMODE=1;m.cursor=2;snap('mode_custom',function()M.draw(m)end)
 m.tab=3;m.cursor=2;snap('randomizer_off',function()M.draw(m)end)

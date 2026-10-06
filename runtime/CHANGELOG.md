@@ -1,3 +1,13 @@
+## 0.7.4
+
+- Fix night-tint clipping: resize the source tint canvas to the current world viewport and clear inherited transforms/scissors.
+- Resolve time encounter species through stable native constants; real grass-step rolls work in morning, day, evening and night.
+- Place the HnS title backdrop palette in background bank 14, instead of beyond the padded logo palette.
+- Render Quick Run control tokens with source glyphs and measure their real widths.
+- Add source follower ball recall/release, basic emotion animation before dialogue, and species-name fallback for empty nicknames.
+- Mark pending and partial settings in Options/Game Modes; add a permanent completed/pending README checklist checked by packaging.
+- Preserve cart identity and sealing; publish mod 0.7.4 and cart 1.0.3.
+
 ## 0.7.2 — Complete source Dex move lists, Pokégear polish and sealed cart releases
 
 - Browse complete egg, level-up, TM/HM and tutor lists, with all 934 source move descriptions/parameters and correct source item icons. Read the configured generation-seven modern learnsets: Totodile now shows 87 entries. Legacy move aliases are resolved without changing native battle IDs; expanded battle effects and learning remain pending.

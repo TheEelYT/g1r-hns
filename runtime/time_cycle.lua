@@ -7,8 +7,8 @@ return function(mod,w,game)
   local Enc=require('src.core.game3.encounters');local Field=require('src.core.game3.field_view')
   -- Content registration resolves species names to native IDs. Timed pools
   -- bypass that registry, so resolve them once before handing them to RSE.
-  local Pokemon=require('src.core.game3.pokemon');local timed={}
-  for id,pools in pairs(w.encounters.timed or {})do
+  local C=require('src.core.game3.constants').of('emerald');local timed={}
+  for id,pools in pairs(w.encounters and w.encounters.timed or {})do
     timed[id]={}
     for period,pool in pairs(pools)do
       local out={};timed[id][period]=out
@@ -16,7 +16,7 @@ return function(mod,w,game)
         local slots={};out[kind]={rate=area.rate,slots=slots}
         for i,entry in ipairs(area.slots)do
           local copy={};for k,v in pairs(entry)do copy[k]=v end
-          copy.species=assert(tonumber(entry.species)or Pokemon.speciesFromName(entry.species),'unresolved timed encounter species '..tostring(entry.species))
+          copy.species=tonumber(entry.species)or C:require('species','SPECIES_'..entry.species)
           slots[i]=copy
         end
       end

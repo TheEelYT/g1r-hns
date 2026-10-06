@@ -91,6 +91,7 @@ return function(spec,U)
       local r=p.rows[i];local y=25+(i-offset-1)*16;local active=M.active(s,p,r)
       if i==s.cursor then local shade=p.kind=='option' and .69 or .88;love.graphics.setColor(shade,shade,shade,1);love.graphics.rectangle('fill',16,y-1,208,16) end
       U.text(r.name,24,y,active and c[6] or c[5],active and c[7] or c[4])
+      if #r.choices>0 and(not r.implemented or r.partial)then U.text('!',16,y,c[8],c[9])end
       local n=#r.choices;local selected=s.values[r.id];local orders={}
       if n==2 then orders={0,1} elseif n==3 then orders=selected==0 and {0,1} or {1,2}
       elseif n>=4 and n<=6 then local first=math.max(0,math.min(n-3,selected-1));orders={first,first+1,first+2}
@@ -111,8 +112,8 @@ return function(spec,U)
     else
       U.box(16,120,208,32,frame)
       local r=p.rows[s.cursor];local desc=r.descriptions[s.values[r.id]+1] or r.descriptions[1] or ''
-      if #r.choices>0 and not r.implemented then desc='NOT IMPLEMENTED YET.\nChoice saved; has no effect.'
-      elseif r.partial then desc=r.partial end
+      if r.partial then desc=r.partial
+      elseif #r.choices>0 and not r.implemented then desc='NOT IMPLEMENTED YET.\nChoice saved; has no effect.'end
       desc=desc:gsub('{([ABLR])_BUTTON}','%1')
       U.text(desc,24,121)
     end

@@ -61,6 +61,12 @@ def check(source,engine,mod,luajit):
     count['source_healthbox_composites']=10
     # Full affine logo and normal backdrop indices, independent of converter.
     root=source/'graphics/title_screen/hns';title=world['boot']['title'] if 'boot' in world else world['bootPresentation']['title']
+    # Check displayed color banks as well as image indices: a padded 8bpp
+    # logo palette previously placed this backdrop beyond BG palette RAM.
+    raw_lines=(root/'rayquaza_and_clouds.pal').read_text().splitlines()
+    expected=[(r>>3)|((g>>3)<<5)|((b>>3)<<10)for r,g,b in(map(int,line.split())for line in raw_lines[3:19])]
+    assert title['palettes']['bg'][224:240]==expected
+    assert len(title['palettes']['bg'])==240
     for name,png,binfile,w,h,affine in [('logo','pokemon_logo.png','pokemon_logo.bin',256,256,True),('rayquaza','rayquaza.png','rayquaza.bin',256,160,False)]:
         im=Image.open(root/png);blob=(root/binfile).read_bytes();words=list(blob) if affine else struct.unpack('<'+str(len(blob)//2)+'H',blob);raw=bytearray()
         for y in range(h):
@@ -79,6 +85,15 @@ def check(source,engine,mod,luajit):
     count['source_escape_flags']=len(world['maps'])
     assert len(world['followers']['species'])==413
     count['follower_species_and_forms']=413;count['follower_normal_shiny_sheets']=826
+    art=world['followers']['emotes'];im=Image.open(source/'graphics/misc/emotes.png');pal=colors(source/'graphics/misc/emotes.pal')
+    raw=bytes(v for n in im.tobytes()for v in pal[n]+(255 if n else 0,))
+    assert (mod/art['file']).read_bytes()==raw
+    assert art['durations']==[30,25,30]
+    anim=(source/'src/trainer_see.c').read_text()
+    for n in range(11):
+        block=re.search(r'sSpriteAnim_Emotes'+str(n)+r'\[\]\s*=\s*\{(.*?)\};',anim,re.S)[1]
+        assert re.findall(r'ANIMCMD_FRAME\([^,]+,\s*(\d+)\)',block)==['30','25','30']
+    count['source_follower_emote_frames']=22
     # Compile the actual source function; compare all 32768 ordinary colors
     # at six transition points against the actual installed Lua arithmetic.
     code=(source/'src/palette.c').read_text();a=code.index('void TimeMixPalettes(');b=code.index('\n// Apply weighted average',a);fn=code[a:b]

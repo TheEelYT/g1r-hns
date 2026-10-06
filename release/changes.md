@@ -1,10 +1,10 @@
-Changes in 0.7.3:
+Changes in 0.7.4:
 
-- HnS Game Freak intro/title and source music.
-- Day/night transitions, timed encounters and saved Fake RTC (24 game seconds per played second).
-- Source normal/shiny followers for 413 native species/forms; enable Follower in OPTIONS.
-- OLD/MODERN battle terrain and GEN 3/GEN 4 healthboxes, source status icons, Fast Intro/Fast Battles, R-ball selection and Quick Run options.
-- 159 reviewed expanded moves, compatible source level-up/egg lists, source species stats and legacy status migration.
-- Sprout Tower Escape Rope and source-font CLOSE/USE/TOSS/ESCAPE repairs.
+- Restores timed wild encounters and the missing HnS title background.
+- Fixes the white outdoor area during morning/evening/night tint, including zoom changes.
+- Corrects Quick Run arrow glyphs and settings layout.
+- Adds follower Poké Ball recall/release and named dialogue after a source animated emotion bubble.
+- Shows pending/partial support in Options and Game Modes.
+- Adds a permanent README progress checklist; completed entries remain struck through.
 
-This is a substantial battle-system extension; full expanded effects/abilities, expanded TM/tutor teaching, remaining challenge rules and later campaign are unfinished. Outdoor tint does not yet preserve source light-immunity palette banks. Live Windows/GPU testing is still needed; see README and reports for coverage.
+Validated with the real native regression suite under both cache roots, converter tests, strict Modkit validation, independent source audits and CPU UI captures. Targeted checks cover native wild grass-step rolls in four periods, viewport resizing/graphics-state cleanup, title palette banks and follower emote/door sequencing. Live Windows/GPU gameplay still needs player verification. Full enhanced battle coverage, conditional follower scenes and later campaign work remain pending; see README.

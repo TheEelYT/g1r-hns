@@ -27,6 +27,12 @@ def package(mod,out,engine,luajit):
     assert manifest['github']==repo
     assert template['id']=='pokemon_heart_soul'and template['seal']=='sealed'
     assert template['base']=='emerald'and template['load_order']==[mod_id]
+    readme=(ROOT/'README.md').read_text()
+    assert readme.splitlines()[0].endswith(' '+version),'Update README for every release'
+    assert template['id']+'-'+cart_version+'.g1rcart' in readme,'README cart download is stale'
+    assert mod_id+'-'+version+'.zip' in readme,'README ZIP download is stale'
+    assert '## Port progress checklist' in readme and '- [x] ~~' in readme and '- [ ] ' in readme,'Keep completed and pending port milestones in README'
+    assert (mod/'README.md').read_text()==readme,'Rebuild with the current README before packaging'
     label=(ROOT/'release/pokemon-heart-soul.png').read_bytes()
     assert label.startswith(b'\x89PNG\r\n\x1a\n')and len(label)<=1024*1024
     out.mkdir(parents=True,exist_ok=True)
