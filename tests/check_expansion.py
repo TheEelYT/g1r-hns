@@ -28,7 +28,14 @@ def map_pixels(im,words,pal,w,h,bank=0):
 
 def check(source,engine,mod,luajit):
     world=json.loads(subprocess.check_output([str(luajit),str(engine/'tools/lua_to_json.lua'),str(mod/'world.lua')],text=True))
-    count={};terrains=world['battleVisuals']['terrains'];assert len(terrains)==210
+    count={};terrains=world['battleVisuals']['terrains']
+    # Audit the source entry set independently, rather than only comparing
+    # pixels for whatever subset the importer happened to emit.
+    envcode=(source/'src/data/battle_environment.h').read_text().split('static const struct ModernBattleGfx sModernBattleGfx',1)[0]
+    environments=set(re.findall(r'^    \[BATTLE_ENVIRONMENT_(\w+)\]',envcode,re.M))
+    assert len(environments)==36 and 'GRASS' in environments and 'COUNT' not in environments
+    assert set(terrains)=={e+'_'+s+'_'+t for e in environments for s in ('old','modern')for t in ('Day','Twilight','Night')}
+    assert terrains['GRASS_modern_Day']['sourceTiles']=='graphics/battle_environment/tall_grass_modern/tiles.png'
     for key,row in terrains.items():
         raw=(source/row['sourceMap']).read_bytes();words=struct.unpack('<'+str(len(raw)//2)+'H',raw)
         pal=colors(source/row['sourcePalette']);pal += [(0,0,0)]*max(0,48-len(pal))
@@ -59,6 +66,33 @@ def check(source,engine,mod,luajit):
                 assert (mod/a['file']).read_bytes()==raw,(style,battler,status)
     count['source_status_strips']=40
     count['source_healthbox_composites']=10
+    for style,d in [('gen3','hns'),('gen4','gen4')]:
+        root=source/'graphics/battle_interface'/d;im=Image.open(root/'last_used_ball_r_cycle.png');original=colors(root/'ability_pop_up.pal')
+        for name,idle in [('ballPrompt',False),('ballPromptIdle',True)]:
+            p=original.copy()
+            if idle:p[10]=p[11]=p[13]
+            raw=bytearray()
+            for y in range(64):
+                for x in range(32):
+                    n=tile_pixel(im,y//8*4+x//8,x%8,y%8)&15;raw.extend(p[n]+(255 if n else 0,))
+            a=world['battleVisuals']['ui'][style][name]
+            assert a['height']==64 and (mod/a['file']).read_bytes()==raw
+    count['source_ball_prompt_pixels']=4*32*64
+    root=source/'graphics/expansion_intro';credits=world['bootPresentation']['credits'];p=colors(root/'credits.pal')[:48]+[(0,0,0)]*208
+    for name,bpp in [('powered_by',4),('rhh_credits',8)]:
+        im=Image.open(root/(name+'.png'));blob=(root/(name+'.bin')).read_bytes();words=struct.unpack('<'+str(len(blob)//2)+'H',blob);raw=bytearray()
+        for y in range(160):
+            for x in range(256):
+                word=words[y//8*32+x//8];px=7-x%8 if word&1024 else x%8;py=7-y%8 if word&2048 else y%8
+                n=tile_pixel(im,word&1023,px,py)+(word>>12)*16*(bpp==4);raw.extend(p[n]+(255,))
+        assert (mod/credits[name]['file']).read_bytes()==raw,name
+    for name,size,num,palette in [('dizzy_egg',32,8,'dizzy_egg'),('porygon',64,3,'porygon'),('porygon_shiny',64,3,'shiny')]:
+        im=Image.open(root/'sprites'/('porygon.png'if name=='porygon_shiny'else name+'.png'));p=colors(root/'sprites'/(palette+'.pal'));raw=bytearray()
+        for y in range(size*num):
+            for x in range(size):
+                tile=y//size*(size*size//64)+(y%size//8)*(size//8)+x//8;n=tile_pixel(im,tile,x%8,y%8)&15;raw.extend(p[n]+(255 if n else 0,))
+        assert (mod/credits[name]['file']).read_bytes()==raw,name
+    count['source_credits_pixels']=2*256*160+32*32*8+2*64*64*3
     # Full affine logo and normal backdrop indices, independent of converter.
     root=source/'graphics/title_screen/hns';title=world['boot']['title'] if 'boot' in world else world['bootPresentation']['title']
     # Check displayed color banks as well as image indices: a padded 8bpp

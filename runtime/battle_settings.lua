@@ -1,6 +1,6 @@
 -- Source battle pacing and optional shortcuts, using native command dispatch.
 return function(mod,w,game)
-  local old=game._hnsBattleSettings or {};local S={ballX=-18};local H=game._hnsRules.rules
+  local old=game._hnsBattleSettings or {};local S={ballX=-14};local H=game._hnsRules.rules
   local Rt=require('src.core.game3.runtime');local Ui=require('src.core.game3.battle.ui')
   local Intro=require('src.core.game3.battle.intro_seq');local AnimSeq=require('src.core.game3.battle.anim_seq')
   local B=require('src.core.game3.battle');local Engine=require('src.core.game3.battle.engine')
@@ -91,15 +91,20 @@ return function(mod,w,game)
   end
   Ui.tick=function(...)
     local result=tick(...);local enabled=Ui._st and S.enabled(Ui._st)and Ui._mode=='menu'and not Ui.busy()
-    S.ballX=enabled and math.min(14,S.ballX+1)or math.max(-18,S.ballX-1);if not enabled then S.ball=nil end
+    S.ballX=enabled and math.min(14,S.ballX+1)or math.max(-14,S.ballX-1);if not enabled then S.ball=nil end
     return result
   end
   function S.drawPrompt()
-    if S.ballX>-18 and Ui._st and H.battle(Ui._st)and game._hnsBattleVisuals then
-      local row=game._hnsBattleVisuals.visuals.row();local a=row.ballPrompt
-      love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(a.file,a.width,a.height),S.ballX-16,(Ui._st.double and 78 or 68)-16)
+    if S.ballX>-14 and Ui._st and H.battle(Ui._st)and game._hnsBattleVisuals and S.enabled(Ui._st)then
+      local row=game._hnsBattleVisuals.visuals.row();local a=S.rHeld and row.ballPrompt or row.ballPromptIdle
+      local y=Ui._st.double and 78 or 68
+      love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(a.file,a.width,a.height),S.ballX-16,y-8-32)
       local balls=S.balls(Ui._st);local id=S.ball or (Ui._st.session.modData or {}).hnsLastBall or balls[1]
-      require('src.ui.game3.rse.bag_chrome').drawItemIcon(id,S.ballX-12,(Ui._st.double and 78 or 68)-12)
+      -- AddItemIconSprite copies a 24x24 image to the top-left of a 32x32
+      -- OAM buffer; its sprite center is (ballX,y), not the image center.
+      local icon=(w.services.bag.items[tostring(id)]or {}).icon
+      if icon then love.graphics.draw(U.image(icon.file,icon.width,icon.height),S.ballX-16,y-16)
+      else require('src.ui.game3.rse.bag_chrome').drawItemIcon(id,S.ballX-16,y-16)end
     end
     if S.quickWindow()and H.value('ITEM_BATTLE_LR_RUN',Intro._st.session)==0 then
       local kind=H.value('ITEM_BATTLE_RUN_TYPE',Intro._st.session)

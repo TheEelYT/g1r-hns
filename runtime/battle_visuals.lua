@@ -36,6 +36,38 @@ return function(mod,w,game)
     local a=w.battleVisuals.textbox;local scroll=mode=='menu'and 160 or mode=='moves'and 320 or 0
     love.graphics.setColor(1,1,1,1);love.graphics.draw(image(a),love.graphics.newQuad(0,112+scroll,240,48,a.width,a.height),0,112)
   end
+  local frames=old.frames or Chrome.drawMenuFrames
+  Chrome.drawMenuFrames=function(mode)
+    if not H.battle(B._st)then return frames(mode)end
+    local n=(require('src.ui.game3.chrome')._frameType or 0)+1
+    local art=n==1 and 'frame'or 'frame'..n
+    for _,r in ipairs(Chrome.RSE_MENU_FRAMES[mode]or {})do U.box(r[1]*8,r[2]*8,r[3]*8,r[4]*8,art)end
+  end
+  local window=old.window or Chrome.window
+  Chrome.window=function(id)
+    if not H.battle(B._st)then return window(id)end
+    local r=assert(w.battleVisuals.windows[(tonumber(id)or 0)+1])
+    return {left=r.left,top=r.top%20,w=r.w,h=r.h,x=r.left*8,y=r.top%20*8}
+  end
+  local colors=old.colors or Chrome.textboxColors
+  Chrome.textboxColors=function(fg,shadow)
+    if not H.battle(B._st)then return colors(fg,shadow)end
+    local p=w.battleVisuals.textboxPalette
+    return {fg=color(p[fg+1]),shadow=color(p[shadow+1]),bg={0,0,0,0}}
+  end
+  -- Native battle messages use a fixed FRLG origin. Shift the printer to the
+  -- source B_WIN_MSG while retaining its control-code/reveal/input machinery.
+  local Msg=require('src.ui.game3.message');local msg=old.msg or Msg.drawText
+  Msg.drawText=function(...)
+    if not H.battle(B._st)or Msg._frame~='battle'then return msg(...)end
+    local F=require('src.ui.game3.frlg_font');local fd=F.draw
+    F.draw=function(text,x,y,opts)
+      local o={};for k,v in pairs(opts or {})do o[k]=v end
+      local bx,by,bw=Chrome.messageOrigin();o.maxWidth=bw;o.colors=Chrome.textboxColors(1,6)
+      return fd(text,x+bx-10,y+by-122,o)
+    end
+    local ok,a,b,c=pcall(msg,...);F.draw=fd;if not ok then error(a)end;return a,b,c
+  end
   local function palettes()local p=V.row().palette;return p,color(p[2]),color(p[4])end
   local Font={CHAR_LV_2=0x105,CHAR_MALE=0xB5,CHAR_FEMALE=0xB6}
   function Font.draw(text,x,y,opts)return U.text(text,x,y,opts and opts.colors and opts.colors.fg,opts and opts.colors and opts.colors.shadow,'small')end
@@ -77,5 +109,5 @@ return function(mod,w,game)
     for key in pairs(keys)do Chrome[key]=original[key]end;Chrome._doublesTried=tried
     if not ok then error(result)end;return result
   end
-  game._hnsBattleVisuals={draw=draw,panel=panel,hb=hb,visuals=V}
+  game._hnsBattleVisuals={draw=draw,panel=panel,frames=frames,window=window,colors=colors,msg=msg,hb=hb,visuals=V}
 end

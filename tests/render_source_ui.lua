@@ -153,8 +153,46 @@ if w.battleVisuals then
     choices.ITEM_BATTLE_NEW_BATTLEUI=style=='gen4'and 1 or 0
     snap('battle_'..style,function()require('src.core.game3.battle.bg').draw(0,0,0,0);require('src.core.game3.battle.healthbox').draw('player',p);require('src.core.game3.battle.healthbox').draw('enemy',e)end)
   end
+  -- Exercise the complete native Ui.draw path, including menu frames and the
+  -- prompt installed after it. Absent ROM font/text/sprites are source fixtures.
+  local Chrome=require('src.ui.game3.battle_chrome');Chrome._manifest={layout='rse',windowTextPal=w.battleVisuals.windowTextPalette,ppTextPal=w.battleVisuals.windowTextPalette}
+  local Font=require('src.ui.game3.frlg_font');local fd,fg=Font.draw,Font.drawGlyph
+  Font.draw=function(text,x,y,o)
+    o=o or {};local c=o.colors or Font.COLOR.NORMAL
+    U.text(text,x,y,c.fg,c.shadow,o.font=='narrow'and 'narrow'or o.small and 'small'or 'normal')
+    return #text,x+U.width(text),y
+  end
+  Font.drawGlyph=function(id,x,y,o)local c=o and o.colors or Font.COLOR.NORMAL;U.glyph('RIGHT_ARROW',x,y,'normal',c.fg,c.shadow)end
+  for name,text in pairs({gText_BattleMenu='FIGHT\nBAG\nPOKéMON\nRUN',gText_WhatWillPkmnDo='What will\nTOTODILE do?',gText_Pp='PP',gText_Type='TYPE/'})do RomText.overrides[name]=IR.fromAscii(text)end
+  Pokemon.backPic=Pokemon.frontPic;Pokemon._moveNames[33]='TACKLE';p.mon.moves={33,33,33,33};p.mon.pp={20,20,20,20}
+  Battle._st.player=p;Battle._st.enemy=e;Bu.reset({headless=true});Bu._st=Battle._st;Bu._session=session;Bu._menuIndex=1
+  Bag.add(session.bag,4,3);Items._byId[4]={name='POKé BALL',pocket='POKE_BALLS'}
+  require('src.core.game3.runtime').session=session
+  assert(load(mod:read('battle_settings.lua')))()(mod,w,collection)
+  local shortcut=collection._hnsBattleSettings.settings;shortcut.ballX=14
+  require('src.core.game3.battle.bg').setTerrain(0)
+  for _,style in ipairs({'gen3','gen4'})do
+    choices.ITEM_BATTLE_NEW_BATTLEUI=style=='gen4'and 1 or 0
+    for _,terrain in ipairs({'old','modern'})do
+      choices.ITEM_BATTLE_NEW_BACKGROUNDS=terrain=='modern'and 1 or 0
+      for _,mode in ipairs({'menu','moves','none'})do
+        Bu._mode=mode
+        snap('battle_full_'..style..'_'..terrain..'_'..mode,function()
+          Bu.draw(240,160)
+          if mode=='none'then local Message=require('src.ui.game3.message');Message.show('TOTODILE used TACKLE!',{frame='battle',battle=true});Message._revealed=999;Message.draw();Message.close()end
+        end)
+      end
+    end
+  end
+  Bu._mode='menu';shortcut.rHeld=true
+  snap('battle_ball_cycle',function()Bu.draw(240,160)end)
+  shortcut.rHeld=false;shortcut.ballX=0;snap('battle_ball_slide',function()Bu.draw(240,160)end)
+  Font.draw,Font.drawGlyph=fd,fg;Bu.reset({headless=true})
   Battle._st=nil;Rtc.calcLocalTime=calc
 end
+local Credits=assert(load(mod:read('intro_credits.lua')))()(U,w.bootPresentation.credits)
+local scene=Credits.new()
+for tick=1,220 do scene:frame(false);if tick==8 or tick==64 or tick==128 or tick==180 or tick==220 then snap('intro_credits_'..tick,function()scene:draw()end)end end
 -- Door frames and gold flash are native drawing routines with source buffers.
 collection.data={maps=w.maps}
 assert(load(mod:read('field_services.lua')))()(mod,w,collection)

@@ -194,10 +194,15 @@ return function(T,game,w,maps)
   P.surfing=true;T.eq(F.allowed(s,big),false,'surfing hides follower');P.surfing=false
   s.map='EM_HNS_ROUTE29_HNS';s.party={lead};Rtc.calcLocalTimeOffset(s,0,20,0,0);setting('ITEM_BATTLE_NEW_BACKGROUNDS',0)
   local row,key=V.terrain(0,s);T.check(key:find('_old_Night',1,true)~=nil,'old terrain uses night palette')
+  T.check(row.sourceTiles:find('/tall_grass/',1,true)~=nil,'grass imports its own table entry, not COUNT/building fallback')
   setting('ITEM_BATTLE_NEW_BACKGROUNDS',1);row,key=V.terrain(0,s);T.check(key:find('_modern_Night',1,true)~=nil,'modern terrain selection works')
+  T.check(row.sourceTiles:find('/tall_grass_modern/',1,true)~=nil,'Modern grass selects the source Modern tile sheet')
   Rtc.calcLocalTimeOffset(s,0,19,0,0);row,key=V.terrain(0,s);T.check(key:find('_Twilight',1,true)~=nil,'battle twilight lasts to 20:00 independently of encounters')
   setting('ITEM_BATTLE_NEW_BATTLEUI',1);T.eq(V.style(s),'gen4','Gen4 UI option selects source art');setting('ITEM_BATTLE_NEW_BATTLEUI',0);T.eq(V.style(s),'gen3','Gen3 UI option selects HnS art')
   B._st=st;st.session=s;T.check(pcall(BgDraw or require('src.core.game3.battle.bg').draw,0,0,0,0),'actual battle background draws source terrain')
+  local Chrome=require('src.ui.game3.battle_chrome')
+  local x,y,width=Chrome.messageOrigin();T.eq(x,16,'battle message uses HnS window x');T.eq(y,121,'battle message uses source printer y');T.eq(width,208,'battle message uses source window width')
+  T.eq(Chrome.window(3).x,16,'first move uses source expanded window origin')
   local stage=require('src.core.game3.battle.anim').stage();stage.healthbox.player.visible=true;stage.healthbox.enemy.visible=true
   st.player.mon.status='PAR';st.player.status='PAR'
   T.check(pcall(require('src.core.game3.battle.healthbox').draw,'player',st.player,{st=st}),'actual source healthbox draws native battler')
@@ -218,8 +223,15 @@ return function(T,game,w,maps)
   local Boot=require('src.ui.game3.boot');local boot=Boot.new(game);T.eq(boot.custom.mods.intro,'hns.intro','new boot selects HnS intro')
   T.eq(boot.custom.mods.title,'hns.title','new boot selects HnS title')
   local movie=game._hnsBoot.Intro.new();local input=keys();local result
-  for i=1,1400 do result=movie:update(input,1/60);if result then break end end
+  local creditsSeen=false
+  for i=1,1800 do result=movie:update(input,1/60);if movie.movie.phase=='expansion'then creditsSeen=true end;if result then break end end
+  T.check(creditsSeen,'real boot reaches custom source credits before Game Freak')
   T.eq(result,'title','HnS intro finishes at title without Emerald scene');movie:destroy()
+  local credits=game._hnsBoot.Credits.new();for i=1,128 do credits:frame(false)end
+  T.eq(credits.eggX,172,'source credits egg reaches collision position after 128 callbacks')
+  T.eq(credits.poryState,'hit','source Porygon reaches collision animation')
+  for i=129,180 do credits:frame(false)end;T.eq(credits.poryState,'up','source Porygon finishes its hit animation')
+  for i=181,260 do credits:frame(false)end;T.eq(credits.state,'done','source credits finish and fade without input')
   local Machine=require('src.ui.game3.rse.gba_machine');local machine=Machine.new()
   local title=game._hnsBoot.Title.new(machine,{params=boot.custom.mods.params.titleParams})
   for i=1,2000 do title:update(input,1/60);if title.phase=='phase3'then break end end

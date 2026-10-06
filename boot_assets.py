@@ -50,6 +50,29 @@ def build(source,engine,stage):
         words=list(struct.unpack('<'+str((root/(rel+'.bin')).stat().st_size//2)+'H',(root/(rel+'.bin')).read_bytes()))
         colors=palette(root/(rel+'.pal'));colors=colors+[0]*(256-len(colors))
         intro[name]=rgba(name,256,160,text_map(tiles(root/(rel+'.png')),words,256,160,colors))
+    sine=re.search(r'gSineDegreeTable\[\]\s*=\s*\{(.*?)\};',(source/'src/trig.c').read_text(),re.S)[1]
+    sine=re.sub(r'/\*.*?\*/|//[^\n]*','',sine,flags=re.S)
+    from decimal import Decimal
+    credits={'sineDegrees':[int(Decimal(v)*4096)for v in re.findall(r'Q_4_12\(([\d.]+)\)',sine)]}
+    assert len(credits['sineDegrees'])==180
+    root=source/'graphics/expansion_intro';colors=palette(root/'credits.pal')[:48]+[0]*208
+    for name,bpp in [('powered_by',4),('rhh_credits',8)]:
+        raw=(root/(name+'.bin')).read_bytes();words=list(struct.unpack('<'+str(len(raw)//2)+'H',raw))
+        # Both BGs are 256x512; display begins at their top-left.
+        credits[name]=rgba('credits_'+name,256,160,text_map(tiles(root/(name+'.png'),bpp),words,256,160,colors,bpp))
+    for name,w,h,frames in [('dizzy_egg',32,32,8),('porygon',64,64,3)]:
+        td=tiles(root/'sprites'/(name+'.png'));colors=palette(root/'sprites'/(name+'.pal'));data=bytearray()
+        for y in range(h*frames):
+            for x in range(w):
+                n=td[(y//h)*(w*h//64)+(y%h//8)*(w//8)+x//8][y%8*8+x%8]&15;c=colors[n]
+                data.extend((round((c&31)*255/31),round((c>>5&31)*255/31),round((c>>10&31)*255/31),255 if n else 0))
+        credits[name]=rgba('credits_'+name,w,h*frames,data)
+    td=tiles(root/'sprites/porygon.png');colors=palette(root/'sprites/shiny.pal');data=bytearray()
+    for y in range(64*3):
+        for x in range(64):
+            n=td[(y//64)*64+(y%64//8)*8+x//8][y%8*8+x%8]&15;c=colors[n]
+            data.extend((round((c&31)*255/31),round((c>>5&31)*255/31),round((c>>10&31)*255/31),255 if n else 0))
+    credits['porygon_shiny']=rgba('credits_porygon_shiny',64,192,data)
     root=source/'graphics/title_screen/hns'
     # Logo is 8bpp, but banks 14/15 belong to the 4bpp backdrop/clouds.
     # The PNG palette is padded to 256; appending would place the backdrop
@@ -97,8 +120,12 @@ def build(source,engine,stage):
     code=(engine/'src/ui/game3/intro_movie.lua').read_text().replace('local IntroMovie = {}','local Source\nlocal IntroMovie = {}\nfunction IntroMovie.configure(s)Source=s end')
     code=code.replace('    self.pal:reset()\n    Bg.initFromTemplates({ { bg = 0','    self.pal:reset()\n    Audio.playSong(Source.song,{restart=true})\n    Bg.initFromTemplates({ { bg = 0',1)
     code=code.replace('    Audio.playSong(Song.MUS_GAME_FREAK, { restart = true })','    -- HnS keeps HG_INTRO playing here.')
+    code=code.replace('      self.phase = "setup"','      self.phase = "expansion"\n      self.credits = Source.credits.new()')
+    code=code.replace('  elseif self.phase == "setup" then','  elseif self.phase == "expansion" then\n    if self.credits:frame(self.pendingSkip)then self.phase="setup";self.state=0;self.pendingSkip=false end\n    return\n  elseif self.phase == "setup" then')
+    code=code.replace('    if self.phase ~= "intro" then self.pendingSkip = false end','    if self.phase ~= "intro" and self.phase ~= "expansion" then self.pendingSkip = false end')
+    code=code.replace('function IntroMovie:draw()', 'function IntroMovie:draw()\n  if self.phase=="expansion" then return self.credits:draw() end')
     a=code.index('    -- pokefirered/src/intro.c:2108');b=code.index('    p.timer = 0',a);code=code[:a]+code[b:]
     a=code.index('function IntroMovie.IntroCB_GF_RevealLogo');b=code.index('-- Scene 1',a)
     part=code[a:b].replace('p.timer > 90','p.timer > 80').replace('p.timer > 20','p.timer > 10').replace('self:setCB("Scene1")','self:setCB("ExitToTitleScreen")');code=code[:a]+part+code[b:]
     (stage/'hns_intro.lua').write_text(code)
-    return {'intro':intro,'title':title}
+    return {'intro':intro,'title':title,'credits':credits}

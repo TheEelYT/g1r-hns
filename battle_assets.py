@@ -11,8 +11,11 @@ def build(source,engine,stage,maps,source_maps):
     paths=dict(re.findall(r'(\w+)\[\]\s*=\s*INCBIN_\w+\("([^\"]+)"\)',(source/'src/data/graphics/battle_environment.h').read_text()))
     code=(source/'src/data/battle_environment.h').read_text()
     regular,modern=code.split('static const struct ModernBattleGfx sModernBattleGfx',1)
-    def blocks(src):return dict(re.findall(r'\[BATTLE_ENVIRONMENT_(\w+)\]\s*=\s*\{(.*?)\n    \}',src,re.S))
+    # Only designated entries, not the enclosing [BATTLE_ENVIRONMENT_COUNT]
+    # declaration (which otherwise consumes the first GRASS entry).
+    def blocks(src):return dict(re.findall(r'^    \[BATTLE_ENVIRONMENT_(\w+)\]\s*=\s*\{(.*?)\n    \}',src,re.S|re.M))
     old,new=blocks(regular),blocks(modern)
+    assert 'GRASS' in old and 'GRASS' in new and 'COUNT' not in old
     def path(sym,suffix):return source/re.sub(r'\.(?:4bpp|gbapal|bin).*$',suffix,paths[sym])
     def save(name,w,h,data):
         assert len(data)==w*h*4,(name,w,h,len(data));file='battle/'+name+'.rgba';(stage/file).write_bytes(data)
@@ -98,15 +101,24 @@ def build(source,engine,stage,maps,source_maps):
                     for x in range(24):pixels[y*24+x]=td[start+status*3+x//8][y*8+x%8]&15
                 icons.append(save(f'{style}_status_{battler}_{status}',24,8,rgba(pixels,colors,True)))
             ui['statusIcons'].append(icons)
-        ui['ballPrompt']=save(style+'_ballPrompt',32,32,rgba(bytes(v&15 for tile in tiles(d/'last_used_ball_r_cycle.png')[:16]for v in tile),palette(d/'ability_pop_up.pal'),True))
-        # Re-layout the R-prompt's OAM tile stream into one 32px frame.
-        td=tiles(d/'last_used_ball_r_cycle.png');idx=bytearray(1024)
-        for y in range(32):
+        # B_LAST_USED_BALL_CYCLE selects a 32x64 OAM sprite, centered at
+        # (14,60) in singles. The cycle arrows share palette indices 10/11.
+        td=tiles(d/'last_used_ball_r_cycle.png');idx=bytearray(32*64)
+        for y in range(64):
             for x in range(32):idx[y*32+x]=td[y//8*4+x//8][y%8*8+x%8]&15
-        ui['ballPrompt']=save(style+'_ballPrompt',32,32,rgba(idx,palette(d/'ability_pop_up.pal'),True))
+        colors=palette(d/'ability_pop_up.pal');ui['ballPrompt']=save(style+'_ballPrompt_cycle',32,64,rgba(idx,colors,True))
+        colors[10]=colors[11]=colors[13]
+        ui['ballPromptIdle']=save(style+'_ballPrompt',32,64,rgba(idx,colors,True))
         out['ui'][style]=ui
     d=source/'graphics/battle_interface/hns';raw=(d/'textbox_map.bin').read_bytes();words=list(struct.unpack('<'+str(len(raw)//2)+'H',raw));pal=palette(d/'textbox.pal')[:16]*2
     out['textbox']=save('textbox',256,512,text_map(tiles(d/'textbox.png'),words,256,512,pal))
+    out['textboxPalette']=palette(d/'textbox.pal')[:16]
+    out['windowTextPalette']=palette(source/'graphics/battle_interface/text.pal')[:16]
+    body=re.search(r'sStandardBattleWindowTemplates\[\]\s*=\s*\{(.*?)\n\};',(source/'src/battle_bg.c').read_text(),re.S)[1]
+    out['windows']=[]
+    for name,row in re.findall(r'\[(B_WIN_\w+)\]\s*=\s*\{(.*?)\}',body,re.S):
+        props={k:int(v,0) for k,v in re.findall(r'\.(\w+)\s*=\s*(0x[\da-fA-F]+|\d+)',row)}
+        out['windows'].append({'name':name,'left':props['tilemapLeft'],'top':props['tilemapTop'],'w':props['width'],'h':props['height']})
     code=(engine/'src/core/game3/battle/healthbox.lua').read_text().replace('local FrlgFont = require("src.ui.game3.frlg_font")','local FrlgFont') .replace('local Healthbox = {}','local Source\nlocal Healthbox = {}\nfunction Healthbox.configure(s)Source=s;FrlgFont=s.font end')
     a=code.index('local function draw_name_gender');b=code.index('local function draw_level',a);code=code[:a]+'''local function draw_name_gender(name,gender,x,y)Source.name(name,gender,x,y)end
 

@@ -6,7 +6,8 @@ return function(mod,w,game)
   local Title=assert(load(mod:read('hns_title.lua')))()
   local Ppu=require('src.core.game3.gba_ppu');local B=w.bootPresentation
   local songs={};for id,name in pairs(w.audio.songs)do songs[name]=tonumber(id)end
-  Movie.configure({song=assert(songs.MUS_HG_INTRO)})
+  local Credits=assert(load(mod:read('intro_credits.lua')))()(U,B.credits)
+  Movie.configure({song=assert(songs.MUS_HG_INTRO),credits=Credits})
   local Intro={}
   function Intro.new()
     local assets={};for name,a in pairs(B.intro)do assets[name]=U.image(a.file,a.width,a.height)end
@@ -38,5 +39,5 @@ return function(mod,w,game)
   end
   Boot.new=function(g)return g==game and configure(new(g))or new(g)end
   configure(game.boot)
-  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,ui=U}
+  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,Credits=Credits,ui=U}
 end
