@@ -144,7 +144,7 @@ return function(T,game,w,maps)
   local a,b,weight=Time.blend({hours=7,minutes=0});T.eq(weight,128,'source halfway morning fade')
   T.eq(Time.channel(31,a[1],b[1],weight),20,'source integer 5-bit channel blend')
   local fixtureMod={hooks={wrap=function()end},read=function(_,file)
-    local f=assert(io.open(arg[1]..'/'..file,'rb'));local text=f:read('*a');f:close();return text
+    return T.readAsset(file)
   end}
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_render_regressions.lua')(T,fixtureMod,w,game,s)
   setting('ITEM_MAIN_FOLLOWER',0);setting('ITEM_MAIN_LARGE_FOLLOWER',1)

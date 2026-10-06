@@ -48,6 +48,7 @@ jobs:
           git -C build/source checkout 167aa6d537b109bb229c231ddce4616974c4da71
           git clone https://github.com/bryanthaboi/gen1recomp.git build/engine
           git -C build/engine checkout 20ab97abf8092c37344d108f2136ec4e5d131500
+          git -C build/engine worktree add --detach ../engine-v0353 bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8
       - name: Build without a ROM
         run: |
           mkdir -p reports
@@ -69,6 +70,14 @@ jobs:
           python3 tests/render_source_ui.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --out build/ui-captures
           test -z "$(git -C build/source status --porcelain)"
           test -z "$(git -C build/engine status --porcelain)"
+      - name: Validate G1R 0.3.53 installed and carried-over assets
+        run: |
+          python3 tests/test_installed_assets.py --engine build/engine-v0353 --mod build/hns_exploration --luajit /usr/bin/luajit
+          project_root="$GITHUB_WORKSPACE"
+          cd build/engine-v0353
+          /usr/bin/luajit "$project_root/tests/test_native.lua" "$project_root/build/hns_exploration" default
+          /usr/bin/luajit "$project_root/tests/test_native.lua" "$project_root/build/hns_exploration"
+          test -z "$(git status --porcelain)"
       - name: Package mod and sealed cart
         run: |
           python3 release.py --mod build/hns_exploration --out dist --engine build/engine --luajit /usr/bin/luajit

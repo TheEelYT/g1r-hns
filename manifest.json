@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development port: source Modern terrain entry layers and scrolling, corrected Gen 3/4 healthbox text bounds and palette colors. Enhanced battle mechanics and later campaign remain in progress. Requires imported vanilla Emerald.",
+  "description": "HnS v2.0.6 development port: compatible compressed mod assets on G1R 0.3.53 and raw assets on 0.3.44. Enhanced battle mechanics and later campaign remain in progress. Requires imported vanilla Emerald.",
   "github": "TheEelYT/g1r-hns"
 }

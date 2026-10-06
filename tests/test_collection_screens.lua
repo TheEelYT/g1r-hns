@@ -49,6 +49,11 @@ return function(T,game,world)
     end
     for i=1,20 do frame()end;frame('a');for i=1,220 do frame()end
     T.eq(Battle._phase,'catch_nickname_prompt','real native capture returns to nickname prompt')
+    if Ui.beginCaughtDexScene then
+      T.check(Ui._caughtDexScene and Ui._caughtDexScene.sprite.img,'new engine receives the actual registration sprite')
+      T.eq(Ui._caughtDexScene.species,161,'new engine caught return retains the captured species')
+      T.eq(Ui._caughtDexScene.sprite.x,120,'registration sprite returns to battle center')
+    end
     T.check(Msg.isOpen(),'native nickname text remains open after registration')
     T.check(Choice.active,'native Yes/No opens after registration prompt prints')
     T.check(Msg.currentPage():find('SCOUT',1,true)~=nil,'source nickname prompt identifies the actual captured mon')

@@ -3,7 +3,9 @@ return function(mod,spec)
   local U={spec=spec,images={}}
   function U.image(file,w,h)
     if not U.images[file] then
-      local im=love.graphics.newImage(love.image.newImageData(w,h,'rgba8',assert(mod:read(file))))
+      local bytes=assert(mod:read(file),'missing HnS image '..file)
+      assert(#bytes==w*h*4,('HnS image %s: expected %d bytes for %dx%d, got %d; reinstall the current cart'):format(file,w*h*4,w,h,#bytes))
+      local im=love.graphics.newImage(love.image.newImageData(w,h,'rgba8',bytes))
       im:setFilter('nearest','nearest');U.images[file]=im
     end
     return U.images[file]

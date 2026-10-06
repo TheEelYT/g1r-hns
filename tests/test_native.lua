@@ -1,6 +1,14 @@
 -- Run from the pinned gen1recomp checkout with LuaJIT, no ROM required.
 package.path = "./?.lua;./?/init.lua;" .. package.path
 local T = require("tests.modkit")
+-- Match LÖVE's raw ImageData size check; the upstream headless stub skips it.
+local imageData=love.image.newImageData
+love.image.newImageData=function(w,h,format,bytes,...)
+  if type(w)=='number' and format=='rgba8' and bytes~=nil then
+    assert(type(bytes)=='string' and #bytes==w*h*4,'raw ImageData byte count must match dimensions')
+  end
+  return imageData(w,h,format,bytes,...)
+end
 local GameVersion = require("src.core.GameVersion")
 GameVersion.set("emerald")
 -- Match the desktop importer too: GameVersion and Versions are separate
@@ -12,6 +20,14 @@ data.generation = 3
 -- party construction. Production reads the user's complete Emerald tables.
 local C=require("src.core.game3.constants").of("emerald")
 local path = arg[1] or "../build/hns_exploration"
+-- Independent pixel/oracle fixtures also read installed files, rather than
+-- assuming that bytes on disk are raw. Production uses its own mod API.
+function T.readAsset(file)
+  local f=assert(io.open(path..'/'..file,'rb'));local bytes=f:read('*a');f:close()
+  local ok,Blob=pcall(require,'src.import.CacheBlob')
+  if ok then local decoded,raw=pcall(Blob.decode,file,bytes);if decoded then bytes=raw end end
+  return bytes
+end
 local world=dofile(path.."/world.lua")
 for _,name in ipairs({"CHIKORITA","CYNDAQUIL","TOTODILE","SENTRET","HOPPIP","RATTATA","HOOTHOOT"}) do
   local id=C.species.byName["SPECIES_"..name]

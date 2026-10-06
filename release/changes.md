@@ -1,8 +1,8 @@
-Changes in 0.7.6:
+Changes in 0.7.7:
 
-- Replaces Modern terrain tile guessing with source BG3 screen blocks and the separate BG1 entry map, including wraparound, scanline scroll and source entry progression. OLD terrain keeps its existing path.
-- Fixes opponent name/level fill extending eight pixels past its source border in both battle UI styles.
-- Uses the source light background palette for GEN 4 names/levels, while retaining the darker HP-number strip.
-- Moves focused player checks into TESTING.md, removes the confirmed R-ball prompt check, and removes publishing from the port progress checklist.
+- Fixes the boot image byte-size crash after newer G1R installs compress `.rgba` and `.idx` mod assets.
+- Decodes compressed installed assets through the engine codec, while preserving raw assets from older installs and compatibility with G1R 0.3.44.
+- Supplies the caught Pokémon sprite and identity to G1R 0.3.53’s new registration-to-nickname handoff, preventing a second crash after catching.
+- Adds image byte-size validation with the affected filename and a regression suite using the actual G1R 0.3.53 installer codec and real mod loader.
 
-Validation uses both native cache roots, converter tests, strict Modkit validation, independent source audits, a compiled source C entry oracle and native battle CPU captures. No live Windows/GPU gameplay is available here. Sprite orchestration and remaining enhanced battle mechanics/campaign work remain in progress.
+Existing HnS cart identity, isolated saves and seal are preserved. This is a compatibility update; previous terrain/UI fixes remain included. Automated checks cover both engine versions and both cache roots. Live Windows/GPU boot and gameplay still need player confirmation.

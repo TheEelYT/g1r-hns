@@ -2,6 +2,7 @@
 -- Gen 3 has no public native tileset registry yet, so this prototype declares
 -- engine_internals and uses a read-only overlay of its own native blobs.
 return function(mod)
+  assert(load(mod:read('asset_io.lua'),'@hns/asset_io.lua'))()(mod)
   local function readTable(file)
     local bytes = mod:read(file)
     if not bytes then return nil, "missing " .. file end

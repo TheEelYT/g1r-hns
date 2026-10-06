@@ -64,6 +64,7 @@ return function(mod,world,game)
     opts=opts or {};local s=opts.session or Rt.getSession()
     R.session=s;R.row=assert(rows[species],'missing supported HnS registration species')
     R.species=species;R.personality=opts.personality;R.onDone=opts.onDone
+    R.caught={species=species,personality=opts.personality,otId=opts.otId,otSecretId=opts.otSecretId,shiny=opts.shiny}
     R.phase='in';R.fade=16;R.x=48;R.y=56;R.acc=0
     Stack.push(R.ID,R,{hideBelow=true,fullscreen=true});return R
   end
@@ -72,7 +73,20 @@ return function(mod,world,game)
     Stack.pop(R.ID);local cb=R.onDone;R.onDone=nil;R.phase=nil
     if cb then
       local Battle=require('src.core.game3.battle')
-      if Battle.isActive() and Battle._phase=='pokedex_reg' then R.pendingCallback=cb else cb()end
+      local caught=R.caught
+      -- Newer G1R resumes the battle with the registration sprite before
+      -- opening the nickname prompt. Older callbacks ignore this argument.
+      if require('src.core.game3.battle.ui').beginCaughtDexScene then
+        local front=R.row.front
+        local pic
+        if caught.shiny or R.row.speciesName=='UNOWN' or R.row.speciesName=='SPINDA'then
+          pic=Pokemon.frontPic(Pokemon.picSpecies(R.species,R.personality or 0),nil,caught.shiny,R.personality)
+          pic=pic and pic.image
+        else pic=U.image(front.file,64,64)end
+        caught.sprite={img=assert(pic,'missing caught Pokémon sprite'),x=R.x,y=R.y}
+      end
+      local function complete()cb(caught)end
+      if Battle.isActive() and Battle._phase=='pokedex_reg' then R.pendingCallback=complete else complete()end
     end
   end
   function R.step()

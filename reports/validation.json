@@ -1,5 +1,5 @@
 {
-  "version": "0.7.6",
+  "version": "0.7.7",
   "native_checks": {
     "default": 96876,
     "mounted": 96876
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 108,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.5",
+  "cart_version": "1.0.6",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -172,30 +172,53 @@
     "Modern BG3 uses both real source screen blocks with 512-pixel wrap; HBlank scroll targets BG3 independently of BG1",
     "1078 source C task frames across grass/long grass/sand/water/underwater/Kyogre/building match Lua register traces",
     "Modern entry CPU draw calls match source BG3 scanline and independent BG1 scroll coordinates; FAST INTRO bypass and OLD terrain retained",
-    "Opponent text fill ends at x=88; source Gen4 name/level BG index 2 and HP-number BG index 3 preserved"
+    "Opponent text fill ends at x=88; source Gen4 name/level BG index 2 and HP-number BG index 3 preserved",
+    "G1R 0.3.53 installer compression decoded for all mod rgba/idx reads; existing raw assets continue working",
+    "G1R 0.3.53 registration callback supplies captured identity and sprite; native nickname Yes/No and naming complete"
   ],
   "tested_build_content_equivalence": {
-    "files": 7689,
-    "differences": [
-      "README.md"
-    ],
-    "release_readme_matches_repository": true
+    "files": 7690,
+    "release_readme_matches_repository": true,
+    "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.6",
-    "cart_version": "1.0.5",
-    "repo": "TheEelYT/g1r-hns",
+    "mod_version": "0.7.7",
+    "cart_version": "1.0.6",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.5.g1rcart",
+        "name": "pokemon_heart_soul-1.0.6.g1rcart",
         "bytes": 1028179,
-        "sha256": "0401bcf46dcd3a7db2974080c84484d1603a1d27a7e35970e5b31a3acbbc39d5"
+        "sha256": "08a0b7f4861c5979a99d5aa206289a9265ddee50bd9ac571f09193cc89b8578d"
       },
       {
-        "name": "hns_exploration-0.7.6.zip",
-        "bytes": 9887167,
-        "sha256": "1a3e9fa5f70c3cd59c5658fc667aaee6fab7070a353c193256160276d90d5f3c"
+        "name": "hns_exploration-0.7.7.zip",
+        "bytes": 9888252,
+        "sha256": "572bec4e56a2af2ab6d2522c2ffeb246f5f3e332f724a3365fa3b3ab89d29b1b"
       }
-    ]
+    ],
+    "repo": "TheEelYT/g1r-hns"
+  },
+  "engine_compatibility": {
+    "v0.3.44": {
+      "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
+      "raw_native_checks": {
+        "default": 96876,
+        "mounted": 96876
+      }
+    },
+    "v0.3.53": {
+      "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
+      "raw_native_checks": {
+        "default": 96881,
+        "mounted": 96881
+      },
+      "compressed_native_checks": {
+        "default": 96881,
+        "mounted": 96881
+      },
+      "installer_encoded_assets": 5471,
+      "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
+    },
+    "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
   }
 }

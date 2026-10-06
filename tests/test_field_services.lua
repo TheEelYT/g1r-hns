@@ -101,7 +101,7 @@ return function(T,game,w,maps)
   local draw=love.graphics.draw;local selected
   love.graphics.draw=function(im,q,x,y)selected={q=q,x=x,y=y}end
   for gender=0,1 do
-    s.gender=gender;local info=S.arrow[tostring(gender)];local f=assert(io.open(arg[1]..'/'..info.file,'rb'));local pixels=f:read('*a');f:close()
+    s.gender=gender;local info=S.arrow[tostring(gender)];local pixels=T.readAsset(info.file)
     for _,dir in ipairs({'down','up','left','right'})do
       Arrow.hide();Arrow.show(dir,7,9)
       for beat=1,2 do

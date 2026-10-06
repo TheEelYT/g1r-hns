@@ -54,7 +54,7 @@ def package(mod,out,engine,luajit):
     records=[{'name':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}for p in (cart_path,zip_path)]
     (out/'SHA256SUMS').write_text(''.join(r['sha256']+'  '+r['name']+'\n'for r in records))
     (out/'release.json').write_text(json.dumps({'mod_version':version,'cart_version':cart_version,'repo':repo,'files':records},indent=2)+'\n')
-    notes='Download **`'+cart_path.name+'` (recommended)** and import it with Gen1Recomp’s cart importer. It installs the exact mod release, keeps HnS saves under the custom cart, and ships sealed with mod edits disabled. Use Gen1Recomp v0.3.44 with vanilla US Emerald imported.\n\n`'+zip_path.name+'` is the alternative manual mod download; it does not create the isolated cart by itself.\n\nMod '+version+' / cart '+cart_version+'. Existing `pokemon_heart_soul` cart identity and label are preserved. This is a development port; the later campaign and expanded battle effects remain in progress.\n'
+    notes='Download **`'+cart_path.name+'` (recommended)** and import it with Gen1Recomp’s cart importer. It installs the exact mod release, keeps HnS saves under the custom cart, and ships sealed with mod edits disabled. Use Gen1Recomp v0.3.44 or v0.3.53 with vanilla US Emerald imported.\n\n`'+zip_path.name+'` is the alternative manual mod download; it does not create the isolated cart by itself.\n\nMod '+version+' / cart '+cart_version+'. Existing `pokemon_heart_soul` cart identity and label are preserved. This is a development port; the later campaign and expanded battle effects remain in progress.\n'
     changes=ROOT/'release/changes.md'
     if changes.exists():notes+='\n'+changes.read_text()
     (out/'release-notes.md').write_text(notes)
