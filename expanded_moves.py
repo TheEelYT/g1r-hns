@@ -14,7 +14,7 @@ EXTRA={'BURN':'BURN','FREEZE_OR_FROSTBITE':'FREEZE','FREEZE':'FREEZE','PARALYSIS
        'SP_ATK_PLUS_1':'SP_ATK_PLUS_1','SP_DEF_PLUS_1':'SP_DEF_PLUS_1'}
 
 
-def build(source,engine):
+def build(source,engine,roost_id=901):
     inp='#define TRUE 1\n#define FALSE 0\n#include "config/general.h"\n#include "config/battle.h"\n#include "config/contest.h"\n#include "data/moves_info.h"\n'
     body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=inp,text=True)
     native=set(re.findall(r'MOVE_(\w+)',(engine/'src/core/game3/constants/emerald/moves.lua').read_text()))
@@ -34,11 +34,14 @@ def build(source,engine):
             a,b=int(compare[1]),int(compare[3]);return int({'<':a<b,'>':a>b,'<=':a<=b,'>=':a>=b,'==':a==b,'!=':a!=b}[compare[2]])
         raise ValueError(field+': '+expr)
     for ordinal,(name,row)in enumerate(re.findall(r'\[MOVE_(\w+)\]\s*=\s*(.*?)(?=\n    \[MOVE_|\Z)',body,re.S)):
-        if name in native or name in ('NONE','ROOST','VISE_GRIP','HIGH_JUMP_KICK','FEINT_ATTACK','SMELLING_SALTS'):continue
+        if name in native or name in ('NONE','VISE_GRIP','HIGH_JUMP_KICK','FEINT_ATTACK','SMELLING_SALTS'):continue
         eff=re.search(r'\.effect\s*=\s*EFFECT_(\w+)',row)
         if not eff:continue
         reason=None;extra=[];effect=eff[1]
-        if effect not in compatible or effect not in effects:reason='expanded effect handler required: '+effect
+        # Roost's reviewed campaign handler heals and removes Flying for the
+        # remainder of the turn. Its row now shares this source-owned table.
+        if name=='ROOST':effect='RESTORE_HP'
+        if (effect not in compatible and name!='ROOST') or effect not in effects:reason='expanded effect handler required: '+effect
         if re.search(r'\.(?:isZMove|isMaxMove)\s*=\s*1',row):reason='special battle transformation required'
         # Unreviewed arguments must not silently disappear.
         args=re.search(r'\.argument\s*=\s*\{([^}]+)',row)
@@ -70,11 +73,12 @@ def build(source,engine):
         for field,bit in [('makesContact',1),('ignoresProtect',2),('magicCoatAffected',4),('snatchAffected',8),('mirrorMoveBanned',16),('ignoresKingsRock',32)]:
             value=num(row,field,0)
             if (field in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and not value)or(field not in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and value):flags|=bit
-        rec={'id':1000+ordinal,'name':display,'description':description,'effect':effects['HIGH_CRITICAL']if crit==1 and effect=='HIT'else effects[effect],
+        rec={'id':roost_id if name=='ROOST'else 1000+ordinal,'name':display,'description':description,'effect':effects['HIGH_CRITICAL']if crit==1 and effect=='HIT'else effects[effect],
             'power':num(row,'power',0),'accuracy':num(row,'accuracy',0),'pp':num(row,'pp',0),'priority':num(row,'priority',0),
             'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'BOTH':8,'ALL_BATTLERS':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
             'additionalEffects':extra,'thawsUser':num(row,'thawsUser',0)==1}
         if rec['thawsUser']and effect=='HIT':rec['effect']=effects['THAW_HIT']
+        if name=='ROOST':rec['sourceEffect']='ROOST'
         hits=num(row,'strikeCount',1)
         if hits!=1:omitted.append({'move':name,'reason':'expanded multi-hit dispatch required'});continue
         records[name]=rec

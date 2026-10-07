@@ -87,6 +87,16 @@ return function(T,game,world,maps)
   T.eq(status,'ok','native teaching preflight accepts source-compatible mon')
   T.eq(Pokemon.teachMove(mon,Q.roostMove),true,'native move storage accepts ROOST')
   T.eq(mon.pp[#mon.moves],5,'ROOST uses pinned source current-generation PP')
+  local Moves=require('src.core.game3.battle.moves')
+  preserve(Moves._rom,{Q.roostMove});Moves._rom[Q.roostMove]=nil
+  local roost=Moves.get(Q.roostMove)
+  T.eq(roost.numId,Q.roostMove,'Roost resolves without an Emerald ROM row')
+  T.eq(roost.type,2,'Roost has native Flying type for battle selection')
+  T.eq(roost.category,'status','Roost is a status move')
+  T.eq(roost.pp,5,'Roost selection exposes source PP')
+  T.eq(roost.effectId,'EXP_RECOVER_EFFECT','Roost dispatch retains implemented healing effect')
+  T.eq(Moves.get('HNS_ROOST').numId,Q.roostMove,'canonical custom move name resolves without ROM data')
+  T.eq(Moves.get({move=Q.roostMove}).numId,Q.roostMove,'native wrapped move identifier resolves')
   local Effects=require('src.core.game3.battle.effects');local Adapter=require('src.core.game3.battle.adapter')
   for _,types in ipairs({{0,2},{2,2},{10,2},{0,0}}) do
     local user={id=0,type1=types[1],type2=types[2],mon={hp=25,maxHp=100}}

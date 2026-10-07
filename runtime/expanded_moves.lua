@@ -6,7 +6,17 @@ return function(mod,w,game)
   local Types=require('src.core.game3.battle.types');local Hit=require('src.core.game3.battle.effects.hit')
   local Secondary=require('src.core.game3.battle.effects.secondary')
   local C=require('src.core.game3.constants').of('emerald');local X={byId={},byName={},species={}}
-  for name,row in pairs(w.expandedMoves.moves)do X.byId[row.id]=row;X.byName[name]=row.id end
+  X.metadata=w.moveTable and w.moveTable.moves or {}
+  X.dataById={};for name,row in pairs(X.metadata)do X.dataById[row.id]=row end
+  for name,bridge in pairs(w.expandedMoves.moves)do
+    local row={};for k,v in pairs(bridge)do row[k]=v end
+    local source=X.metadata[name]
+    if source then
+      for _,k in ipairs({'name','description','power','accuracy','pp','priority','category','sourceId','sourceFields','sourceEffect'})do row[k]=source[k]end
+    end
+    X.byId[row.id]=row;X.byName[name]=row.id
+  end
+  X.byName.HNS_ROOST=X.byName.ROOST
   for _,row in ipairs(w.pokedex.registrationEntries)do
     local id=C.species.byName['SPECIES_'..row.speciesName];if id then X.species[id]=row end
   end
@@ -26,8 +36,15 @@ return function(mod,w,game)
     if H.battle()and X.byName[key]then return X.byName[key]end;return number(n)
   end
   Moves.get=function(id)
-    local key=tonumber(id)or(type(id)=='string'and X.byName[id:upper():gsub(' ','_'):gsub('-','_')])
-    local row=H.battle()and X.byId[key];if not row then return get(id)end
+    local value=type(id)=='table'and(id.id or id.move or id.moveId or id.num or id.name or id[1])or id
+    local key=tonumber(value)or(type(value)=='string'and X.byName[value:upper():gsub(' ','_'):gsub('-','_')])
+    local row=H.battle()and X.byId[key]
+    if not row then
+      local m=get(id)
+      local source=H.battle()and X.dataById[m.numId]
+      if source then m.description=source.description end
+      return m
+    end
     local m={};for k,v in pairs(row)do m[k]=v end
     m.id=Moves.constName(key);m.numId=key;m.effectId=E.STATUS_SETUP[m.effect]
     if m.legacyType and H.value('ITEM_MODE_FAIRY_TYPES')==0 then m.type=m.legacyType end

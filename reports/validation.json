@@ -1,8 +1,8 @@
 {
-  "version": "0.7.7",
+  "version": "0.7.8",
   "native_checks": {
-    "default": 96876,
-    "mounted": 96876
+    "default": 96899,
+    "mounted": 96899
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 108,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.6",
+  "cart_version": "1.0.7",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -79,7 +79,9 @@
         "source_move_rows": 354,
         "source_matchups": 361,
         "source_contest_move_rows": 354,
+        "retained_source_move_fields": 16070,
         "source_move_descriptions": 934,
+        "complete_move_table_rows": 935,
         "source_display_move_rows": 934,
         "source_critical_stages": 5,
         "source_fairy_species": 18,
@@ -144,7 +146,7 @@
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
         "source_c_tint_colors": 196608,
-        "expanded_supported_moves": 159,
+        "expanded_supported_moves": 160,
         "expanded_explicit_omissions": 420
       },
       "limits": [
@@ -174,7 +176,9 @@
     "Modern entry CPU draw calls match source BG3 scanline and independent BG1 scroll coordinates; FAST INTRO bypass and OLD terrain retained",
     "Opponent text fill ends at x=88; source Gen4 name/level BG index 2 and HP-number BG index 3 preserved",
     "G1R 0.3.53 installer compression decoded for all mod rgba/idx reads; existing raw assets continue working",
-    "G1R 0.3.53 registration callback supplies captured identity and sprite; native nickname Yes/No and naming complete"
+    "G1R 0.3.53 registration callback supplies captured identity and sprite; native nickname Yes/No and naming complete",
+    "All 935 configured HnS move rows and source enum IDs compared with compiled C values; 16070 source fields retained by independent token audit",
+    "Roost lookup with the Emerald ROM row removed: full GEN 3/4 selection/details draw, wrapped IDs, PP, healing and temporary Flying removal; save ID 901 retained"
   ],
   "tested_build_content_equivalence": {
     "files": 7690,
@@ -182,43 +186,50 @@
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.7",
-    "cart_version": "1.0.6",
+    "mod_version": "0.7.8",
+    "cart_version": "1.0.7",
+    "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.6.g1rcart",
+        "name": "pokemon_heart_soul-1.0.7.g1rcart",
         "bytes": 1028179,
-        "sha256": "08a0b7f4861c5979a99d5aa206289a9265ddee50bd9ac571f09193cc89b8578d"
+        "sha256": "32377fcefbe256e75bc1ebafff1b164807c57ae2488dacdf26812c80397d133c"
       },
       {
-        "name": "hns_exploration-0.7.7.zip",
-        "bytes": 9888252,
-        "sha256": "572bec4e56a2af2ab6d2522c2ffeb246f5f3e332f724a3365fa3b3ab89d29b1b"
+        "name": "hns_exploration-0.7.8.zip",
+        "bytes": 10006829,
+        "sha256": "afd6b336faec8651b6fde0a5dcfb5c66aee1363525f8de269095bddaf7c42932"
       }
-    ],
-    "repo": "TheEelYT/g1r-hns"
+    ]
   },
   "engine_compatibility": {
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 96876,
-        "mounted": 96876
+        "default": 96899,
+        "mounted": 96899
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 96881,
-        "mounted": 96881
+        "default": 96904,
+        "mounted": 96904
       },
       "compressed_native_checks": {
-        "default": 96881,
-        "mounted": 96881
+        "default": 96904,
+        "mounted": 96904
       },
       "installer_encoded_assets": 5471,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
     },
     "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
+  },
+  "move_table": {
+    "rows": 935,
+    "native_bridges": 354,
+    "implemented_custom": 160,
+    "pending_moves": 420,
+    "pending_source_effect_families": 205
   }
 }

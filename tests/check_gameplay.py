@@ -1,7 +1,8 @@
 """Audit source battle parameters using a C compiler as the expression oracle.
 
-Independent of the converter: all 354 native moves and 361 matchups are
-compared with pinned C data/config, plus source farewell and jingle targets.
+Independent of the converter: all 935 configured move rows, the 354 native
+bridges and 361 matchups are compared with pinned C data/config. Token audits
+also verify retained source fields, alongside farewell and jingle targets.
 """
 import argparse
 import json
@@ -25,10 +26,12 @@ def check(source, engine, mod, luajit):
     matchup=(source/'src/data/types_info.h').read_text()
     definitions='\n'.join(line for line in matchup.splitlines() if line.startswith('#define '))
     table=matchup.split('gTypeEffectivenessTable')[1].split('=',1)[1].split('\n};')[0]
-    c+='#define UQ_4_12(x) ((x)*10)\n'+definitions+'\nstatic const double matchups[21][21]='+table+'\n};\nint main(void){\n'
+    c+='#include "constants/moves.h"\n#define UQ_4_12(x) ((x)*10)\n'+definitions+'\nstatic const double matchups[21][21]='+table+'\n};\nint main(void){\n'
     names=[]
     for entry in re.finditer(r'\[MOVE_(\w+)\]\s*=\s*\{(.*?)(?=\n\s*\[MOVE_|\Z)',pre,re.S):
         name=aliases.get(entry[1],entry[1])
+        fields=[re.search(r'\.'+field+r'\s*=\s*([^,]+),',entry[2])[1]for field in ('power','accuracy','type','category','pp','priority')]
+        c+='printf("TABLE '+name+' %d %d %d %d %d %d %d\\n",MOVE_'+entry[1]+','+','.join(fields)+');\n'
         if name!='NONE':
             fields=[re.search(r'\.'+field+r'\s*=\s*([^,]+),',entry[2])[1]for field in ('power','accuracy','type','category')]
             c+='printf("DISPLAY '+name+' %d %d %d %d\\n",'+','.join(fields)+');\n'
@@ -48,6 +51,28 @@ def check(source, engine, mod, luajit):
         subprocess.run(['gcc','-std=c99','-I'+str(source/'include'),str(root/'oracle.c'),'-o',str(root/'oracle')],check=True)
         results=subprocess.check_output([str(root/'oracle')],text=True)
     counts={'source_move_rows':0,'source_matchups':0,'source_contest_move_rows':0}
+    # Token-level comparison independently checks that unimplemented fields,
+    # nested arguments, flags and animation references were all retained.
+    def tokens(text):
+        return re.findall(r'"(?:[^"\\]|\\.)*"|[A-Za-z_]\w*|\d+|[^\s]',text)
+    retained=0
+    for entry in re.finditer(r'\[MOVE_(\w+)\]\s*=\s*\{(.*?)(?=\n\s*\[MOVE_|\Z)',pre,re.S):
+        actual={};part=[];depth=0
+        for token in tokens(entry[2]):
+            if token=='}' and depth==0:break
+            if token in ('{','(','['):depth+=1
+            if token in ('}',')',']'):depth-=1
+            if token==',' and depth==0:
+                equals=part.index('=');key=''.join(part[1:equals]);actual[key]=part[equals+1:];part=[]
+            else:part.append(token)
+        if part:
+            equals=part.index('=');actual[''.join(part[1:equals])]=part[equals+1:]
+        name=aliases.get(entry[1],entry[1]);saved=world['moveTable']['moves'][name]['sourceFields']
+        assert set(actual)==set(saved),name
+        for key,value in actual.items():assert tokens(saved[key])==value,(name,key)
+        retained+=len(actual)
+    assert world['moveTable']['count']==935 and set(world['moveTable']['moves'])=={'NONE'}|set(world['pokedex']['moveInfo'])
+    counts['retained_source_move_fields']=retained
     effects_pp=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input='#define TRUE 1\n#define FALSE 0\n#include "constants/global.h"\n#include "config/general.h"\n#include "config/contest.h"\n#include "constants/contest.h"\n#include "data/contest_moves.h"\n',text=True)
     effects={}
     for n,b in re.findall(r'\[(\d+)\]\s*=\s*\{(.*?)(?=\n\s*\[\d+\]|\n};)',effects_pp,re.S):
@@ -73,11 +98,19 @@ def check(source, engine, mod, luajit):
     for line in desc_rows.splitlines():
         name,raw=line.split(' ',1);expected=bytes.fromhex(raw).decode().replace('{POKEBLOCK}','POKéBLOCK').replace('{PKMN}','POKéMON')
         assert world['pokedex']['moveInfo'][name]['description']==expected,name
+        assert world['moveTable']['moves'][name]['description']==expected,name
         if name in native:assert rules['moves'][name]['description']==expected,name
     counts['source_move_descriptions']=len(desc_rows.splitlines())
     for row in results.splitlines():
         parts=row.split()
-        if parts[0]=='DISPLAY':
+        if parts[0]=='TABLE':
+            name=parts[1];values=list(map(int,parts[2:]));expected=world['moveTable']['moves'][name]
+            assert [expected[k]for k in ('sourceId','power','accuracy')]==values[:3],name
+            assert expected['type']==type_names[values[3]],name
+            assert expected['category']==('physical','special','status')[values[4]],name
+            assert [expected[k]for k in ('pp','priority')]==values[5:],name
+            counts['complete_move_table_rows']=counts.get('complete_move_table_rows',0)+1
+        elif parts[0]=='DISPLAY':
             name=parts[1];values=list(map(int,parts[2:]));expected=world['pokedex']['moveInfo'][name]
             assert [expected['power'],expected['accuracy']]==values[:2],name
             assert expected['type']==type_names[values[2]],(name,values[2],expected['type'])

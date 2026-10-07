@@ -1,8 +1,8 @@
-Changes in 0.7.7:
+Changes in 0.7.8:
 
-- Fixes the boot image byte-size crash after newer G1R installs compress `.rgba` and `.idx` mod assets.
-- Decodes compressed installed assets through the engine codec, while preserving raw assets from older installs and compatibility with G1R 0.3.44.
-- Supplies the caught Pokémon sprite and identity to G1R 0.3.53’s new registration-to-nickname handoff, preventing a second crash after catching.
-- Adds image byte-size validation with the affected filename and a regression suite using the actual G1R 0.3.53 installer codec and real mod loader.
+- Imports all 935 configured HnS move rows into a shared source table, preserving source IDs, names/descriptions, parameters, targets and every original field expression, including effect arguments, flags and animation references. Existing port IDs remain stable.
+- Moves Roost into the shared reviewed HnS move lookup, fixes selection without an Emerald ROM row, and supplies its source START details. Healing and temporary Flying removal retain the existing reviewed handler.
+- Keeps all 420 pending move effects explicit and excluded from learned move lists; data import does not claim to implement them.
+- Removes player-confirmed boot/credits, caught naming, Modern terrain and GEN 3/4 battle UI checks from TESTING.md.
 
-Existing HnS cart identity, isolated saves and seal are preserved. This is a compatibility update; previous terrain/UI fixes remain included. Automated checks cover both engine versions and both cache roots. Live Windows/GPU boot and gameplay still need player confirmation.
+Both G1R 0.3.44 and 0.3.53 remain supported. Tests remove the nonexistent Roost ROM row, exercise move selection/details/healing and compare the complete imported data against source. Live Windows/GPU confirmation remains a player check.

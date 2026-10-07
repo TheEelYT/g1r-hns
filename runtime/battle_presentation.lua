@@ -9,6 +9,8 @@ return function(mod,world,game)
   local C=require('src.core.game3.constants').of('emerald')
   local rows={};for name,row in pairs(world.startup.rules.moves)do rows[C:require('moves','MOVE_'..name)]=row end
   for _,row in pairs(world.expandedMoves and world.expandedMoves.moves or {})do rows[row.id]=row end
+  if world.campaign then rows[world.campaign.roostMove]=world.pokedex.moveInfo.ROOST end
+  for _,row in pairs(world.moveTable and world.moveTable.moves or {})do rows[row.id]=row end
   local P={ui=U,hintX=-30}
   local function own(st)return (st and st.session and world.maps[st.session.map] and not (st.link or st.kinds and st.kinds.link)) and true or false end
   function P.eligible()

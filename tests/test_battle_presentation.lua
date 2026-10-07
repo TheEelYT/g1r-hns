@@ -33,6 +33,41 @@ return function(T,game,world)
   Ui.handleInput(key('start'));Ui.handleInput(key('start'));T.eq(P.details,false,'START toggles description closed')
   Ui._mode='menu';T.eq(P.eligible(),false,'action menu keeps native START behavior')
   Ui._mode='moves';Ui._swap={};T.eq(P.eligible(),false,'move rearrangement keeps native controls');Ui._swap=nil
+  -- The SDK registry previously populated this row, hiding the real desktop
+  -- failure. Explicitly remove it and draw the complete native selection UI.
+  local Moves=require('src.core.game3.battle.moves');local roost=world.campaign.roostMove
+  local rom=Moves._rom[roost];Moves._rom[roost]=nil
+  local beforeMoves,beforePp=mon.moves,mon.pp;mon.moves={roost,33};mon.pp={5,35}
+  st.player.moves=mon.moves
+  local H=game._hnsRules.rules;local value=H.value;local style=0
+  H.value=function(id,session)if id=='ITEM_BATTLE_NEW_BATTLEUI'then return style end;return value(id,session)end
+  local Battle=require('src.core.game3.battle');local battleSt=Battle._st;Battle._st=st
+  -- The ROM-free fixture has no imported sprite-coordinate cache. Supply only
+  -- this graphical boundary; the native move lookup and menu draw stay real.
+  local Coords=require('src.core.game3.battle.pic_coords')
+  local front,back,elev=rawget(Coords,'front'),rawget(Coords,'back'),rawget(Coords,'elev')
+  Coords.front={[152]=0,[19]=0};Coords.back={[152]=0,[19]=0};Coords.elev={}
+  local RomText=require('src.core.game3.rom_text');local IR=require('src.core.game3.scripting.text_ir')
+  local textSaved={}
+  for k,v in pairs({gText_MoveInterfacePP='PP',gText_MoveInterfaceType='TYPE/', ['gTypeNames[2]']='FLYING'})do
+    textSaved[#textSaved+1]={k,RomText.overrides[k]};RomText.overrides[k]=IR.fromAscii(v)
+  end
+  for i=0,1 do
+    style=i;Ui._moveIndex=1;P.details=false
+    local ok,err=pcall(Ui.draw,240,160)
+    T.check(ok,'native GEN '..(i==0 and 3 or 4)..' Roost selection draws without a ROM move row '..tostring(err or ''))
+    Ui.handleInput(key('start'));T.check(P.details,'Roost START details open')
+    local def,info=P.selected();T.eq(def.numId,roost,'shared HnS lookup resolves selected Roost')
+    T.eq(info.description,world.moveTable.moves.ROOST.description,'Roost details use the complete source move table')
+    T.eq(def.pp,5,'Roost battle panel uses source PP')
+    ok,err=pcall(Ui.draw,240,160)
+    T.check(ok,'Roost native menu and source details draw together '..tostring(err or ''))
+    Ui.handleInput(key('right'));T.eq(Ui._moveIndex,2,'cursor can leave Roost while details are open')
+    Ui.handleInput(key('b'));T.eq(P.details,false,'Roost details close normally')
+  end
+  Coords.front=front;Coords.back=back;Coords.elev=elev
+  for _,row in ipairs(textSaved)do RomText.overrides[row[1]]=row[2]end
+  Battle._st=battleSt;H.value=value;Moves._rom[roost]=rom;mon.moves=beforeMoves;mon.pp=beforePp;st.player.moves=beforeMoves
   s.map='EM_LITTLEROOT_TOWN';T.eq(P.eligible(),false,'vanilla selection has no HnS overlay');s.map=world.startup.start.map
   -- Only unavailable imported battle strings/font metrics are supplied below.
   -- The native message printer, timed queue and catch-step state machine run.
@@ -56,5 +91,5 @@ return function(T,game,world)
   st.session.map='EM_LITTLEROOT_TOWN';delivered=0
   Catch.begin(st,4,false,0,options);Catch.update();T.eq(delivered,1,'vanilla capture keeps original announcement callback')
   Catch.reset();Ui.reset({headless=true});Text.get=get;Font.wrap=wrap;Anim._headless=animHeadless;Rt.session=oldSession
-  print('HnS battle presentation: START/details navigation and native automatic throw continuation')
+  print('HnS battle presentation: ROM-free Roost in both UIs, START/details navigation and native automatic throw continuation')
 end

@@ -173,13 +173,13 @@ def check(source,engine,mod,luajit):
     moves=world['expandedMoves']['moves'];omitted=world['expandedMoves']['omitted'];assert len(moves)>150
     # All source expanded move declarations are either supported or explained.
     body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input='#define TRUE 1\n#define FALSE 0\n#include "config/general.h"\n#include "config/battle.h"\n#include "config/contest.h"\n#include "data/moves_info.h"\n',text=True)
-    native=set(re.findall(r'MOVE_(\w+)',(engine/'src/core/game3/constants/emerald/moves.lua').read_text()))|{'NONE','ROOST','VISE_GRIP','HIGH_JUMP_KICK','FEINT_ATTACK','SMELLING_SALTS'}
+    native=set(re.findall(r'MOVE_(\w+)',(engine/'src/core/game3/constants/emerald/moves.lua').read_text()))|{'NONE','VISE_GRIP','HIGH_JUMP_KICK','FEINT_ATTACK','SMELLING_SALTS'}
     allnames=set(re.findall(r'\[MOVE_(\w+)\]',body))-native
     assert set(moves)|{r['move']for r in omitted}==allnames
     assert not set(moves)&{r['move']for r in omitted}
     for i,(name,row)in enumerate(re.findall(r'\[MOVE_(\w+)\]\s*=\s*(.*?)(?=\n    \[MOVE_|\Z)',body,re.S)):
         if name not in moves:continue
-        m=moves[name];assert m['id']==1000+i
+        m=moves[name];assert m['id']==(world['campaign']['roostMove']if name=='ROOST'else 1000+i)
         display=world['pokedex']['moveInfo'][name]
         assert m['power']==display['power'] and m['accuracy']==display['accuracy'] and m['category']==display['category'],name
         assert m['description']==display['description'],name

@@ -100,5 +100,4 @@ def build(source,stage,maps,source_maps,labels,text,scripts,opening_data,palette
     learnables=json.loads((source/'src/data/pokemon/all_learnables.json').read_text())
     q['limits']='Source opening scenes, rival naming, Sprout Tower/Silver/Li/Flash and Violet Gym/Falkner/Zephyr/TM51 ROOST are bridged. Later campaign, phone calls and expanded battle data remain in progress.'
     return {'flags':{'silverHidden':SILVER_HIDDEN,'flashGift':FLASH_GIFT,'zephyr':ZEPHYR,'roostGift':ROOST_GIFT},'vars':{'towerStage':TOWER_STAGE},'objects':objects,'battles':battles,'pickups':pickups,
-            'roostItem':ROOST_ITEM,'roostMove':ROOST_MOVE,'roostSpecies':[s for s,moves in sorted(learnables.items()) if 'MOVE_ROOST' in moves and s in prepared['known']['species']],
-            'moves':{'HNS_ROOST':{'id':'HNS_ROOST','index':ROOST_MOVE,'name':'ROOST','type':'FLYING','power':0,'accuracy':0,'pp':5,'effect':32,'target':16,'priority':0,'category':'status','flags':64}}}
+            'roostItem':ROOST_ITEM,'roostMove':ROOST_MOVE,'roostSpecies':[s for s,moves in sorted(learnables.items()) if 'MOVE_ROOST' in moves and s in prepared['known']['species']]}

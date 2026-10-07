@@ -505,7 +505,12 @@ def build(args):
         presentation_data=field_presentation.build(source,stage,packed_maps,source_maps,layouts,parse_palette)
         import service_assets
         services=service_assets.build(source,engine,stage,pairs,packed_maps,source_maps,text,scripts,opening_data,lua,parse_palette)
-        expanded_data=expanded_moves.build(source,engine)
+        expanded_data=expanded_moves.build(source,engine,campaign_data['roostMove'])
+        import move_table
+        from gameplay import TYPE_NAMES
+        move_data=move_table.build(source,engine,dex_data['moveInfo'],expanded_data,campaign_data['roostMove'])
+        roost=expanded_data['moves']['ROOST']
+        campaign_data['moves']={'HNS_ROOST':dict(roost,id='HNS_ROOST',index=roost['id'],type=TYPE_NAMES[roost['type']])}
         battle_data=battle_assets.build(source,engine,stage,packed_maps,source_maps)
         boot_data=boot_assets.build(source,engine,stage)
         follower_data=followers.build(source,engine,stage,opening_data,scripts,parse_palette)
@@ -515,7 +520,7 @@ def build(args):
         events_data["spriteCount"]=len(opening_data["sprites"])
         data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
-                "expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
+                "moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent
         # top-level datasets in their own functions as this port grows.
         world_lua="-- Private source-converted data. Rebuild with build_port.py.\nlocal world={}\n"
@@ -523,7 +528,7 @@ def build(args):
             world_lua+="world["+lua(key)+"]=(function() return "+lua(value)+" end)()\n"
         (stage / "world.lua").write_text(world_lua+"return world\n",encoding="utf-8")
         report = audit(source,hns,engine)
-        report.update({"scope":args.scope,"built_map_count":len(maps),"built_pair_count":len(pairs),"ported_sign_count":sum(s.startswith("HNS_PORT_SIGN_") for s in scripts),
+        report.update({"move_table":{"rows":move_data['count'],"counts":move_data['counts']},"scope":args.scope,"built_map_count":len(maps),"built_pair_count":len(pairs),"ported_sign_count":sum(s.startswith("HNS_PORT_SIGN_") for s in scripts),
                        "built_hns_map_count":sum(m.get("game_version")=="hns" for m in maps),"shared_map_ids":sorted(SHARED_MAP_IDS) if args.scope=="all" else [],
                        "warp_count":sum(len(m["warps"]) for m in packed_maps.values()),"dynamic_warp_count":sum(w.get("mapNum")==127 for m in packed_maps.values() for w in m["warps"]),
                        "connection_count":sum(len(m["connections"]) for m in packed_maps.values()),
