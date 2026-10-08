@@ -27,6 +27,24 @@ return function(mod,w,game)
   local frames
   for n=1,100000 do Seq.update(p,1);local done=true;for _,tr in ipairs(p.tracks)do if not tr.done then done=false;break end end;if done then frames=n;break end end
   Title.configure({manifest=B.title,layer=layer,template=template,song=id,songFrames=frames})
+  -- Replace the baked source-version banner with a centered caption. Read the
+  -- installed mod version from the native API so every release stays current.
+  local versionText='v2.0.6 · Port v'..assert(mod.version,'HnS mod version missing')
+  Title.createCopyrightBanner=function(self,x,y)
+    self.versionText=versionText;self.versionX=x;self.versionY=y-8
+  end
+  local titleDraw=Title.draw
+  Title.draw=function(self)
+    titleDraw(self)
+    if not self.versionText then return end
+    -- Use the title's live OBJ palette, including its native exit/RTC fades.
+    local ppu=self.m.ppu;local bank=ppu.sprites:indexOfPaletteTag(1001)
+    local function color(index)
+      local c=ppu.palette.pltt[256+bank*16+index]
+      return {c%32/31,math.floor(c/32)%32/31,math.floor(c/1024)%32/31,1}
+    end
+    U.text(self.versionText,self.versionX-U.width(self.versionText,'small')/2,self.versionY,color(5),color(1),'small')
+  end
   local loadScreen=old.loadScreen or BM.load
   BM.load=function(name)if name=='hns.intro'then return Intro elseif name=='hns.title'then return Title end;return loadScreen(name)end
   local new=old.new or Boot.new
@@ -39,5 +57,5 @@ return function(mod,w,game)
   end
   Boot.new=function(g)return g==game and configure(new(g))or new(g)end
   configure(game.boot)
-  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,Credits=Credits,ui=U}
+  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,Credits=Credits,ui=U,versionText=versionText}
 end

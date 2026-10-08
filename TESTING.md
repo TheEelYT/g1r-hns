@@ -4,6 +4,10 @@ These are suggested checks for the ongoing port testing, separate from the gener
 
 Roost was reported as working as intended in 0.7.8. Its suggested checks have been removed; no outstanding player checks remain for this update.
 
+## Prepared for the next build
+
+- [ ] Check the title footer shows `v2.0.6 · Port vX.Y.Z`, matching the installed mod version, below PRESS START. It should stay readable and fade with the title when starting the game.
+
 ## Updating these notes
 
 Refresh this file with every release, using the latest player feedback. Remove checks confirmed as working, add checks for new changes and unresolved bugs, and re-add a confirmed check only when its behavior changes or a regression is reported. Keep the list focused on the current update instead of carrying forward the full historical test list.

@@ -12,6 +12,8 @@ For a manual install, uninstall the prior same-ID mod, import the ZIP and enable
 
 Arrow keys/WASD move; Z/Enter is A. Gen1Recomp's native key bindings apply.
 
+Starting with the next release, the title screen shows `v2.0.6 · Port vX.Y.Z`. The port version comes from the installed mod manifest and stays current with each release.
+
 ## Imported world and gameplay
 
 The port retains all **564 maps/interiors**, **146 tileset pairs**, **550,536 layout cells**, **219 connections**, **1,419 static warps** and 11 dynamic-return headers. There are **2,204 map objects**, source avatar states, 37 trainer portraits and source walking/turning/counter interactions. The normal/shiny follower assets add **826 sheets for 413 native species/forms** to the prior 402 overworld sheets. Missing conditional residents and later campaign objects remain tracked.

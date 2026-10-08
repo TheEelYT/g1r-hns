@@ -238,8 +238,27 @@ return function(T,game,w,maps)
   T.eq(title.phase,'phase3','actual source title reaches input phase');T.eq(machine.ppu.bg[1].layer,nil,'source HnS omits Emerald clouds')
   T.check(machine.ppu:_bgEnabled(0),'actual title enables source backdrop')
   T.eq(machine.ppu.palette.pltt[225],32767,'title bank 14 contains source white instead of PNG padding')
+  local U=game._hnsBoot.ui;local text=U.text;local caption
+  -- Supply only the unavailable GPU compositor. The title draw, live palette
+  -- and source-font rendering remain real.
+  local ppuDraw=rawget(machine.ppu,'draw');local composed=0
+  machine.ppu.draw=function()composed=composed+1 end
+  U.text=function(label,x,y,fg,shadow,font)
+    caption={label=label,x=x,y=y,fg=fg,shadow=shadow,font=font};return text(label,x,y,fg,shadow,font)
+  end
+  local ok,err=pcall(title.draw,title)
+  T.check(ok,'actual title draws version caption '..tostring(err or ''))
+  T.eq(composed,1,'version caption follows the title compositor')
+  T.eq(caption.label,game._hnsBoot.versionText,'title caption uses the installed manifest version')
+  T.check(caption.label:match('^v2%.0%.6 · Port v%d+%.%d+%.%d+$')~=nil,'title separates source and port versions')
+  T.eq(caption.x+U.width(caption.label,caption.font)/2,128,'version caption is centered with the source banner')
+  T.check(caption.x>=0 and caption.x+U.width(caption.label,caption.font)<=240,'version caption fits the native viewport')
+  T.eq(caption.y,140,'version caption fits below PRESS START')
+  T.eq(caption.fg[1],1,'title caption uses the source white palette')
   title:update(keys('start'),1/60);for i=1,120 do result=title:update(input,1/60);if result then break end end
-  T.eq(result,'menu','START on HnS title enters native main menu');title:destroy()
+  T.eq(result,'menu','START on HnS title enters native main menu')
+  title:draw();T.eq(caption.shadow[1],1,'caption shadow follows the native white exit fade')
+  U.text=text;machine.ppu.draw=ppuDraw;title:destroy()
   Intro.reset();Ui.reset({headless=true});F.actor=nil;F.mon=nil
   for i=#saved,1,-1 do local r=saved[i];r.t[r.k]=r.v end
   print('HnS expansion: persistent status, source stats, tower escape, RTC/time encounters, native followers, terrain/UI options, shortcuts and boot machines')

@@ -165,6 +165,9 @@ run.loader.game=game
 Runtime.emit("game.ready",{game=game})
 T.eq(#run.errors,0,"game.ready installs without errors")
 T.check(game._hnsExploration~=nil,"native integration installed")
+if world.bootPresentation then
+  T.eq(game._hnsBoot.versionText,'v2.0.6 · Port v'..run.mod.manifest.version,'title uses the installed mod manifest version')
+end
 if arg[3]=='expansion' then
   require('src.core.game3.items_data').installPack({items=data.gen3Items._byId})
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_expansion.lua')(T,game,world,maps)
