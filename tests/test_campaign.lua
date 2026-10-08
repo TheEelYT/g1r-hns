@@ -29,7 +29,7 @@ return function(T,game,world,maps)
     a.removeObject=Objects.removeObject;a.addObject=Objects.addObject
     a.modifyItem=function(op,id,n)if opts.reject then return false end;return Bag.add(session.bag,id,n) end
     local vm=Vm.new({scripts=game.data.gen3Scripts,text=game.data.gen3Text,store=store,adapters=a})
-    T.check(vm:start('HNS_CAMPAIGN_'..name),'campaign script starts '..name)
+    T.check(vm:start(opts.script or 'HNS_CAMPAIGN_'..name),'campaign script starts '..name)
     for _=1,2400 do
       Audio.update(1/60);Player.tick(game);Objects.update(game)
       if pending then local done=pending;pending=nil;done(opts.result or 'win') end
@@ -79,6 +79,18 @@ return function(T,game,world,maps)
   end
   reset(gym,9,5)
   local Pokemon=require('src.core.game3.pokemon');local Items=require('src.core.game3.items_data')
+  for _,pickup in ipairs(world.teaching and world.teaching.pickups or {})do
+    reset(pickup.map,0,0)
+    run('machine '..pickup.flag,{script=pickup.script,reject=true})
+    T.eq(Flags.getFlag(store,nil,pickup.flag),false,'full bag preserves machine pickup')
+    run('machine '..pickup.flag,{script=pickup.script});run('machine '..pickup.flag,{script=pickup.script})
+    T.eq(Bag.get(session.bag,pickup.itemId),1,'source machine pickup cannot duplicate')
+    Space.persistSession(nil,game)
+    local loaded=Schema.fromSaveTable(Schema.toSaveTable(session))
+    T.eq(Bag.get(loaded.bag,pickup.itemId),1,'source machine persists in native save schema')
+    T.eq(Flags.getFlag(Flags.loadInto(Flags.newStore(),loaded),nil,pickup.flag),true,'machine pickup flag persists')
+  end
+  reset(gym,9,5)
   T.eq(Items.isTm(Q.roostItem),true,'ROOST appears as teachable TM');T.eq(Items.tmNumber(Q.roostItem),51,'ROOST uses source TM number')
   T.eq(Pokemon.canLearnTmItem(16,Q.roostItem),true,'source Pidgey can learn ROOST')
   T.eq(Pokemon.canLearnTmItem(19,Q.roostItem),false,'source Rattata cannot learn ROOST')

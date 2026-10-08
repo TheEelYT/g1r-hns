@@ -13,15 +13,36 @@ EXTRA={'BURN':'BURN','FREEZE_OR_FROSTBITE':'FREEZE','FREEZE':'FREEZE','PARALYSIS
        'ATK_PLUS_1':'ATK_PLUS_1','DEF_PLUS_1':'DEF_PLUS_1','SPD_PLUS_1':'SPD_PLUS_1',
        'SP_ATK_PLUS_1':'SP_ATK_PLUS_1','SP_DEF_PLUS_1':'SP_DEF_PLUS_1'}
 
+STAT_SCRIPTS={'ATTACK_ACCURACY_UP':'AttackAccUp','ATTACK_SPATK_UP':'AttackSpAttackUp',
+              'QUIVER_DANCE':'QuiverDance','COIL':'Coil','SHELL_SMASH':'ShellSmash',
+              'DEFENSE_UP_3':'DefenseUp3','VICTORY_DANCE':'VictoryDance'}
+
+def stat_changes(source):
+    body=(source/'data/battle_scripts_1.s').read_text()
+    names={'ATK':'attack','DEF':'defense','SPEED':'speed','SPATK':'spAtk','SPDEF':'spDef','ACC':'accuracy','EVASION':'evasion'}
+    result={}
+    for effect,script in STAT_SCRIPTS.items():
+        start=body.index('BattleScript_Effect'+script+'::')
+        end=body.find('\nBattleScript_Effect',start+1)
+        block=body[start:end if end!=-1 else len(body)]
+        result[effect]=[{'stat':names[s],'delta':int(n)*(-1 if down=='TRUE'else 1)}
+                        for s,n,down in re.findall(r'setstatchanger STAT_(\w+), (\d+), (TRUE|FALSE)',block)]
+        assert result[effect],effect
+    return result
+
 
 def build(source,engine,roost_id=901):
     inp='#define TRUE 1\n#define FALSE 0\n#include "config/general.h"\n#include "config/battle.h"\n#include "config/contest.h"\n#include "data/moves_info.h"\n'
     body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=inp,text=True)
     native=set(re.findall(r'MOVE_(\w+)',(engine/'src/core/game3/constants/emerald/moves.lua').read_text()))
     effects=dict((name,int(n))for name,n in re.findall(r'^  (\w+) = (\d+),',(engine/'src/core/game3/battle/effect_ids.lua').read_text(),re.M))
+    for name,target in re.findall(r'EffectIds\.(\w+) = EffectIds\.(\w+)',(engine/'src/core/game3/battle/effect_ids.lua').read_text()):
+        if target in effects:effects[name]=effects[target]
+    stages=stat_changes(source)
     # Explicitly reviewed dispatches: HIT and its additional-effect list,
     # 50% absorption, high critical stage 1 and native-compatible status moves.
     compatible={'HIT','ABSORB','ALWAYS_HIT','ATTACK_UP','DEFENSE_UP','SPEED_UP','SPECIAL_ATTACK_UP','SPECIAL_DEFENSE_UP','ATTACK_DOWN','DEFENSE_DOWN','SPEED_DOWN','SPECIAL_ATTACK_DOWN','SPECIAL_DEFENSE_DOWN','SLEEP','POISON','TOXIC','PARALYZE','CONFUSE','RECOVER','REST','REFRESH','INGRAIN','WISH','PAIN_SPLIT','HEAL_BELL','SAFEGUARD','REFLECT','LIGHT_SCREEN','MIST','HAZE','FOCUS_ENERGY','SUBSTITUTE','PROTECT','ENDURE','SPIKES','LEECH_SEED','HELPING_HAND'}
+    compatible.update({'RECOIL','RESTORE_HP','SPEED_UP_2','SPECIAL_ATTACK_UP_2','DEFENSE_UP_2'})
     records={};omitted=[]
     def num(row,field,default=None):
         m=re.search(r'\.'+field+r'\s*=\s*([^,}\n]+)',row)
@@ -37,7 +58,8 @@ def build(source,engine,roost_id=901):
         if name in native or name in ('NONE','VISE_GRIP','HIGH_JUMP_KICK','FEINT_ATTACK','SMELLING_SALTS'):continue
         eff=re.search(r'\.effect\s*=\s*EFFECT_(\w+)',row)
         if not eff:continue
-        reason=None;extra=[];effect=eff[1]
+        reason=None;extra=[];effect=eff[1];handler={}
+        if effect in stages:handler={'hnsHandler':'stats','stageChanges':stages[effect]};effect='HIT'
         # Roost's reviewed campaign handler heals and removes Flying for the
         # remainder of the turn. Its row now shares this source-owned table.
         if name=='ROOST':effect='RESTORE_HP'
@@ -45,7 +67,14 @@ def build(source,engine,roost_id=901):
         if re.search(r'\.(?:isZMove|isMaxMove)\s*=\s*1',row):reason='special battle transformation required'
         # Unreviewed arguments must not silently disappear.
         args=re.search(r'\.argument\s*=\s*\{([^}]+)',row)
-        if args and not(effect=='ABSORB'and re.fullmatch(r'\s*\.absorbPercentage\s*=\s*50\s*,?\s*',args[1])):reason='expanded move argument required'
+        if args:
+            if effect in ('ABSORB','RECOIL'):
+                field='absorbPercentage'if effect=='ABSORB'else'recoilPercentage'
+                value=num(args[1],field)
+                if value is not None and len(re.findall(r'\.\w+\s*=',args[1]))==1 and 0<value<=100:
+                    handler[field]=value;handler['hnsHandler']='postHit';effect='HIT'
+                else:reason='expanded move argument required'
+            else:reason='expanded move argument required'
         addition=re.search(r'\.additionalEffects\s*=\s*(.*?)(?=\n\s*\.(?:contest|battleAnim|valid)|\Z)',row,re.S)
         if addition:
             for block in re.findall(r'\{([^{}]+)\}',addition[1]):
@@ -78,7 +107,7 @@ def build(source,engine,roost_id=901):
             'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'BOTH':8,'ALL_BATTLERS':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
             'additionalEffects':extra,'thawsUser':num(row,'thawsUser',0)==1}
         if rec['thawsUser']and effect=='HIT':rec['effect']=effects['THAW_HIT']
-        if name=='ROOST':rec['sourceEffect']='ROOST'
+        rec.update(handler);rec['sourceEffect']=eff[1]
         hits=num(row,'strikeCount',1)
         if hits!=1:omitted.append({'move':name,'reason':'expanded multi-hit dispatch required'});continue
         records[name]=rec

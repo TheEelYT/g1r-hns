@@ -1,15 +1,12 @@
-# Player testing notes — 0.7.8
+# Player testing notes — 0.7.9
 
-These are suggested checks for the ongoing port testing, separate from the general installation guide and permanent progress checklist. These checks cover the current fixes and outstanding visual confirmation.
+Suggested checks for the current update; confirmed checks are removed. Roost, credits, capture naming, Modern terrain, followers and Gen 3/4 battle UI were already reported as working.
 
-Roost was reported as working as intended in 0.7.8. Its suggested checks have been removed; no outstanding player checks remain for this update.
-
-## Prepared for the next build
-
-- [ ] Check the title footer shows `v2.0.6 · Port vX.Y.Z`, matching the installed mod version, below PRESS START. It should stay readable and fade with the title when starting the game.
+- [ ] Check the title footer reads `v2.0.6 · Mod v0.7.9`, below PRESS START, and fades with the title.
+- [ ] Check a newly restored TM item ball (for example TM54 in Ilex Forest or TM60 on Route 39). It should grant once, remain if the bag is full, and stay collected after saving/reloading.
+- [ ] When you obtain a new machine, check its number, description and colored disc in the TM pocket. Teach a compatible Pokémon, decline replacement on a full move list, and check inventory/moves after reloading. Pending effects such as Fling should give a clear unavailable message.
+- [ ] As moves become available, check draining/recoil and setup moves such as Quiver Dance, Coil or Shell Smash in an actual battle. Confirm START details and PP; report incorrect animations separately, since distinct expanded move animations remain pending.
 
 ## Updating these notes
 
-Refresh this file with every release, using the latest player feedback. Remove checks confirmed as working, add checks for new changes and unresolved bugs, and re-add a confirmed check only when its behavior changes or a regression is reported. Keep the list focused on the current update instead of carrying forward the full historical test list.
-
-The permanent progress checklist stays in [README.md](README.md), with completed work struck through. Automated validation results and their limitations stay in `reports/`.
+Refresh this file with every release using the latest feedback. Remove confirmed checks, add new changes/unresolved bugs, and re-add a confirmed check only after a change or reported regression. The permanent progress checklist stays in [README.md](README.md), with completed work struck through; automated results stay in `reports/`.

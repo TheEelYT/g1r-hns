@@ -166,7 +166,7 @@ Runtime.emit("game.ready",{game=game})
 T.eq(#run.errors,0,"game.ready installs without errors")
 T.check(game._hnsExploration~=nil,"native integration installed")
 if world.bootPresentation then
-  T.eq(game._hnsBoot.versionText,'v2.0.6 · Port v'..run.mod.manifest.version,'title uses the installed mod manifest version')
+  T.eq(game._hnsBoot.versionText,'v2.0.6 · Mod v'..run.mod.manifest.version,'title uses the installed mod manifest version')
 end
 if arg[3]=='expansion' then
   require('src.core.game3.items_data').installPack({items=data.gen3Items._byId})
@@ -388,7 +388,7 @@ for id,def in pairs(maps) do
     importedObjects=importedObjects+#Objects._order
   end
 end
-if world.scope=="all" then T.eq(importedObjects,(world.startup and world.startup.extraObjectCount or 0)+world.opening.npcCount+world.worldEvents.dialogueNpcCount+#world.worldEvents.nurses+(world.worldEvents.specialResidentCount or (world.worldEvents.additionalResidents and 1 or 0))+#(world.worldEvents.marts and world.worldEvents.marts.clerks or {})+#(world.trainers and world.trainers.events or {})+#(world.quest and world.quest.objects or {})+#(world.campaign and world.campaign.objects or {})+#(world.fieldPokemon and world.fieldPokemon.objects or {})+#(world.services and world.services.objects or {}),"all imported NPCs, trainers, clerks, Pokémon and starter objects spawn") end
+if world.scope=="all" then T.eq(importedObjects,(world.startup and world.startup.extraObjectCount or 0)+world.opening.npcCount+world.worldEvents.dialogueNpcCount+#world.worldEvents.nurses+(world.worldEvents.specialResidentCount or (world.worldEvents.additionalResidents and 1 or 0))+#(world.worldEvents.marts and world.worldEvents.marts.clerks or {})+#(world.trainers and world.trainers.events or {})+#(world.quest and world.quest.objects or {})+#(world.campaign and world.campaign.objects or {})+#(world.fieldPokemon and world.fieldPokemon.objects or {})+#(world.services and world.services.objects or {})+#(world.teaching and world.teaching.pickups or {}),"all imported NPCs, trainers, clerks, Pokémon and starter objects spawn") end
 local lab=maps.EM_HNS_NEW_BARK_TOWN_LAB_HNS
 Objects.loadMap(game,lab.id,lab)
 T.eq(#Objects._order,world.quest.nameNative and 7 or 6,"Elm lab source objects spawn")

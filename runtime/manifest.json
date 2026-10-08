@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development port: complete source move data imported, shared Roost lookup/details and stable save IDs; compressed G1R assets supported. Unfinished effects and later campaign remain in progress.",
+  "description": "HnS v2.0.6 development mod: reviewed draining/recoil/setup effects, full source TM/HM catalogue and teaching compatibility, Mod title version; later campaign and unfinished battle mechanics remain in progress.",
   "github": "TheEelYT/g1r-hns"
 }

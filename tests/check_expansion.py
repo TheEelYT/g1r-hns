@@ -184,6 +184,39 @@ def check(source,engine,mod,luajit):
         assert m['power']==display['power'] and m['accuracy']==display['accuracy'] and m['category']==display['category'],name
         assert m['description']==display['description'],name
     count['expanded_supported_moves']=len(moves);count['expanded_explicit_omissions']=len(omitted)
+    # Compile the HnS branch of FOREACH_TM/HM independently. In particular,
+    # POKEMON_HNS alone does not define IS_HNS until global.h is included.
+    machines=world['teaching']['machines']
+    code='#include <stdio.h>\n#define POKEMON_HNS 1\n#define TRUE 1\n#define FALSE 0\n#include "constants/global.h"\n#include "constants/items.h"\n#define ROW_TM(x) {"TM",#x,ITEM_TM_##x},\n#define ROW_HM(x) {"HM",#x,ITEM_HM_##x},\nstruct Machine{const char *kind,*move;int id;} machines[]={FOREACH_TM(ROW_TM) FOREACH_HM(ROW_HM)};\nint main(void){for(unsigned i=0;i<sizeof(machines)/sizeof(*machines);i++)printf("%s %s %d\\n",machines[i].kind,machines[i].move,machines[i].id);}\n'
+    with tempfile.TemporaryDirectory()as temp:
+        tmp=Path(temp);(tmp/'oracle.c').write_text(code)
+        subprocess.run(['gcc','-std=c99','-I'+str(source/'include'),str(tmp/'oracle.c'),'-o',str(tmp/'oracle')],check=True)
+        actual=[line.split()for line in subprocess.check_output([str(tmp/'oracle')],text=True).splitlines()]
+    assert len(actual)==100 and len(machines)==100
+    assert [(r['kind'],r['move'])for r in machines]==[(r[0],r[1])for r in actual]
+    assert machines[50]['move']=='ROOST'and machines[-1]['move']=='WHIRLPOOL'
+    assert len({r['itemId']for r in machines})==100
+    assert all(r['itemId']==(288+r['number']if r['number']<=50 else 901 if r['number']==51 else 852+r['number'])for r in machines if r['kind']=='TM')
+    count['source_c_machine_catalogue']=100
+    assembly=(source/'data/battle_scripts_1.s').read_text()
+    scripts={'HONE_CLAWS':'AttackAccUp','WORK_UP':'AttackSpAttackUp','QUIVER_DANCE':'QuiverDance','COIL':'Coil','SHELL_SMASH':'ShellSmash','COTTON_GUARD':'DefenseUp3','VICTORY_DANCE':'VictoryDance'}
+    names={'attack':'ATK','defense':'DEF','speed':'SPEED','spAtk':'SPATK','spDef':'SPDEF','accuracy':'ACC','evasion':'EVASION'}
+    for move,script in scripts.items():
+        block=assembly.split('BattleScript_Effect'+script+'::',1)[1].split('\nBattleScript_Effect',1)[0]
+        expected=re.findall(r'setstatchanger STAT_(\w+), (\d+), (TRUE|FALSE)',block)
+        assert [(names[r['stat']],str(abs(r['delta'])),'TRUE'if r['delta']<0 else'FALSE')for r in moves[move]['stageChanges']]==expected,move
+    count['source_ordered_setup_scripts']=len(scripts)
+    for pickup in world['teaching']['pickups']:
+        original=srcmaps[world['maps'][pickup['map']]['hnsSourceId']]['object_events'][pickup['localId']-1]
+        assert original['flag']==pickup['sourceFlag']
+        body=(source/'data/maps'/world['maps'][pickup['map']]['hnsSourceId'].removeprefix('MAP_')/'scripts.inc')
+        # Source scripts may be shared from another map. Match the defining
+        # label across the source without relying on importer label tables.
+        definition=next(p.read_text().split(original['script']+'::',1)[1]for p in (source/'data/maps').glob('*/scripts.inc')if original['script']+'::'in p.read_text())
+        assert re.match(r'\s*finditem '+pickup['sourceItem']+r'\s+end\b',definition),pickup
+        rows=world['scripts'][pickup['script']]
+        grant=next(r for r in rows if r['op']=='additem');assert grant['item']==pickup['itemId']and grant['quantity']==1
+    count['source_machine_pickups']=len(world['teaching']['pickups'])
     return {'result':'pass','counts':count,'limits':['Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
 
 if __name__=='__main__':

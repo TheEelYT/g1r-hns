@@ -59,7 +59,7 @@ return function(mod,w,game)
   Pokemon.moveMaxPp=function(id)if H.battle()and X.byId[tonumber(id)]then return X.byId[tonumber(id)].pp end;return maxpp(id)end
   local hit=old.hit or Hit.run
   Hit.run=function(M)
-    if H.battle(M.st)and M.move.additionalEffects and #M.move.additionalEffects>0 then M.extraEffect={eff='HNS_ADDITIONAL_LIST'}end
+    if H.battle(M.st)and(M.move.hnsHandler=='postHit'or M.move.additionalEffects and #M.move.additionalEffects>0)then M.extraEffect={eff='HNS_ADDITIONAL_LIST'}end
     return hit(M)
   end
   local chance=old.chance or Secondary.withChance
@@ -67,13 +67,40 @@ return function(mod,w,game)
     if effect~='HNS_ADDITIONAL_LIST'then return chance(M,effect,certain,user)end
     if M.noEffect then return false end
     local ad=M.adapter;local result=false
-    for _,row in ipairs(M.move.additionalEffects)do
+    for _,row in ipairs(M.move.additionalEffects or {})do
       local n=row.chance;if ad:abilityOf(M.user)=='SERENE_GRACE'then n=n*2 end
       if n>=100 or ad:roll(0,99)<n then
         result=Secondary.set(M,row.effect,false,n>=100,row.user)or result
       end
     end
+    local dealt=M.hpDealt or 0;local user,target=M.user,M.target
+    if dealt>0 and ad:hp(user)>0 then
+      if M.move.absorbPercentage then
+        local amount=math.max(1,math.floor(dealt*M.move.absorbPercentage/100))
+        if ad:abilityOf(target)=='LIQUID_OOZE'then
+          ad:applyHpLoss(user,amount);ad:sayText('STRINGID_ITSUCKEDLIQUIDOOZE');M.checkUserFaint=true
+        else ad:heal(user,amount);ad:sayText('STRINGID_PKMNENERGYDRAINED',{def=target})end
+      end
+      if M.move.recoilPercentage and ad:abilityOf(user)~='ROCK_HEAD'and ad:abilityOf(user)~='MAGIC_GUARD'then
+        ad:applyHpLoss(user,math.max(1,math.floor(dealt*M.move.recoilPercentage/100)))
+        ad:sayText('STRINGID_PKMNHITWITHRECOIL',{atk=user});M.checkUserFaint=true
+      end
+    end
     return result
+  end
+  local Effects=require('src.core.game3.battle.effects')
+  local runEffect=old.runEffect or Effects.runForMove
+  Effects.runForMove=function(ad,user,target,id,M)
+    local move=M and M.move or Moves.get(id)
+    if not(H.battle(ad._st)and move.hnsHandler=='stats')then return runEffect(ad,user,target,id,M)end
+    local changes=move.stageChanges;local any=false
+    for _,r in ipairs(changes)do local stage=user.stages[r.stat]or 0;if r.delta>0 and stage<6 or r.delta<0 and stage> -6 then any=true end end
+    if not any then if M then M.failed=true end;ad:sayFail();return true end
+    if M then M:attackAnimation()end
+    for _,r in ipairs(changes)do
+      Secondary.changeStat(ad,user,r.stat,r.delta,{user=true,allowPtr=true,certain=r.delta<0})
+    end
+    return true
   end
   local learn=old.learn or Pokemon.learnset;local eggs=old.eggs or Pokemon.eggMoves
   local function speciesId(sp)if type(sp)=='table'then return Pokemon.speciesOf(sp)elseif type(sp)=='string'then return Pokemon.speciesFromName(sp)or tonumber(sp)end;return tonumber(sp)end
@@ -93,5 +120,5 @@ return function(mod,w,game)
     if not pool then return eggs(sp)end
     local result={};for _,n in ipairs(pool)do local id=X.id(n);if id then result[#result+1]=id end end;return result
   end
-  game._hnsExpandedMoves={get=get,name=name,number=number,battleMove=battleMove,moveName=moveName,pp=pp,maxpp=maxpp,hit=hit,chance=chance,learn=learn,eggs=eggs,moves=X}
+  game._hnsExpandedMoves={get=get,name=name,number=number,battleMove=battleMove,moveName=moveName,pp=pp,maxpp=maxpp,hit=hit,chance=chance,runEffect=runEffect,learn=learn,eggs=eggs,moves=X}
 end

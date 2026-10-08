@@ -3,7 +3,7 @@ import json,re,struct,subprocess
 from PIL import Image
 
 
-def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette_parser):
+def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette_parser,teaching=None,dex=None):
     prefix='#define TRUE 1\n#define FALSE 0\n#define POKEMON_HNS 1\n#include "constants/global.h"\n#include "config/general.h"\n#include "config/item.h"\n#include "config/overworld.h"\n#include "config/battle.h"\n'
     def pp(path):return subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=prefix+'#include "'+path+'"\n',text=True,stderr=subprocess.DEVNULL)
     def paths(body):return dict(re.findall(r'\b(\w+)\[\].*?=\s*INCBIN_\w+\("([^"]+)"',body))
@@ -57,6 +57,13 @@ def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette
         if g and p and g[1]in itempaths and p[1]in itempaths:row['icon']=save('services/item_'+str(native[name])+'.rgba',indexed(itempaths[g[1]],pal(itempaths[p[1]])))
         bag['items'][str(native[name])]=row
     bag['returnIcon']=save('services/item_return.rgba',indexed(itempaths['gItemIcon_ReturnToFieldArrow'],pal(itempaths['gItemIconPalette_ReturnToFieldArrow'])))
+    if teaching:
+        for r in teaching['machines']:
+            # GetItemIconPalette uses the move's type; the generic disc has
+            # no per-item icon pointers in gItemsInfo.
+            typ=dex['moveInfo'][r['move']]['type'].title().replace('_','')
+            icon=save('services/item_'+str(r['itemId'])+'.rgba',indexed(itempaths['gItemIcon_'+r['kind']],pal(itempaths['gItemIconPalette_'+typ+'TMHM'])))
+            bag['items'][str(r['itemId'])]={'source':r['label'],'medicine':False,'name':r['name'],'description':r['description'],'icon':icon}
     # Door lookup retains the exact source pair/metatile, including reused IDs.
     body=(source/'src/field_door.c').read_text();doorpaths=paths(body);palrows={n:list(map(int,re.findall(r'\d+',b)))for n,b in re.findall(r'(sDoorAnimPalettes_\w+)\[\]\s*=\s*\{([^}]+)',body)}
     mids={n:int(v,0)for n,v in re.findall(r'#define\s+(METATILE_\w+)\s+(0x[\da-fA-F]+|\d+)\b',(source/'include/constants/metatile_labels.h').read_text())}

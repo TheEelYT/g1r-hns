@@ -50,7 +50,7 @@ def build(source, preprocess, modern_generation):
         legacy[key]={name:ref for name,ref in re.findall(r'\[SPECIES_(\w+)\]\s*=\s*(\w+)',body)}
     labels={}
     for kind,macro in [('TM','FOREACH_TM'),('HM','FOREACH_HM')]:
-        text=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-'],input=prefix+'#include "constants/tms_hms.h"\n#define SHOW_MOVE(x) MACHINE_##x\n'+macro+'(SHOW_MOVE)\n',text=True)
+        text=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-'],input=prefix+'#include "constants/global.h"\n#include "constants/tms_hms.h"\n#define SHOW_MOVE(x) MACHINE_##x\n'+macro+'(SHOW_MOVE)\n',text=True)
         for i,move in enumerate(re.findall(r'MACHINE_(\w+)',text),1):
             labels[move_aliases.get(move,move)]=kind+str(i).zfill(2)
     return teachables,eggs,legacy,labels

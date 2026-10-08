@@ -76,6 +76,7 @@ return function(T,game,w,maps)
     ad.roll=function()return 9 end;Secondary.withChance(M,'HNS_ADDITIONAL_LIST');T.eq(st.enemy.mon.status,'FRZ','source Ice Fang freeze chance includes roll 9');T.eq(st.enemy.flinched,true,'source Ice Fang rolls flinch independently')
     ad.roll=roll
   end
+  if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_move_expansion.lua')(T,game,w,s,mon,keep)end
   -- Record escape entry using native Warp.request, then retain it across stairs.
   Map.current='EM_HNS_VIOLET_CITY_HNS';P.facing='up';Warp._busy=false
   Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_1F_HNS',8,14,'up',{doorX=19,doorY=6})
@@ -250,7 +251,7 @@ return function(T,game,w,maps)
   T.check(ok,'actual title draws version caption '..tostring(err or ''))
   T.eq(composed,1,'version caption follows the title compositor')
   T.eq(caption.label,game._hnsBoot.versionText,'title caption uses the installed manifest version')
-  T.check(caption.label:match('^v2%.0%.6 · Port v%d+%.%d+%.%d+$')~=nil,'title separates source and port versions')
+  T.check(caption.label:match('^v2%.0%.6 · Mod v%d+%.%d+%.%d+$')~=nil,'title separates source and mod versions')
   T.eq(caption.x+U.width(caption.label,caption.font)/2,128,'version caption is centered with the source banner')
   T.check(caption.x>=0 and caption.x+U.width(caption.label,caption.font)<=240,'version caption fits the native viewport')
   T.eq(caption.y,140,'version caption fits below PRESS START')

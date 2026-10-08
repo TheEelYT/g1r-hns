@@ -1,8 +1,8 @@
 {
-  "version": "0.7.8",
+  "version": "0.7.9",
   "native_checks": {
-    "default": 96899,
-    "mounted": 96899
+    "default": 97772,
+    "mounted": 97772
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 108,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.7",
+  "cart_version": "1.0.8",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -29,7 +29,7 @@
         "layout_cells": 550536,
         "static_warps": 1419,
         "connections": 219,
-        "objects": 2204,
+        "objects": 2216,
         "dynamic_warps": 11,
         "audited_source_warp_omissions": 12,
         "audited_field_pokemon_omissions": 208,
@@ -146,8 +146,11 @@
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
         "source_c_tint_colors": 196608,
-        "expanded_supported_moves": 160,
-        "expanded_explicit_omissions": 420
+        "expanded_supported_moves": 182,
+        "expanded_explicit_omissions": 398,
+        "source_c_machine_catalogue": 100,
+        "source_ordered_setup_scripts": 7,
+        "source_machine_pickups": 12
       },
       "limits": [
         "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
@@ -156,7 +159,7 @@
     }
   },
   "limitations": [
-    "Full enhanced battle mechanics/abilities/species/items, expanded TM/tutor teaching, remaining challenge effects and later campaign are unfinished.",
+    "Full enhanced battle mechanics/abilities/species/items, tutor NPC menus/fees/unlocks, remaining machine rewards/shops/field-HM progression, challenge effects and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
@@ -178,27 +181,33 @@
     "G1R 0.3.53 installer compression decoded for all mod rgba/idx reads; existing raw assets continue working",
     "G1R 0.3.53 registration callback supplies captured identity and sprite; native nickname Yes/No and naming complete",
     "All 935 configured HnS move rows and source enum IDs compared with compiled C values; 16070 source fields retained by independent token audit",
-    "Roost lookup with the Emerald ROM row removed: full GEN 3/4 selection/details draw, wrapped IDs, PP, healing and temporary Flying removal; save ID 901 retained"
+    "Roost lookup with the Emerald ROM row removed: full GEN 3/4 selection/details draw, wrapped IDs, PP, healing and temporary Flying removal; save ID 901 retained",
+    "Exact source drain/recoil percentages using actual damage, substitute/faint ordering, Liquid Ooze/Rock Head/Magic Guard and misses/zero damage",
+    "Ordered Quiver Dance/Coil/Shell Smash/Hone Claws/Work Up/Cotton Guard/Victory Dance and native two-stage/healing dispatches",
+    "All 100 source machines: native preflight/teaching/consumption, duplicate/full move-list cancellation, Egg/unsupported rejection, HM08 Whirlpool and HM forgetting protection",
+    "Twelve source machine pickup VMs: full-bag retry, duplicate prevention, saved inventory and flags",
+    "Source-name tutor compatibility, source PP/move save persistence and level relearner beyond twenty rows",
+    "Manifest-derived source-font Mod title caption with real palette fade"
   ],
   "tested_build_content_equivalence": {
-    "files": 7690,
+    "files": 7791,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.8",
-    "cart_version": "1.0.7",
+    "mod_version": "0.7.9",
+    "cart_version": "1.0.8",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.7.g1rcart",
+        "name": "pokemon_heart_soul-1.0.8.g1rcart",
         "bytes": 1028179,
-        "sha256": "32377fcefbe256e75bc1ebafff1b164807c57ae2488dacdf26812c80397d133c"
+        "sha256": "2e76a42db952cadbb25e5b8f99a412f81d78f3fdf036793c3ad0d02cbcc67029"
       },
       {
-        "name": "hns_exploration-0.7.8.zip",
-        "bytes": 10006829,
-        "sha256": "afd6b336faec8651b6fde0a5dcfb5c66aee1363525f8de269095bddaf7c42932"
+        "name": "hns_exploration-0.7.9.zip",
+        "bytes": 10071366,
+        "sha256": "3073be9e7b0016e4ef4620e8927997615ff38a21d58bad7d559aa9790ce77977"
       }
     ]
   },
@@ -206,21 +215,21 @@
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 96899,
-        "mounted": 96899
+        "default": 97772,
+        "mounted": 97772
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 96904,
-        "mounted": 96904
+        "default": 97777,
+        "mounted": 97777
       },
       "compressed_native_checks": {
-        "default": 96904,
-        "mounted": 96904
+        "default": 97777,
+        "mounted": 97777
       },
-      "installer_encoded_assets": 5471,
+      "installer_encoded_assets": 5571,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
     },
     "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
@@ -228,8 +237,18 @@
   "move_table": {
     "rows": 935,
     "native_bridges": 354,
-    "implemented_custom": 160,
-    "pending_moves": 420,
-    "pending_source_effect_families": 205
+    "implemented_custom": 182,
+    "pending_moves": 398,
+    "pending_source_effect_families": 193
+  },
+  "teaching": {
+    "machines": 100,
+    "TMs": 92,
+    "HMs": 8,
+    "source_tutor_names": 60,
+    "machine_pickups": 12,
+    "port_TM52_to_TM92_IDs": "904..944",
+    "stable_Roost_item_move_ID": 901,
+    "tutor_NPC_services_complete": false
   }
 }

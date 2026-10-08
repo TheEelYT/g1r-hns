@@ -164,7 +164,7 @@ def build(source,engine,stage,maps,labels,text,scripts,q,Q):
             if row['id'] in IMPLEMENTED:row['implemented']=True
             partial={
                 'ITEM_MODE_GAMEMODE':'PARTLY IMPLEMENTED:\nSome Custom rules are pending.',
-                'ITEM_MODE_MODERN_MOVES':'PARTLY IMPLEMENTED:\nCompatible native learnsets only.',
+                'ITEM_MODE_MODERN_MOVES':'PARTLY IMPLEMENTED:\nReviewed moves only; others pending.',
                 'ITEM_MAIN_FOLLOWER':'PARTLY IMPLEMENTED:\nSome conditional scenes pending.',
             }
             if row['id'] in partial:row['partial']=partial[row['id']]

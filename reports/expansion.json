@@ -16,8 +16,11 @@
     "follower_normal_shiny_sheets": 826,
     "source_follower_emote_frames": 22,
     "source_c_tint_colors": 196608,
-    "expanded_supported_moves": 160,
-    "expanded_explicit_omissions": 420
+    "expanded_supported_moves": 182,
+    "expanded_explicit_omissions": 398,
+    "source_c_machine_catalogue": 100,
+    "source_ordered_setup_scripts": 7,
+    "source_machine_pickups": 12
   },
   "limits": [
     "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
