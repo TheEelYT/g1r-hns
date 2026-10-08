@@ -2,8 +2,7 @@
 
 These are suggested checks for the ongoing port testing, separate from the general installation guide and permanent progress checklist. These checks cover the current fixes and outstanding visual confirmation.
 
-- [ ] With a Pokémon that already learned TM51 Roost, highlight Roost in battle under GEN 3 and GEN 4 UI, open START details, and switch to another move. Roost should show FLYING/status, 5 PP and the source healing description without crashing.
-- [ ] Use Roost when damaged. It should restore half maximum HP and remove Flying typing only for that turn; at full HP it should fail without changing typing. Save/reload should retain the same Roost move and PP.
+Roost was reported as working as intended in 0.7.8. Its suggested checks have been removed; no outstanding player checks remain for this update.
 
 ## Updating these notes
 
