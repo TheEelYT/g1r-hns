@@ -29,7 +29,7 @@ return function(mod,w,game)
   Title.configure({manifest=B.title,layer=layer,template=template,song=id,songFrames=frames})
   -- Replace the baked source-version banner with a centered caption. Read the
   -- installed mod version from the native API so every release stays current.
-  local versionText='v2.0.6 · Port v'..assert(mod.version,'HnS mod version missing')
+  local versionText='v2.0.6 · Mod v'..assert(mod.version,'HnS mod version missing')
   Title.createCopyrightBanner=function(self,x,y)
     self.versionText=versionText;self.versionX=x;self.versionY=y-8
   end
