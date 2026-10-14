@@ -10,6 +10,7 @@ def build(source, stage, palette_parser):
     # CHAR_EXTRA_SYMBOL followed by NO; this is one bitmap, not three letters.
     glyphs['№']=256+int(re.search(r'^NO\s*=\s*F9 ([0-9A-F]{2})',(source/'charmap.txt').read_text(),re.M)[1],16)
     tokens={name:(256 if bank else 0)+int(code,16)for name,bank,code in re.findall(r'^([A-Z][A-Z_0-9]+)\s*=\s*(F9 )?([0-9A-F]{2})\s*$',(source/'charmap.txt').read_text(),re.M)}
+    composites={name:[int(v,16)for v in values.split()]for name,values in re.findall(r'^([A-Z][A-Z_0-9]+)\s*=\s*([0-9A-F]{2}(?: [0-9A-F]{2})+)\s*$',(source/'charmap.txt').read_text(),re.M)if name in ('POKE','PKMN','POKEBLOCK')}
     fonts={}
     for name in ('normal','small','narrow','small_narrower'):
         im=Image.open(source/f'graphics/fonts/latin_{name}.png')
@@ -57,4 +58,4 @@ def build(source, stage, palette_parser):
     im=Image.open(source/'graphics/pokenav/name_box.png');(stage/art['callName']['file']).write_bytes(bytes(v for i in im.tobytes() for v in (*[round(x*255) for x in rgb(callcolors[i])[:3]],255 if i else 0)))
     palette=Image.open(source/'graphics/pokenav/hns/match_call/nav_icon.png').getpalette()
     iconcolors=[(palette[i*3]//8)|((palette[i*3+1]//8)<<5)|((palette[i*3+2]//8)<<10) for i in range(16)]
-    return {'fonts':fonts,'glyphs':glyphs,'tokens':tokens,'art':art,'presentation':presentation,'colors':[rgb(c) for c in colors], 'callColors':[rgb(c) for c in callcolors], 'iconColors':[rgb(c) for c in iconcolors]}
+    return {'fonts':fonts,'glyphs':glyphs,'tokens':tokens,'composites':composites,'art':art,'presentation':presentation,'colors':[rgb(c) for c in colors], 'callColors':[rgb(c) for c in callcolors], 'iconColors':[rgb(c) for c in iconcolors]}

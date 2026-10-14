@@ -1,8 +1,8 @@
 {
-  "version": "0.7.13",
+  "version": "0.7.14",
   "native_checks": {
-    "default": 99283,
-    "mounted": 99283
+    "default": 99329,
+    "mounted": 99329
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.12",
+  "cart_version": "1.0.13",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -41,8 +41,9 @@
         "campaign_objects": 8,
         "campaign_battles": 2,
         "source_map_music": 564,
-        "source_songs": 150,
-        "source_instrument_samples": 402,
+        "source_gear_sound_effects": 3,
+        "source_songs": 153,
+        "source_instrument_samples": 403,
         "source_wild_areas": 316,
         "source_wild_slots": 2795,
         "wild_maps": 150,
@@ -66,6 +67,7 @@
         "source_banner_themes": 14,
         "source_gear_map_pixels": 76800,
         "source_map_sections": 262,
+        "source_compound_gear_glyphs": 2,
         "source_font_pixels": 524288,
         "source_keypad_pixels": 1664,
         "source_field_ui_art": 6,
@@ -146,6 +148,8 @@
         "source_gbs_distinct_tracks": 104,
         "source_c_gbs_frames": 215638,
         "source_c_gbs_register_bytes": 13800832,
+        "source_c_follower_pose_frames": 2048,
+        "source_c_follower_jump_frames": 56,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -223,48 +227,51 @@
     "Actual imported Azalea triple ledges: follower begins and completes movement on every native player hop; hidden followers defer release until walking.",
     "Source follower idle draw alternates two imported poses and one-pixel offsets; seamless loads preserve identity/visibility and rebase coordinates in four directions, while door recall remains covered.",
     "GB SOUNDS uses native Bag and registered SELECT dispatch without consumption, preserves the enable flag in save serialization, restores normal music and clears stale player/fanfare caches.",
-    "123 source GBS remaps/104 tracks, 215638 C frames and 13800832 register bytes; fractional note carry, loops/calls, changing tempo, modulation, waves/drums match actual source; native PSG voices produce buffered PCM."
+    "123 source GBS remaps/104 tracks, 215638 C frames and 13800832 register bytes; fractional note carry, loops/calls, changing tempo, modulation, waves/drums match actual source; native PSG voices produce buffered PCM.",
+    "Held Down on real Azalea triple ledges, continuing walking/running: final jump completes without restart and latest following target lands; prior build fails six checks.",
+    "Source walking/running pose timers and jump arcs: 2048 source C pose frames and 56 source C jump frames match.",
+    "Native start-menu hook retains {POKE}GEAR; actual bitmap draw uses source glyphs 0x55/0x56; source ON/OFF/SELECT cues cover open, cursor, pages and fade close without duplicate sound."
   ],
   "tested_build_content_equivalence": {
-    "files": 7816,
+    "files": 7820,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
     "result": "pass",
-    "mod_version": "0.7.13",
-    "cart_version": "1.0.12",
+    "mod_version": "0.7.14",
+    "cart_version": "1.0.13",
+    "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.12.g1rcart",
+        "name": "pokemon_heart_soul-1.0.13.g1rcart",
         "bytes": 1028181,
-        "sha256": "5f2e0363a19fee873d5b11206074efd4e386f1569814ce2efe7ea5e7fe19e7c4"
+        "sha256": "a414fe74e793dc53bd1ea12a86acaefd35053e35da7c88f095ac2d0024a902cc"
       },
       {
-        "name": "hns_exploration-0.7.13.zip",
-        "bytes": 10177078,
-        "sha256": "99e42bea50c7310de4e85a513aa4922c246017fc1855dc25f3567be5a169151f"
+        "name": "hns_exploration-0.7.14.zip",
+        "bytes": 10182841,
+        "sha256": "5db953f73e018c444754ef1027a67c5a7acfdeb71edfec5d1ab1beb9b6807d7a"
       }
-    ],
-    "repo": "TheEelYT/g1r-hns"
+    ]
   },
   "engine_compatibility": {
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 99283,
-        "mounted": 99283
+        "default": 99329,
+        "mounted": 99329
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 99288,
-        "mounted": 99288
+        "default": 99334,
+        "mounted": 99334
       },
       "compressed_native_checks": {
-        "default": 99288,
-        "mounted": 99288
+        "default": 99334,
+        "mounted": 99334
       },
       "installer_encoded_assets": 5589,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
@@ -340,6 +347,33 @@
     "actual_azalea_three_ledge_hops": true,
     "hidden_hop_does_not_release_ball": true,
     "seamless_actor_preserved_four_directions": true,
-    "door_recall_retained": true
+    "door_recall_retained": true,
+    "held_down_walk_and_run_after_triple_ledges": true,
+    "latest_trailing_step_retained": true,
+    "source_c_pose_frames": 2048,
+    "source_c_jump_frames": 56,
+    "source_walk_pose_duration": 6,
+    "source_run_pose_duration": 4,
+    "source_jump_durations": [
+      32,
+      16,
+      8
+    ],
+    "prior_build_negative_control_failed_checks": 6,
+    "idle_animation_player_confirmed": true
+  },
+  "pokegear_feedback": {
+    "source_menu_label": "{POKE}GEAR",
+    "compound_glyphs": [
+      85,
+      86
+    ],
+    "source_sound_effects": [
+      "SE_POKENAV_ON",
+      "SE_POKENAV_OFF",
+      "SE_SELECT"
+    ],
+    "source_se_player_channels": true,
+    "duplicate_close_sound_prevented": true
   }
 }

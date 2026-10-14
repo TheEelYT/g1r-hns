@@ -1,10 +1,11 @@
-# Player testing notes — 0.7.13
+# Player testing notes — 0.7.14
 
-The title/bubble, original flashing version, steady Mod version and battle-menu prompt animations are confirmed correct; their checks are removed. Earlier confirmed checks remain removed.
+Follower idle animation is confirmed working; its check is removed. The title/bubble, original flashing version, steady Mod version and battle-menu prompt animations are confirmed correct; their checks are removed. Earlier confirmed checks remain removed.
 
 - [ ] Use GB SOUNDS from the Bag, then toggle it off. Listen during travel, a wild/trainer battle, healing and item receipt; check that the saved selection survives loading.
-- [ ] Leave a follower idle facing different directions; check its two poses and subtle bobbing.
-- [ ] Hop Azalea's three ledges consecutively. Check that the follower advances on each hop without waiting for another walking input.
+- [ ] Hold Down across Azalea's three ledges and keep moving afterward, both walking and running. Check that the follower lands and continues following without releasing Down or turning sideways.
+- [ ] Watch follower walking/running poses, including transitions from idle and changes of direction or speed. Check their cadence against HnS.
+- [ ] Check the compact Pokégear start-menu label against the supplied screenshot; listen for open/close sounds and selection sounds when moving between pages.
 - [ ] Cross town/route borders in both directions. Check that a visible follower stays out, while building doors still recall/release it.
 - [ ] If a terrain move becomes available in normal play, check its field background and restoration after expiry/removal.
 

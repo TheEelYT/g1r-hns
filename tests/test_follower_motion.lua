@@ -21,6 +21,43 @@ return function(T,game,w,s,lead,keep)
     T.eq(a.jumping,false,'follower jump completes '..hop)
   end
   T.eq(F.transition,nil,'visible follower never releases a ball on ledges')
+  -- Hold Down after the last hop using the real hook-before-player frame order.
+  -- The follower's final 32-frame jump overlaps the player's 16/8-frame walks.
+  local ModRt=require('src.mods.Runtime');local flat
+  for _,spot in ipairs(spots)do
+    local good=true
+    for n=7,10 do if not Coll.canEnter(game,spot[1],spot[2]+n,{fromX=spot[1],fromY=spot[2]+n-1,dir='down',elevation=3})then good=false;break end end
+    if good then flat=spot;break end
+  end
+  T.check(flat,'Azalea has a real triple ledge with walkable ground below')
+  for _,run in ipairs({false,true})do
+    x,y=flat[1],flat[2];P.reset(x,y,'down');F.actor=nil;F.refresh();a=F.actor
+    a.visible=true;a.cellY=y-1;a.py=(y-1)*16
+    local lastProgress,reset=false,false;local jumps=0;local moves=0
+    local limit=32*3+(run and 8 or 16)*4+1
+    for frame=1,limit do
+      ModRt.call('input.step',function()end,game,1/60);P.tick(game)
+      if not P.moving then
+        P.turnArmed=false;P.turnTimer=0
+        local result=P.tryMove('down',game,run)
+        if result=='ledge'then jumps=jumps+1 elseif result=='step'then moves=moves+1 end
+      end
+      if a.jumping and a.targetY==y+6 then
+        if lastProgress and a.progress<lastProgress then reset=true end
+        lastProgress=a.progress
+      end
+    end
+    T.eq(jumps,3,'held Down traverses all three actual ledges')
+    T.check(moves>=4,'held Down continues walking below the ledges')
+    T.eq(reset,false,'walking cannot restart the in-flight last jump')
+    T.check(a.cellY>=y+6,'follower lands while Down stays held, run='..tostring(run))
+    -- Releasing input drains the latest trailing destination without a turn.
+    for frame=1,80 do ModRt.call('input.step',function()end,game,1/60);P.tick(game)end
+    T.eq(a.jumping,false,'last jump finishes without lateral input')
+    T.eq(a.moving,false,'follower finishes deferred movement after release')
+    T.eq(a.cellY,P.cellY-1,'latest trailing destination is retained after release')
+  end
+
   -- Idle frames are independently exercised through actual sprite draw dispatch.
   local Ow=require('src.core.game3.ow_sprites');local lg=love.graphics;keep(lg,{'draw'})
   local quads={};lg.draw=function(_,quad)quads[#quads+1]=quad end

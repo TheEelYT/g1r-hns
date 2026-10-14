@@ -112,15 +112,18 @@ return function(mod,world,game,Settings,UI)
       if onDone then onDone() elseif returnToGear then G.page='phone';Stack.push(G.ID,G,{hideBelow=true,fullscreen=true}) end
     end,G.caller or 'PROF. ELM')
   end
+  local function menuSound(name)Audio.playSe(world.audio.menuSounds[name])end
   function G.show(opts)
     G.session=opts and opts.session or Rt.getSession();G.page='home';G.cursor=1
-    G.fade=16;G.headerTick=0;G.nav=nil
+    G.fade=16;G.headerTick=0;G.nav=nil;G.offSound=false;menuSound('SE_POKENAV_ON')
     Stack.push(G.ID,G,{hideBelow=true,fullscreen=true})
   end
   function G.go(page)
+    if page=='closed'then menuSound('SE_POKENAV_OFF');G.offSound=true else menuSound('SE_SELECT')end
     G.nav={page=page,tick=0};G.headerTick=0
   end
   function G.close()
+    if Stack.has(G.ID)and not G.offSound then menuSound('SE_POKENAV_OFF')end;G.offSound=false
     Stack.pop(G.ID);G.page='home'
     local done=G.done;G.done=nil;if done then done() end
   end
@@ -224,14 +227,14 @@ return function(mod,world,game,Settings,UI)
       return
     end
     if G.page=='map' then
-      if pressed('select') then G.region=G.region=='johto' and 'kanto' or 'johto' end
+      if pressed('select') then menuSound('SE_SELECT');G.region=G.region=='johto' and 'kanto' or 'johto' end
       if pressed('left')then G.mapX=math.max(0,G.mapX-1)end;if pressed('right')then G.mapX=math.min(27,G.mapX+1)end
       if pressed('up')then G.mapY=math.max(0,G.mapY-1)end;if pressed('down')then G.mapY=math.min(17,G.mapY+1)end
       return
     end
     if G.page=='condition' or G.page=='ribbons' then
       local count=G.page=='ribbons' and #Pages.ribbonRows() or #(G.session.party or {})+1
-      if pressed('up') or pressed('down')then G.cursor=(G.cursor-1+(pressed('up') and -1 or 1))%math.max(1,count)+1 end
+      if pressed('up') or pressed('down')then local previous=G.cursor;G.cursor=(G.cursor-1+(pressed('up') and -1 or 1))%math.max(1,count)+1;if previous~=G.cursor then menuSound('SE_SELECT')end end
       if pressed('a')then
         if G.page=='ribbons' and count>0 then G.go('ribbonSummary');G.ribbonCursor=1
         elseif G.page=='condition' and G.cursor==count then G.go('home');G.cursor=1 end
@@ -239,9 +242,9 @@ return function(mod,world,game,Settings,UI)
       return
     end
     local home=G.homeRows();local rows=G.page=='phone' and G.contacts() or home
-    if pressed('up') or pressed('down')then G.cursor=(G.cursor-1+(pressed('up')and -1 or 1))%#rows+1 end
+    if pressed('up') or pressed('down')then local previous=G.cursor;G.cursor=(G.cursor-1+(pressed('up')and -1 or 1))%#rows+1;if previous~=G.cursor then menuSound('SE_SELECT')end end
     if pressed('a')then
-      if G.page=='phone'then local row=rows[G.cursor];G.caller=row.name;G.call(row.rating and G.elmRating(true)or row.text);return end
+      if G.page=='phone'then menuSound('SE_SELECT');local row=rows[G.cursor];G.caller=row.name;G.call(row.rating and G.elmRating(true)or row.text);return end
       local choice=home[G.cursor];G.cursor=1
       if choice=='SWITCH OFF'then G.go('closed')
       elseif choice=='CLOCK'then G.clock()
@@ -292,6 +295,13 @@ return function(mod,world,game,Settings,UI)
       UI.text(clock,8,9);UI.text(t.hours>=12 and 'PM' or 'AM',11+UI.width(clock),9)
     end
   end
+  local printPx=old.printPx or Window.printPx
+  Window.printPx=function(value,x,y,opts)
+    if Start.open and own(Start._session)and value==Q.gearLabel then
+      return UI.tokenText(value,x,y,'normal')
+    end
+    return printPx(value,x,y,opts)
+  end
   local function migrate(s)
     if not own(s)then return end
     local Bag=require('src.core.game3.bag');local native=C:require('items','ITEM_EXP_SHARE')
@@ -304,7 +314,7 @@ return function(mod,world,game,Settings,UI)
     mod.hooks:wrap('ui.start_menu.items',function(next,g,rows)
       rows=next(g,rows)
       local s=g and (g.session or g.save) or Rt.getSession();if not own(s)then return rows end
-      for _,r in ipairs(rows)do if r.id=='pokenav'then r.label='POKéGEAR' end end
+      for _,r in ipairs(rows)do if r.id=='pokenav'then r.label=Q.gearLabel end end
       return rows
     end)
     mod.hooks:wrap('item.use',function(next,g,mon,id,slot,bag)
@@ -350,5 +360,5 @@ return function(mod,world,game,Settings,UI)
   migrate(game.session or game.save)
   local Presentation=assert(load(mod:read('presentation_ui.lua'),'@hns/presentation_ui.lua'))()(mod,world,game,Settings,UI,O,old.presentation)
   G.phone=Presentation.phone
-  game._hnsGear={screensGet=baseGet,startDraw=baseDraw,trainerBack=baseBack,mapRead=baseRead,mapLua=baseLua,expAward=baseAward,hooks=true,gear=G,options=O,settings=Settings,presentation=Presentation}
+  game._hnsGear={screensGet=baseGet,startDraw=baseDraw,printPx=printPx,trainerBack=baseBack,mapRead=baseRead,mapLua=baseLua,expAward=baseAward,hooks=true,gear=G,options=O,settings=Settings,presentation=Presentation}
 end

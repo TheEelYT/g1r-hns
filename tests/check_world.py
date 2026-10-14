@@ -147,6 +147,10 @@ def check(source, engine, mod, luajit, baseline=None):
             counts["source_map_music"]+=1
         index=json.loads(subprocess.check_output([str(luajit),str(engine/"tools/lua_to_json.lua"),str(mod/"audio/index.lua")],text=True))
         at=lambda table,id:table[int(id)-1] if isinstance(table,list) else table[str(id)]
+        source_players={name.upper():int(player.removeprefix('MUSIC_PLAYER_SE'))for name,player in re.findall(r'^\s*song (se_\w+),\s*(MUSIC_PLAYER_SE\d)',(source/'sound/song_table.inc').read_text(),re.M)}
+        for name,id in audio['menuSounds'].items():
+            assert id==song_ids[name] and index['songs'][str(id)]['kind']=='se' and index['songs'][str(id)]['player']==source_players[name]
+        counts['source_gear_sound_effects']=3
         sample_bytes=(mod/"audio/samples.bin").stat().st_size
         assert sample_bytes==audio["sampleBytes"]
         for id,name in audio["songs"].items():

@@ -16,6 +16,8 @@
     "source_gbs_distinct_tracks": 104,
     "source_c_gbs_frames": 215638,
     "source_c_gbs_register_bytes": 13800832,
+    "source_c_follower_pose_frames": 2048,
+    "source_c_follower_jump_frames": 56,
     "follower_species_and_forms": 413,
     "follower_normal_shiny_sheets": 826,
     "source_follower_emote_frames": 22,

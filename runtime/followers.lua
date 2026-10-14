@@ -9,6 +9,7 @@ return function(mod,w,game)
   local Map=require('src.core.game3.map');local Coll=require('src.core.game3.collision')
   local Ow=require('src.core.game3.ow_sprites');local Fx=require('src.core.game3.field_effects')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
+  local Motion=assert(load(mod:read('follower_motion.lua')))()
   local rows={};for name,r in pairs(w.followers.species)do rows[C:require('species','SPECIES_'..name)]=r end
   function F.lead(s)
     for _,mon in ipairs(s and s.party or {})do
@@ -52,20 +53,24 @@ return function(mod,w,game)
   function F.step(x,y,frames,playerJump)
     local a=F.refresh();if not a then return end
     if F.transition then return end
+    if a.moving then a.pendingStep={x=x,y=y,frames=frames,playerJump=playerJump};return end
     if not a.visible then
       -- Source invisible followers shadow jumps rather than emerging mid-hop.
       if playerJump then a.cellX=P.cellX;a.cellY=P.cellY;a.px=a.cellX*16;a.py=a.cellY*16;return end
       a.cellX=x;a.cellY=y;a.px=x*16;a.py=y*16;a.facing=P.facing;a.moving=false
       F.beginBall('exit',frames and frames<16);return
     end
+    if x==a.cellX and y==a.cellY then return end
     local dir=x>a.cellX and 'right'or x<a.cellX and 'left'or y>a.cellY and 'down'or 'up'
     local lx,ly=Coll.ledgeLanding(game,a.cellX,a.cellY,dir)
     a.jumping=lx~=nil
-    if lx then x,y=lx,ly;frames=32 elseif playerJump then frames=32 end
+    a.jumpStride=playerJump and 1 or (frames or 16)<=8 and 4 or 2
+    if lx then x,y=lx,ly;frames=32/a.jumpStride elseif playerJump then frames=32 end
     a.visible=true;a.startPx=a.px;a.startPy=a.py;a.targetX=x;a.targetY=y
     local dx,dy=x*16-a.px,y*16-a.py
     if dx~=0 then a.facing=dx<0 and 'left'or 'right'elseif dy~=0 then a.facing=dy<0 and 'up'or 'down'end
     a.moving=dx~=0 or dy~=0;a.progress=0;a.animClock=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
+    Motion.begin(a,w.followers.motion,(a.stepFrames<=8)and not a.jumping)
   end
   function F.tick()
     local a=F.refresh();if not a then return end
@@ -87,19 +92,27 @@ return function(mod,w,game)
       end
     end
     if a.moving then
+      Motion.tick(a)
       a.progress=a.progress+1;local f=math.min(1,a.progress/a.stepFrames)
       a.px=a.startPx+(a.targetX*16-a.startPx)*f;a.py=a.startPy+(a.targetY*16-a.startPy)*f
-      if a.jumping then a.raiseY=w.followers.motion.jumpY[math.floor((a.progress-1)/2)+1]or 0
+      if a.jumping then
+        local shape=a.jumpStride==1 and w.followers.motion.jumpY or w.followers.motion.jumpNormalY
+        a.raiseY=shape[math.floor((a.progress-1)*a.jumpStride/2)+1]or 0
       elseif w.followers.motion.bobbing then a.raiseY=math.floor((a.progress+2)/8)%2==0 and -1 or 0 end
-      if f==1 then a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)end
+      if f==1 then
+        a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)
+        local pending=a.pendingStep;a.pendingStep=nil
+        if pending then F.step(pending.x,pending.y,pending.frames,pending.playerJump)end
+      end
     elseif not F.interaction and a.visible then
       a.idleClock=(a.idleClock or 0)+1
+      a.poseIndex=math.floor((a.idleClock-1)%24/6)
       a.raiseY=w.followers.motion.bobbing and(math.floor((a.idleClock+2)/8)%2==1 and -1 or 0)or 0
     end
   end
   function F.beginBall(kind,fast,done)
     local a=F.actor;if not a then if done then done()end;return end
-    a.visible=true;a.moving=false;a.raiseY=0
+    a.visible=true;a.moving=false;a.raiseY=0;a.pendingStep=nil
     F.transition={kind=kind,elapsed=0,frames=fast and 8 or 16,done=done}
   end
   function F.ballPose()
@@ -141,6 +154,7 @@ return function(mod,w,game)
         local dx,dy=opts.x-d[1]-P.cellX,opts.y-d[2]-P.cellY
         a.cellX=a.cellX+dx;a.cellY=a.cellY+dy;a.px=a.px+dx*16;a.py=a.py+dy*16
         if a.targetX then a.targetX=a.targetX+dx;a.targetY=a.targetY+dy;a.startPx=a.startPx+dx*16;a.startPy=a.startPy+dy*16 end
+        if a.pendingStep then a.pendingStep.x=a.pendingStep.x+dx;a.pendingStep.y=a.pendingStep.y+dy end
         F.map=id;a.mapDef=g.data.maps[id];F.seamlessTransfer=true
       end
     end
@@ -166,6 +180,13 @@ return function(mod,w,game)
   local owDraw=old.owDraw or Ow.draw
   Ow.draw=function(id,px,py,cx,cy,facing,phase,flip,opts)
     local a=F.actor
+    if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and a.moving and not(F.transition or F.interaction)then
+      local out={};for k,v in pairs(opts or {})do out[k]=v end
+      local spr=Ow.get(id);local right=facing=='right'and spr and spr.hnsAsymmetric
+      local frames=right and {9,11}or({down={0,4},up={1,6},left={2,8},right={2,8}})[facing]or {0,4}
+      out.frame=frames[Motion.frame(a,w.followers.motion)+1]
+      return owDraw(id,px,py,cx,cy,right and'left'or facing,phase,flip,out)
+    end
     if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and not(a.moving or F.transition or F.interaction)then
       local out={};for k,v in pairs(opts or {})do out[k]=v end
       local spr=Ow.get(id);local right=facing=='right'and spr and spr.frameCount==12

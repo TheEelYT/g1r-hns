@@ -4,6 +4,7 @@ from pathlib import Path
 from PIL import Image
 from check_battle_entry import check_entry
 from check_gb_sounds import check as check_gb
+from check_follower_motion import check as check_follower
 
 
 def colors(path):
@@ -149,6 +150,7 @@ def check(source,engine,mod,luajit):
     jump=list(map(int,re.findall(r'-?\d+',re.search(r'sJumpY_High\[\]\s*=\s*\{(.*?)\}',movement,re.S)[1])))
     assert motion['jumpY']==jump and motion['bobbing']is True and motion['idleFrames']==16
     count.update(check_gb(source,engine,mod,luajit,world))
+    count.update(check_follower(source,engine,mod,luajit,world))
     count['follower_species_and_forms']=413;count['follower_normal_shiny_sheets']=826
     art=world['followers']['emotes'];im=Image.open(source/'graphics/misc/emotes.png');pal=colors(source/'graphics/misc/emotes.pal')
     raw=bytes(v for n in im.tobytes()for v in pal[n]+(255 if n else 0,))

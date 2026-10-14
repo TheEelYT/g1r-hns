@@ -55,14 +55,15 @@ return function(mod,spec)
   function U.tokenWidth(s,font)
     font=font or 'small';local pos,width=1,0
     local function glyph(name)
-      local a=spec.art[name];local id=spec.tokens[name]or(name=='MN'and spec.tokens.PK+1)
+      local a=spec.art[name];local id=type(name)=='number'and name or spec.tokens[name]or(name=='MN'and spec.tokens.PK+1)
       return a and a.width or spec.fonts[font].widths[id+1]
     end
     while pos<=#s do
       local a,b,name=s:find('{([A-Z_0-9]+)}',pos)
       width=width+U.width(a and s:sub(pos,a-1)or s:sub(pos),font)
       if not a then break end
-      width=width+(name=='PKMN'and glyph('PK')+glyph('MN')or glyph(name));pos=b+1
+      if spec.composites and spec.composites[name]then for _,id in ipairs(spec.composites[name])do width=width+glyph(id)end
+      else width=width+(name=='PKMN'and glyph('PK')+glyph('MN')or glyph(name))end;pos=b+1
     end
     return width
   end
@@ -70,7 +71,7 @@ return function(mod,spec)
     font=font or 'small';local pos=1
     local function glyph(name)
       U.glyph(name,x,y,font,fg,shadow)
-      local a=spec.art[name];local id=spec.tokens[name]or(name=='MN'and spec.tokens.PK+1)
+      local a=spec.art[name];local id=type(name)=='number'and name or spec.tokens[name]or(name=='MN'and spec.tokens.PK+1)
       x=x+(a and a.width or spec.fonts[font].widths[id+1])
     end
     while pos<=#s do
@@ -78,14 +79,15 @@ return function(mod,spec)
       local plain=a and s:sub(pos,a-1)or s:sub(pos)
       U.text(plain,x,y,fg,shadow,font);x=x+U.width(plain,font)
       if not a then break end
-      if name=='PKMN'then glyph('PK');glyph('MN')else glyph(name)end
+      if spec.composites and spec.composites[name]then for _,id in ipairs(spec.composites[name])do glyph(id)end
+      elseif name=='PKMN'then glyph('PK');glyph('MN')else glyph(name)end
       pos=b+1
     end
     return x
   end
   function U.glyph(name,x,y,font,fg,shadow)
     if spec.art[name]then local im,a=U.art(name);love.graphics.setColor(1,1,1,1);love.graphics.draw(im,love.graphics.newQuad(0,0,a.width,a.height,a.width,a.height),x,y);return end
-    local id=assert(spec.tokens[name]or(name=='MN'and spec.tokens.PK+1),name);local f=spec.fonts[font or 'small']
+    local id=assert(type(name)=='number'and name or spec.tokens[name]or(name=='MN'and spec.tokens.PK+1),name);local f=spec.fonts[font or 'small']
     local q=love.graphics.newQuad(id%16*16,math.floor(id/16)*16,f.widths[id+1]or 6,16,f.width,f.height)
     love.graphics.setColor(unpack(shadow or spec.colors[4]));love.graphics.draw(U.image(f.shadow,f.width,f.height),q,x,y)
     love.graphics.setColor(unpack(fg or spec.colors[3]));love.graphics.draw(U.image(f.fg,f.width,f.height),q,x,y)

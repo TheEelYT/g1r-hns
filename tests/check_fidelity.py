@@ -114,6 +114,10 @@ def check(source,engine,mod,luajit):
             data=(mod/info[layer]).read_bytes()
             assert data==bytes(v for p in im.tobytes() for v in (255,255,255,255 if p==index else 0))
         pixels+=im.width*im.height
+    assert q['gearLabel']==re.search(r'gText_MenuPokenav\[\]\s*=\s*_\(\"([^\"]+)\"\)',(source/'src/strings.c').read_text())[1]
+    assert q['ui']['composites']['POKE']==[int(v,16)for v in re.search(r'^POKE\s*=\s*([^\n]+)',(source/'charmap.txt').read_text(),re.M)[1].split()]
+    assert set(q['ui']['composites'])=={'POKE','PKMN','POKEBLOCK'}
+    counts['source_compound_gear_glyphs']=2
     counts['source_font_pixels']=pixels
     keypad=Image.open(source/'graphics/fonts/keypad_icons.png');pal=image_palette(source/'graphics/fonts/keypad_icons.png');buttons=0
     for name,first,width in [('A_BUTTON',0,8),('B_BUTTON',1,8),('L_BUTTON',2,16),('R_BUTTON',4,16),('START_BUTTON',6,24),('SELECT_BUTTON',9,24),('DPAD_UPDOWN',32,8)]:

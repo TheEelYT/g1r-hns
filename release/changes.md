@@ -1,9 +1,10 @@
-## Pokémon Heart & Soul — Mod 0.7.13
+## Pokémon Heart & Soul — Mod 0.7.14
 
-Use the `.g1rcart` download; it installs the pinned mod with isolated saves and mod edits disabled. Cart version is 1.0.12; Mod 1.0 is reserved for complete romhack parity.
+Use the `.g1rcart` download; it installs the pinned mod with isolated saves and mod edits disabled. Cart version is 1.0.13; Mod 1.0 is reserved for complete romhack parity.
 
-- GB SOUNDS now toggles source Game Boy music and fanfares, including travel, battles and healing, with the choice saved. The source bytecode sequencer retains fractional timing and continuous loops; it uses the native PSG mixer.
-- Followers idle with source poses/bobbing and move on each consecutive ledge hop. Outdoor town/route crossings preserve the follower instead of releasing it again; building doors retain their ball transitions.
-- The confirmed title check is removed from the separate TESTING.md; new checks cover GB playback and the reported follower issues. README progress retains completed items with strikethrough.
+- Fix followers repeatedly restarting the last ledge jump when Down remains held. Unfinished movement completes before the latest trailing step starts.
+- Connect source faster ledge hops when the player resumes walking/running, and source walking/running pose timers with phase continuity.
+- Replace the written-out Pokégear start-menu label with the source compound glyph and connect source ON/OFF/SELECT sound effects.
+- Remove the confirmed idle-animation check from TESTING.md and add continuous-input and movement-cadence checks. Retain the README progress history.
 
-Automated validation uses both supported native engines, source C GB timing/register comparisons, actual Azalea ledge collision, native audio/UI paths and retained audits. Audible PSG fidelity, GB cry remaps/SFX arbitration and remaining source ability assignment/effects are still pending.
+Checks cover real imported Azalea ledges with held Down while walking/running, source jump/animation routines, both supported native engines and retained integration/audits. Live Windows movement/animation confirmation remains in TESTING.md. Other port limitations remain tracked in README.

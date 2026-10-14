@@ -50,6 +50,7 @@ def build(source,engine,stage,maps,source_maps,labels,text,scripts,ow,palette_pa
     def move(lid,names):return [r('applymovement',localId=lid,movementNames=['MOVEMENT_ACTION_'+x for x in names]+['MOVEMENT_ACTION_STEP_END']),r('waitmovement',localId=lid)]
     done=[r('releaseall'),r('end')]
     script('END',[r('end')]);script('FINISH',done)
+    Q['gearLabel']=re.search(r'gText_MenuPokenav\[\]\s*=\s*_\(\"([^\"]+)\"\)',(source/'src/strings.c').read_text())[1]
     Q.update(gearFlag=GEAR,elmPhoneFlag=ELM_PHONE,elmCallFlag=ELM_CALL,expOffFlag=EXP_OFF,expItem=EXP_ITEM,windowHiddenFlag=WINDOW_HIDDEN,radioFlag=RADIO,elmPendingVar=ELM_PENDING,callPendingVar=CALL_PENDING,callNative=CALL_NATIVE,settings=settings.build(source),oakSong='MUS_HG_NEW_GAME')
     # Native save flags/vars persist contacts, settings and key-item toggles.
     q['items']['HNS_EXP_SHARE']={'id':'HNS_EXP_SHARE','index':EXP_ITEM,'name':'EXP. SHARE','price':0,'pocket':'KEY_ITEMS','fieldUse':'none','importance':1,'description':'Shares experience with the whole party. Use to switch it on or off.'}

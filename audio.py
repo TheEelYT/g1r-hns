@@ -90,6 +90,8 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
     for rows in scripts.values():
         for row in rows:
             if row.get('songName'):selected.add(names[row['songName']])
+    menu_sounds={name:sid(name)for name in ('SE_POKENAV_ON','SE_POKENAV_OFF','SE_SELECT')}
+    selected.update(id-BASE for id in menu_sounds.values())
     selected.add(names['MUS_HG_OAK'])
     selected.update(names[n]for n in ('MUS_HG_INTRO','MUS_HG_TITLE'))
     for name in names:
@@ -185,8 +187,8 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
             except subprocess.CalledProcessError as exc:raise ValueError(exc.stderr.decode()[:10000]) from exc
             nm=subprocess.check_output(['nm','-n',temp/'sounds.elf'],text=True)
             symbols={m[3]:int(m[1],16) for line in nm.splitlines() if (m:=re.fullmatch(r'([0-9a-f]+) (\w) (\S+)',line))}
-            records={str(BASE+i):{'name':table[i][0].upper(),'header':symbols[table[i][0]]-0x08000000,'player':0,
-                      'kind':'fanfare' if table[i][0].upper() in fanfares else 'bgm',
+            records={str(BASE+i):{'name':table[i][0].upper(),'header':symbols[table[i][0]]-0x08000000,'player':int(table[i][1].removeprefix('MUSIC_PLAYER_SE'))if table[i][0].startswith('se_')else 0,
+                      'kind':'se'if table[i][0].startswith('se_')else 'fanfare' if table[i][0].upper() in fanfares else 'bgm',
                       'fanfareFrames':fanfares.get(table[i][0].upper())} for i in sorted(selected)}
             (temp/'songs.lua').write_text('return '+lua(records))
             out=temp/'pack';out.mkdir();(out/'songs').mkdir()
@@ -223,7 +225,7 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
             if row['op']=='setflag' and row.get('flag')==0x6017:additions.append({'after':i,'rows':[{'op':'playfanfare','songName':'MUS_HG_OBTAIN_BERRY'},{'op':'waitfanfare'}]})
         if key=='HNS_QUEST_RIVAL_CORE':additions.append({'before':1,'rows':[{'op':'playbgm','songName':'MUS_HG_ENCOUNTER_RIVAL'}]})
         if additions:cues[key]=additions
-    return {'base':BASE,'songs':{str(BASE+i):table[i][0].upper() for i in sorted(selected)},
+    return {'base':BASE,'menuSounds':menu_sounds,'songs':{str(BASE+i):table[i][0].upper() for i in sorted(selected)},
             'roles':{k:sid(v) for k,v in roles.items()},'aliases':aliases,'mapSongs':map_songs,
             'fanfares':{str(sid(k)):{'frames':v,'name':k} for k,v in fanfares.items()},
             'oak':sid('MUS_HG_OAK'),'cues':cues,'songCount':len(selected),'sampleBytes':(target/'samples.bin').stat().st_size,
