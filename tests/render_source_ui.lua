@@ -26,10 +26,10 @@ U.image=function(file,x,y)local im=img(file,x,y);im.file=file;return im end
 local M=assert(load(mod:read('settings.lua')))()(w.startup.settings,U)
 local function snap(name,fn)draws={};fn();frames[#frames+1]={name=name,draws=draws}end
 local Banner=assert(load(mod:read('title_caption.lua')))()(U,w.bootPresentation.title.captionFont)
-local version='v2.0.6 · Mod v'..assert(mod:read('manifest.json'):match('"version"%s*:%s*"([^"]+)"'))
+local version='Mod v'..assert(mod:read('manifest.json'):match('"version"%s*:%s*"([^"]+)"'))
 for _,mode in ipairs({'normal','white','black'})do
   snap('title_version_'..mode,function()
-    Banner.draw(version,128-Banner.width(version)/2,144,function(n)
+    Banner.draw(version,236-Banner.width(version),151,function(n)
       if mode=='white'then return {1,1,1,1}elseif mode=='black'then return {0,0,0,1}end
       local c=w.bootPresentation.title.palettes.pressStart[n+1]
       return {c%32/31,math.floor(c/32)%32/31,math.floor(c/1024)%32/31,1}

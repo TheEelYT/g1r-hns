@@ -14,6 +14,8 @@ Arrow keys/WASD move; Z/Enter is A. Gen1Recomp's native key bindings apply.
 
 The title screen shows `v2.0.6 · Mod vX.Y.Z` in bitmap lettering matching the original banner, including its outlines, shaded rows and live palette fades. The mod version comes from the installed mod manifest and stays current with each release.
 
+**Queued for the next gameplay release:** restore the original `v2.0.6` banner flashing with PRESS START, and move the separate, steady `Mod vX.Y.Z` label to the lower-right corner. The custom `0` glyph now excludes its neighboring source period, fixing doubled dots. These changes are prepared on `main`; the current 0.7.10 downloads are unchanged. See [queued changes](release/queued.md).
+
 ## Imported world and gameplay
 
 The port retains all **564 maps/interiors**, **146 tileset pairs**, **550,536 layout cells**, **219 connections**, **1,419 static warps** and 11 dynamic-return headers. There are **2,216 map objects**, source avatar states, 37 trainer portraits and source walking/turning/counter interactions. The normal/shiny follower assets add **826 sheets for 413 native species/forms** to the prior 402 overworld sheets. Missing conditional residents and later campaign objects remain tracked.

@@ -27,12 +27,14 @@ return function(mod,w,game)
   local frames
   for n=1,100000 do Seq.update(p,1);local done=true;for _,tr in ipairs(p.tracks)do if not tr.done then done=false;break end end;if done then frames=n;break end end
   Title.configure({manifest=B.title,layer=layer,template=template,song=id,songFrames=frames})
-  -- Replace the baked source-version banner with a centered caption. Read the
-  -- installed mod version from the native API so every release stays current.
-  local versionText='v2.0.6 · Mod v'..assert(mod.version,'HnS mod version missing')
+  -- Keep the source v2.0.6 banner and its PRESS START blink. The separate Mod
+  -- caption stays visible in the lower right and follows only screen fades.
+  local versionText='Mod v'..assert(mod.version,'HnS mod version missing')
   local banner=assert(load(mod:read('title_caption.lua')))()(U,B.title.captionFont)
+  local copyrightBanner=Title.createCopyrightBanner
   Title.createCopyrightBanner=function(self,x,y)
-    self.versionText=versionText;self.versionX=x;self.versionY=y-4
+    copyrightBanner(self,x,y)
+    self.versionText=versionText;self.versionX=236-banner.width(versionText);self.versionY=151
   end
   local titleDraw=Title.draw
   Title.draw=function(self)
@@ -44,7 +46,7 @@ return function(mod,w,game)
       local c=ppu.palette.pltt[256+bank*16+index]
       return {c%32/31,math.floor(c/32)%32/31,math.floor(c/1024)%32/31,1}
     end
-    banner.draw(self.versionText,self.versionX-banner.width(self.versionText)/2,self.versionY,color)
+    banner.draw(self.versionText,self.versionX,self.versionY,color)
   end
   local loadScreen=old.loadScreen or BM.load
   BM.load=function(name)if name=='hns.intro'then return Intro elseif name=='hns.title'then return Title end;return loadScreen(name)end

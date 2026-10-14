@@ -4,8 +4,9 @@ from PIL import Image
 
 def build(source,stage):
     original=Image.open(source/'graphics/title_screen/hns/press_start.png')
-    # Preserve the actual version-banner glyphs, including antialias colors.
-    crops={'v':(91,8,5,7),'2':(96,8,9,7),'0':(106,8,10,7),'6':(116,8,10,7)}
+    # Preserve the actual glyphs and antialias colors, excluding the adjacent
+    # separators: x=115 is the source period after 0, not part of that glyph.
+    crops={'v':(91,8,5,7),'2':(96,8,9,7),'0':(106,8,9,7),'6':(116,8,9,7)}
     glyphs={c:original.crop((x,y,x+w,y+h))for c,(x,y,w,h)in crops.items()}
     patterns={
         '1':['..###..','...##..','...##..','...##..','.######'],

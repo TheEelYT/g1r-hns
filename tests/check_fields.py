@@ -4,10 +4,15 @@ from pathlib import Path
 from PIL import Image
 
 
-def check(source,engine,mod,luajit,world):
+def check_title_font(source,mod,world):
     f=world['bootPresentation']['title']['captionFont'];im=Image.open(source/'graphics/title_screen/hns/press_start.png');samples=0
-    for char,(x,y,w,h)in f['sourceGlyphs'].items():
+    # Independent bounds exclude the period at source x=115. Auditing only
+    # whatever rectangle the converter emits would miss the doubled dot.
+    bounds={'v':(91,8,5,7),'2':(96,8,9,7),'0':(106,8,9,7),'6':(116,8,9,7)}
+    assert f['sourceGlyphs']=={c:list(r)for c,r in bounds.items()}
+    for char,(x,y,w,h)in bounds.items():
         g=f['glyphs'][char]
+        assert g['w']==w
         for n in range(1,6):
             a=f['layers'][str(n)];raw=(mod/a['file']).read_bytes()
             for py in range(h):
@@ -15,6 +20,11 @@ def check(source,engine,mod,luajit,world):
                     offset=(py*a['width']+g['x']+px)*4
                     assert raw[offset:offset+4]==bytes((255,255,255,255 if im.getpixel((x+px,y+py))==n else 0))
                     samples+=1
+    return samples
+
+
+def check(source,engine,mod,luajit,world):
+    samples=check_title_font(source,mod,world)
     util=(source/'src/battle_util.c').read_text()
     assert re.search(r'gFieldTimers\.terrainTimer = 8;\s*else\s*gFieldTimers\.terrainTimer = 5;',util)
     fields=world['battleFields'];assert fields['terrainTurns']==5 and fields['extendedTurns']==8
