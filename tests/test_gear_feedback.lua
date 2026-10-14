@@ -21,11 +21,14 @@ return function(T,game,w,s)
   Start.show({session=s,game={session=s}})
   local label;for _,row in ipairs(Start.ENTRIES)do if row.id=='pokenav'then label=row.label end end
   T.eq(label,Q.gearLabel,'actual start-menu hook uses source label')
-  local lg=love.graphics;local draw,quad=lg.draw,lg.newQuad;local calls={}
+  local lg=love.graphics;local draw,quad,color=lg.draw,lg.newQuad,lg.setColor;local calls={};local colors={};local drawColors={}
+  lg.setColor=function(...)colors[#colors+1]={...}end
   lg.newQuad=function(a,b,c,d)return {a,b,c,d}end
-  lg.draw=function(_,q,x,y)calls[#calls+1]={q[1],q[2],q[3],q[4],x,y}end
+  lg.draw=function(_,q,x,y)calls[#calls+1]={q[1],q[2],q[3],q[4],x,y};drawColors[#drawColors+1]=colors[#colors]end
   Window.printPx(label,100,50)
-  lg.draw=draw;lg.newQuad=quad
+  lg.draw=draw;lg.newQuad=quad;lg.setColor=color
+  local normal=require('src.ui.game3.frlg_font').COLOR.NORMAL
+  for i=1,4 do T.eq(drawColors[1][i],normal.shadow[i],'compound label matches native shadow component '..i);T.eq(drawColors[2][i],normal.fg[i],'compound label matches native ink component '..i)end
   T.eq(#calls,12,'source label draws two compound glyphs and four letters, with shadows')
   T.eq(calls[1][1],80,'first compound glyph is source 0x55');T.eq(calls[3][1],96,'second compound glyph is source 0x56')
   T.eq(calls[1][2],80,'compound glyph source row');T.eq(calls[1][6],50,'compound glyph aligns to native menu text origin')

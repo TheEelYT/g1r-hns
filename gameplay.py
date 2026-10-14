@@ -13,7 +13,7 @@ IMPLEMENTED = {'ITEM_MODE_MODERN_MOVES','ITEM_MODE_SPLIT', 'ITEM_MODE_FAIRY_TYPE
                'ITEM_MAIN_FOLLOWER','ITEM_MAIN_LARGE_FOLLOWER','ITEM_FEATURES_RTC_TYPE',
                'ITEM_BATTLE_FAST_INTRO','ITEM_BATTLE_FAST_BATTLES','ITEM_BATTLE_NEW_BACKGROUNDS',
                'ITEM_BATTLE_NEW_BATTLEUI','ITEM_BATTLE_BALL_PROMPT','ITEM_BATTLE_RUN_TYPE','ITEM_BATTLE_LR_RUN',
-               'ITEM_MODE_GEN_ONE_RECHARGE','ITEM_DIFFICULTY_LESS_ESCAPES','ITEM_DIFFICULTY_ESCAPE_ROPE_DIG'}
+               'ITEM_MODE_LEGENDARY_ABILITIES','ITEM_MODE_GEN_ONE_RECHARGE','ITEM_DIFFICULTY_LESS_ESCAPES','ITEM_DIFFICULTY_ESCAPE_ROPE_DIG'}
 TYPE_NAMES = ('NORMAL','FIGHTING','FLYING','POISON','GROUND','ROCK','BUG','GHOST',
               'STEEL','MYSTERY','FIRE','WATER','GRASS','ELECTRIC','PSYCHIC','ICE','DRAGON','DARK','FAIRY')
 
@@ -123,13 +123,13 @@ def derivatives(engine,stage):
     (stage/'hns_accuracy.lua').write_text('-- Derived from native Ctx:accuracyCheck; see GEN1RECOMP_LICENSE.md.\n'+prefix+accuracy+'\nreturn Ctx.accuracyCheck\nend\n')
     selfhit=src[src.index('function Engine.selfHit'):src.index('-- pokefirered/src/battle_util.c:1253')]
     selfhit=replace_once(selfhit,'function Engine.selfHit(M, dmg)','return function(M, dmg)')
-    selfhit=replace_once(selfhit,'  local banded = HeldItems.rollFocusBand(ad, user)','  local sturdy=HNS.sturdy(M, user, dmg)\n  if sturdy then dmg=ad:hp(user)-1 end\n  local banded = not sturdy and HeldItems.rollFocusBand(ad, user)')
-    selfhit=replace_once(selfhit,'  M:tryFaintUser()','  if sturdy then HNS.sturdyMessage(ad,user) end\n  M:tryFaintUser()')
-    (stage/'hns_self_hit.lua').write_text('-- Derived from native Engine.selfHit; see GEN1RECOMP_LICENSE.md.\nreturn function(HNS)\nlocal HeldItems=require("src.core.game3.battle.held_items")\nlocal function roll(ad,lo,hi)return ad:roll(lo,hi)end\n'+selfhit+'\nend\n')
+    selfhit=replace_once(selfhit,'  ad:applyHpLoss(user, dmg)','  local sturdy=HNS.sturdy(M,user,dmg)\n  if sturdy then dmg=ad:hp(user)-1;hung=nil end\n  ad:applyHpLoss(user,dmg)\n  if sturdy then HNS.sturdyMessage(ad,user)end')
+    (stage/'hns_self_hit.lua').write_text('-- Derived from native Engine.selfHit; see GEN1RECOMP_LICENSE.md.\nreturn function(HNS)\nlocal BattleProfile=require("src.core.game3.battle.profile")\nlocal HeldItems=require("src.core.game3.battle.held_items")\nlocal function roll(ad,lo,hi)return ad:roll(lo,hi)end\n'+selfhit+'\nend\n')
     src=(engine/'src/core/game3/step_events.lua').read_text()
-    src=replace_once(src,'local StepEvents = {}\n\nStepEvents._queue = {}\nStepEvents._activeEvent = nil\nStepEvents._poisonFlashTimer = 0\nStepEvents._totalSteps = 0','local StepEvents = setmetatable({}, {__index=NativeSteps, __newindex=function(t,k,v)\n  if k:sub(1,1)=="_" then NativeSteps[k]=v else rawset(t,k,v) end\nend})')
+    src=replace_once(src,'local StepEvents = {}\n\nStepEvents._queue = {}\nStepEvents._activeEvent = nil\nStepEvents._poisonTask = nil\nStepEvents._totalSteps = 0','local StepEvents = setmetatable({}, {__index=NativeSteps, __newindex=function(t,k,v)\n  if k:sub(1,1)=="_" then NativeSteps[k]=v else rawset(t,k,v) end\nend})')
     src=replace_once(src,'mon.hp = math.max(0, hp - 1)','mon.hp = math.max(HNS.poisonSurvives(session) and 1 or 0, hp - 1)')
-    src=replace_once(src,'if mon.hp == 0 then','if mon.hp == 0 or (HNS.poisonSurvives(session) and mon.hp == 1) then')
+    src=replace_once(src,'elseif mon.hp == 0 then','elseif mon.hp == 0 or (HNS.poisonSurvives(session) and mon.hp == 1) then')
+    src=replace_once(src,'    local poisonScript = profileField and profileField.fieldPoisonScript','    local poisonScript = profileField and profileField.fieldPoisonScript\n    if HNS.poisonSurvives(session)then poisonScript=nil end')
     src=replace_once(src,'          Pokemon.adjustFriendship(mon, Pokemon.FRIENDSHIP_EVENT_FAINT_OUTSIDE_BATTLE,\n            { mapSec = Pokemon.currentMapSec(session) })','          if mon.hp == 0 then Pokemon.adjustFriendship(mon, Pokemon.FRIENDSHIP_EVENT_FAINT_OUTSIDE_BATTLE,\n            { mapSec = Pokemon.currentMapSec(session) }) end')
     src=replace_once(src,'poisonFainted = #faintedMons > 0','for _,v in ipairs(faintedMons) do if v.mon.hp == 0 then poisonFainted=true end end')
     src=replace_once(src,'Hud.openMessage(game, RomText.box((P.field and P.field.poisonFaintText) or "gText_PkmnFainted3",\n              { stringVars = { fainted.name } }),','Hud.openMessage(game, fainted.mon.hp > 0 and HNS.poisonMessage(fainted.name) or RomText.box((P.field and P.field.poisonFaintText) or "gText_PkmnFainted3",\n              { stringVars = { fainted.name } }),')

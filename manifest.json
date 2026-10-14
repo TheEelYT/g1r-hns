@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.14",
+  "version": "0.7.15",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development mod: exact source title bubble placement, four terrain seeds and Surge entry handlers, complete ability identity catalogue. Source ability assignment and other battle/campaign parity remain in progress.",
+  "description": "HnS v2.0.6 development mod for G1R 0.3.86: source ability slots, field shadows/follower grass, GB wave-volume and walking/Pok\u00e9gear fixes. Expanded effects and later campaign remain in progress.",
   "github": "TheEelYT/g1r-hns"
 }

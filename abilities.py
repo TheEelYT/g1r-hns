@@ -22,5 +22,12 @@ def build(source,engine,dex):
         records[name]={**row,'sourceId':ids[name],'id':native.get(name,1000+ids[name]),'sourceFields':source_fields[name],
                        'support':'native'if name in native else'reviewed'if name in SURGES else'pending'}
     assert len({r['id']for r in records.values()})==len(records)
-    return {'records':records,'surges':SURGES,'counts':{k:sum(r['support']==k for r in records.values())for k in ('native','reviewed','pending')},
-            'limits':'Complete source ability identities/descriptions/fields, native bridges and four reviewed Surge entry effects. Automatic source species/hidden-slot assignment, remaining expanded effects, suppression/transfer differences and source ability popups remain pending.'}
+    species={}
+    for row in dex['registrationEntries']:
+        names=row['abilityNames'];assert len(names)==3 and all(n in records for n in names)
+        species[row['speciesName']]={'slots':names}
+    pokemon=(source/'src/pokemon.c').read_text()
+    legendary=dict(re.findall(r'\{ SPECIES_(\w+),\s*ABILITY_(\w+)',pokemon.split('sLegendaryCustomAbilities[] = {')[1].split('};',1)[0]))
+    assert len(legendary)==9
+    return {'records':records,'species':species,'legendary':legendary,'normalSlots':2,'hiddenSlots':1,'surges':SURGES,'counts':{k:sum(r['support']==k for r in records.values())for k in ('native','reviewed','pending')},
+            'limits':'Complete source ability identities/descriptions/fields, native bridges and four reviewed Surge entry effects. Normal/hidden source slot identities and legendary setting are connected; hidden acquisition, randomizer and remaining expanded effects, suppression/transfer differences and source ability popups remain pending.'}

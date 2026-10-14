@@ -17,7 +17,7 @@ def build(source,engine,stage,opening_data,scripts,palette_parser):
             gfx='OBJ_EVENT_GFX_SPECIES(SPECIES_'+source_name+')'+(' | OBJ_EVENT_MON_SHINY' if shiny else '')
             meta=opening.sprite(source,gfx,gid,stage,palette_parser)
             opening_data['sprites'][str(gid)]=meta
-            entry['shiny' if shiny else 'normal']=gid;entry['width']=meta['width'];entry['height']=meta['height']
+            entry['shiny' if shiny else 'normal']=gid;entry['width']=meta['width'];entry['height']=meta['height'];entry['shadowSize']=meta['shadowSize']
         species[name]=entry
     texts='\n'.join((source/p).read_text() for p in ('src/data/text/follower_messages.h','src/follower_helper.c'))
     messages={}

@@ -1,15 +1,18 @@
-# Player testing notes — 0.7.14
+# Player testing notes — 0.7.15
 
-Follower idle animation is confirmed working; its check is removed. The title/bubble, original flashing version, steady Mod version and battle-menu prompt animations are confirmed correct; their checks are removed. Earlier confirmed checks remain removed.
+Use G1R 0.3.86 for this update. Confirmed Pokégear sounds and follower running-animation checks are removed. Previously confirmed idle, title/version and battle-prompt checks remain removed.
 
-- [ ] Use GB SOUNDS from the Bag, then toggle it off. Listen during travel, a wild/trainer battle, healing and item receipt; check that the saved selection survives loading.
-- [ ] Hold Down across Azalea's three ledges and keep moving afterward, both walking and running. Check that the follower lands and continues following without releasing Down or turning sideways.
-- [ ] Watch follower walking/running poses, including transitions from idle and changes of direction or speed. Check their cadence against HnS.
-- [ ] Check the compact Pokégear start-menu label against the supplied screenshot; listen for open/close sounds and selection sounds when moving between pages.
+- [ ] Listen to GB SOUNDS in Pokémart and other music encountered during normal play. Check that the previously missing instrument is audible; retain toggle/save checks if not already verified.
+- [ ] Watch follower walking, including continued movement and changes from idle, direction or running. Check that the pose cycle no longer stutters between steps.
+- [ ] Hold Down across Azalea's three ledges and keep moving afterward. Check that the follower lands and continues following without releasing Down or turning sideways.
+- [ ] Check that the compact Pokégear label has the same ink/shadow color as its neighboring menu rows.
+- [ ] Check player, NPC and follower shadows on ordinary ground, while moving/jumping and at different zoom levels. Grass/water suppression should follow HnS.
+- [ ] Walk the follower through tall and long grass. Check independent rustling and feet cover; ensure hiding/recalling it leaves no stale effect.
+- [ ] Check an existing Pokémon's ability in its summary and after loading a save. Legendary Abilities should respond to its setting when the relevant species becomes available.
 - [ ] Cross town/route borders in both directions. Check that a visible follower stays out, while building doors still recall/release it.
-- [ ] If a terrain move becomes available in normal play, check its field background and restoration after expiry/removal.
+- [ ] If a terrain move becomes available, check its field background and restoration after expiry/removal.
 
-Move effects and seed/Surge handlers rely on automated checks for now; there is no need to test every move or ability by hand. Source ability assignment/hidden slots and item acquisition remain unfinished. Report crashes or mismatches encountered in normal play; add a focused regression and manual check then.
+Ability identities and reviewed move/seed/Surge effects rely on automated checks for now; there is no need to test every move or ability by hand. Hidden acquisition, many expanded ability effects, source popups, weather shadow rules and the full follower ground-effect set remain unfinished. Report crashes or mismatches encountered in normal play.
 
 ## Updating these notes
 

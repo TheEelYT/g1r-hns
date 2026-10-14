@@ -58,6 +58,9 @@ return function(T,game,w,s,lead,keep)
     T.eq(a.cellY,P.cellY-1,'latest trailing destination is retained after release')
   end
 
+  a.moving=false;a.visible=true;a.poseDuration=w.followers.motion.walkPoseDuration;a.poseIndex=2;a.poseDelay=3
+  F.tick();T.eq(a.poseIndex,2,'one-frame walking gap retains source pose');T.eq(a.poseDelay,2,'walking gap advances pose timer')
+  F.step(a.cellX,a.cellY+1,16);T.eq(a.poseIndex,2,'next walking step preserves previous foot phase');a.moving=false
   -- Idle frames are independently exercised through actual sprite draw dispatch.
   local Ow=require('src.core.game3.ow_sprites');local lg=love.graphics;keep(lg,{'draw'})
   local quads={};lg.draw=function(_,quad)quads[#quads+1]=quad end

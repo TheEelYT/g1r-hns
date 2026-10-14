@@ -143,7 +143,7 @@ def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette
     dirt=berries[next(iter(berries))]['tree'];raw=(stage/'services'/('tree_'+next(iter(berries))+'.rgba')).read_bytes()[:16*16*4]
     (stage/'ow'/f'{gid}.rgba').write_bytes(raw)
     (stage/'ow'/f'{gid}.meta').write_bytes(b'SVOW'+struct.pack('<BB6HBHB',2,1,gid,16,16,1,0xFFFF,0xFFFF,4,0xFFFF,0)+bytes(32)+bytes(64))
-    ow['sprites'][str(gid)]={'graphicsId':gid,'width':16,'height':16,'frameCount':1,'source':'OBJ_EVENT_GFX_BERRY_TREE','standingOnly':True}
+    ow['sprites'][str(gid)]={'graphicsId':gid,'width':16,'height':16,'frameCount':1,'source':'OBJ_EVENT_GFX_BERRY_TREE','standingOnly':True,'shadowSize':3}
     for r in objects:
         m=maps[r['map']];o=next(o for o in m['objects']if o['localId']==r['localId']);src=source_maps[m['hnsSourceId']]['object_events'][r['localId']-1]
         o.update(graphicsId=gid,hnsGraphicsId=gid,rangeX=src['movement_range_x'],rangeY=src['movement_range_y'],facing='down',radius={'x':src['movement_range_x'],'y':src['movement_range_y']})

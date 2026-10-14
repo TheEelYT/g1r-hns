@@ -56,6 +56,7 @@ return function(mod,world,game,Settings,UI)
         if Space.store and s==Rt.getSession() then Flags.setVar(Space.store,nil,r.var,v) end
       end end
       setflag(Q.settings.initializedFlag,true,s)
+      if game._hnsAbilities then game._hnsAbilities.abilities.migrate(s)end
       local Options=require('src.core.game3.options');game.options=game.options or {};local block=Options.block(game.options,Options.blockId(s))
       for k,v in pairs(Settings.native(O.model))do block[k]=v end
       Options.bind(s,game.options)
@@ -298,7 +299,8 @@ return function(mod,world,game,Settings,UI)
   local printPx=old.printPx or Window.printPx
   Window.printPx=function(value,x,y,opts)
     if Start.open and own(Start._session)and value==Q.gearLabel then
-      return UI.tokenText(value,x,y,'normal')
+      local colors=opts and opts.colors or Font.COLOR.NORMAL
+      return UI.tokenText(value,x,y,'normal',colors.fg,colors.shadow)
     end
     return printPx(value,x,y,opts)
   end
@@ -331,7 +333,10 @@ return function(mod,world,game,Settings,UI)
     Flags.setVar(Space.store,ctx,0x8004,(Rt.getSession()or {}).gender or 0)
     return N.yieldHost(ctx,a,function(done)CenterClock.open({mode='view',session=Rt.getSession(),gender=(Rt.getSession()or {}).gender or 0,onDone=function()done()end})end)
   end
-  local Trainer=require('src.core.game3.trainer_pic');local baseBack=old.trainerBack or Trainer.back;local backCache={}
+  local Trainer=require('src.core.game3.trainer_pic');
+  local backAnims=old.backAnims or Trainer.backAnims
+  if backAnims then Trainer.backAnims=function(gender)if own(Rt.getSession())and Q.battleBacks[tostring(tonumber(gender)or 0)]then return Q.battleBackAnims end;return backAnims(gender)end end
+ local baseBack=old.trainerBack or Trainer.back;local backCache={}
   Trainer.back=function(gender)
     local s=Rt.getSession();local info=Q.battleBacks[tostring(tonumber(gender)or 0)]
     if own(s)and info then
@@ -360,5 +365,5 @@ return function(mod,world,game,Settings,UI)
   migrate(game.session or game.save)
   local Presentation=assert(load(mod:read('presentation_ui.lua'),'@hns/presentation_ui.lua'))()(mod,world,game,Settings,UI,O,old.presentation)
   G.phone=Presentation.phone
-  game._hnsGear={screensGet=baseGet,startDraw=baseDraw,printPx=printPx,trainerBack=baseBack,mapRead=baseRead,mapLua=baseLua,expAward=baseAward,hooks=true,gear=G,options=O,settings=Settings,presentation=Presentation}
+  game._hnsGear={screensGet=baseGet,startDraw=baseDraw,printPx=printPx,trainerBack=baseBack,backAnims=backAnims,mapRead=baseRead,mapLua=baseLua,expAward=baseAward,hooks=true,gear=G,options=O,settings=Settings,presentation=Presentation}
 end

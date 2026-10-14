@@ -41,4 +41,6 @@ def check(source,engine,world):
         native='STAT_DEF'if stat=='defense'else'STAT_SPDEF'
         assert re.search(r'TryHandleSeed\(battler, STATUS_FIELD_'+kind+r'_TERRAIN, '+native+r'\)',script)
     assert world['bootPresentation']['title']['bannerPosition']=={'LEFT_X':98,'RIGHT_X':162,'Y':2,'Y_GOAL':58}
-    return {'source_ability_rows':len(actual),'native_ability_bridges':77,'reviewed_surge_handlers':4,'pending_ability_effects':230,'source_seed_items':4,'source_title_banner_goal_y':58}
+    from check_ability_slots import check as slots
+    slot_counts=slots(source,world)
+    return {**slot_counts,'source_ability_rows':len(actual),'native_ability_bridges':77,'reviewed_surge_handlers':4,'pending_ability_effects':230,'source_seed_items':4,'source_title_banner_goal_y':58}

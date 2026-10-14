@@ -71,6 +71,7 @@ return function(mod,w,game)
     if dx~=0 then a.facing=dx<0 and 'left'or 'right'elseif dy~=0 then a.facing=dy<0 and 'up'or 'down'end
     a.moving=dx~=0 or dy~=0;a.progress=0;a.animClock=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
     Motion.begin(a,w.followers.motion,(a.stepFrames<=8)and not a.jumping)
+    if not a.jumping and game._hnsFieldShadows then game._hnsFieldShadows.shadows.step(a,x,y,false)end
   end
   function F.tick()
     local a=F.refresh();if not a then return end
@@ -100,13 +101,15 @@ return function(mod,w,game)
         a.raiseY=shape[math.floor((a.progress-1)*a.jumpStride/2)+1]or 0
       elseif w.followers.motion.bobbing then a.raiseY=math.floor((a.progress+2)/8)%2==0 and -1 or 0 end
       if f==1 then
+        if a.jumping and game._hnsFieldShadows then game._hnsFieldShadows.shadows.step(a,a.targetX,a.targetY,true)end
         a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)
         local pending=a.pendingStep;a.pendingStep=nil
         if pending then F.step(pending.x,pending.y,pending.frames,pending.playerJump)end
       end
     elseif not F.interaction and a.visible then
       a.idleClock=(a.idleClock or 0)+1
-      a.poseIndex=math.floor((a.idleClock-1)%24/6)
+      -- A one-frame walking gap must not restart the pose cycle.
+      if not a.poseDuration or a.poseDuration~=w.followers.motion.walkPoseDuration then Motion.begin(a,w.followers.motion,false)else Motion.tick(a)end
       a.raiseY=w.followers.motion.bobbing and(math.floor((a.idleClock+2)/8)%2==1 and -1 or 0)or 0
     end
   end
@@ -192,7 +195,7 @@ return function(mod,w,game)
       local spr=Ow.get(id);local right=facing=='right'and spr and spr.frameCount==12
       local base=right and 10 or({down=0,up=1,left=2,right=2})[facing]or 0
       local second=right and 11 or({down=4,up=6,left=8,right=8})[facing]or 4
-      local pos=((a.idleClock or 1)-1)%24;out.frame=pos>=6 and pos<18 and second or base
+      out.frame=Motion.frame(a,w.followers.motion)==1 and second or base
       return owDraw(id,px,py,cx,cy,right and'left'or facing,phase,flip,out)
     end
     if not(a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and F.transition)then

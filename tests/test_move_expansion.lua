@@ -20,6 +20,7 @@ return function(T,game,w,s,mon,keep)
   for k,v in pairs(fixtures)do keep(Text.overrides,{k});Text.overrides[k]=IR.fromAscii(v)end
   local function battle(name,hp,targetHp,ability,targetAbility,sub)
     local id=assert(X.id(name),name);local p,e=mon(),mon(19)
+    p.hnsAbilityOverride=ability~=nil;e.hnsAbilityOverride=targetAbility~=nil
     p.hp=hp or 50;p.moves={id};p.pp={40};p.ability=ability or 0;e.hp=targetHp or 100;e.ability=targetAbility or 0
     local st=State.new({session=s,wild=true,playerParty={p},foeParty={e}});st.session=s
     st.rng=function(lo,hi)if hi==100 then return 1 end;return hi end

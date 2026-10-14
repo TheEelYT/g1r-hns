@@ -1,8 +1,8 @@
 {
-  "version": "0.7.14",
+  "version": "0.7.15",
   "native_checks": {
-    "default": 99329,
-    "mounted": 99329
+    "default": 119421,
+    "mounted": 119421
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.13",
+  "cart_version": "1.0.14",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -87,7 +87,7 @@
         "source_display_move_rows": 934,
         "source_critical_stages": 5,
         "source_fairy_species": 18,
-        "implemented_settings": 23,
+        "implemented_settings": 24,
         "egg_handoff_paths": 2
       }
     },
@@ -150,6 +150,10 @@
         "source_c_gbs_register_bytes": 13800832,
         "source_c_follower_pose_frames": 2048,
         "source_c_follower_jump_frames": 56,
+        "source_shadow_mask_pixels": 2496,
+        "source_shadow_size_rows": 1229,
+        "source_follower_grass_pixels": 2304,
+        "source_follower_grass_sequences": 2,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -163,6 +167,9 @@
         "source_c_terrain_power_cases": 1536,
         "source_core_terrain_moves": 4,
         "source_duration_items": 5,
+        "source_ability_species": 386,
+        "source_c_ability_slot_cases": 3860,
+        "source_legendary_ability_overrides": 9,
         "source_ability_rows": 311,
         "native_ability_bridges": 77,
         "reviewed_surge_handlers": 4,
@@ -181,11 +188,12 @@
     }
   },
   "limitations": [
-    "Automatic source species/hidden-slot ability assignment, expanded ability interactions/acquisition/transfer/suppression and source popups, held-item acquisition, remaining battle/settings and later campaign are unfinished.",
+    "Hidden ability acquisition, expanded interactions/transfer/suppression and source popups, held-item acquisition, remaining battle/settings and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available.",
-    "GB music/fanfares run source bytecode through native PSG synthesis; GB cry remaps, hardware SFX channel arbitration and audible/analog fidelity remain pending."
+    "GB music/fanfares run source bytecode through native PSG synthesis; GB cry remaps, hardware SFX channel arbitration and audible/analog fidelity remain pending.",
+    "Field shadows use source masks, size/offset and opacity; weather-driven suppression and complete non-grass follower effects remain pending."
   ],
   "targeted_regressions": [
     "Real native grass-step rolls in Morning/Day/Evening/Night",
@@ -230,53 +238,53 @@
     "123 source GBS remaps/104 tracks, 215638 C frames and 13800832 register bytes; fractional note carry, loops/calls, changing tempo, modulation, waves/drums match actual source; native PSG voices produce buffered PCM.",
     "Held Down on real Azalea triple ledges, continuing walking/running: final jump completes without restart and latest following target lands; prior build fails six checks.",
     "Source walking/running pose timers and jump arcs: 2048 source C pose frames and 56 source C jump frames match.",
-    "Native start-menu hook retains {POKE}GEAR; actual bitmap draw uses source glyphs 0x55/0x56; source ON/OFF/SELECT cues cover open, cursor, pages and fade close without duplicate sound."
+    "Native start-menu hook retains {POKE}GEAR; actual bitmap draw uses source glyphs 0x55/0x56; source ON/OFF/SELECT cues cover open, cursor, pages and fade close without duplicate sound.",
+    "Every distinct mapped GB track audited for GBA NR32 force-75% volume; Pokemart wave channel renders nonzero PCM.",
+    "Source compound Pok\u00e9gear glyphs retain normal menu foreground/shadow ink.",
+    "Follower source pose advances through one-frame walking gaps instead of resetting; running/idle retained.",
+    "Source field shadows on ordinary ground, suppression on grass/water, ground anchoring while raised, camera offsets/opacity; real follower steps trigger independent tall/long grass with ordered back/feet layers.",
+    "386 supported species, 3860 compiled source slot/legendary cases, native creation and battle construction, hidden identity/save serialization, sparse PC and legacy-secondary migration; summaries/settings refresh abilities.",
+    "Latest native trainer-back idle/throw metadata, partial texture-upload bands and native poison-script sequence, retaining HnS survival/Sturdy."
   ],
   "tested_build_content_equivalence": {
-    "files": 7820,
+    "files": 7827,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
     "result": "pass",
-    "mod_version": "0.7.14",
-    "cart_version": "1.0.13",
+    "mod_version": "0.7.15",
+    "cart_version": "1.0.14",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.13.g1rcart",
+        "name": "pokemon_heart_soul-1.0.14.g1rcart",
         "bytes": 1028181,
-        "sha256": "a414fe74e793dc53bd1ea12a86acaefd35053e35da7c88f095ac2d0024a902cc"
+        "sha256": "4a5b8a1a85d18ffa614c8a60dfcecf455823123d49791609ea9fa430b0ce04cf"
       },
       {
-        "name": "hns_exploration-0.7.14.zip",
-        "bytes": 10182841,
-        "sha256": "5db953f73e018c444754ef1027a67c5a7acfdeb71edfec5d1ab1beb9b6807d7a"
+        "name": "hns_exploration-0.7.15.zip",
+        "bytes": 10194812,
+        "sha256": "e496a4b608c7aa8f19d1ddd1a11585534be3f58af468fff181bcea533a7b0c31"
       }
     ]
   },
   "engine_compatibility": {
-    "v0.3.44": {
-      "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
+    "v0.3.86": {
+      "commit": "49d289ce9c00d9586c8b39a44a305c16f38b7b8e",
+      "latest_release_verified": "2026-10-14",
       "raw_native_checks": {
-        "default": 99329,
-        "mounted": 99329
-      }
-    },
-    "v0.3.53": {
-      "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
-      "raw_native_checks": {
-        "default": 99334,
-        "mounted": 99334
+        "default": 119421,
+        "mounted": 119421
       },
       "compressed_native_checks": {
-        "default": 99334,
-        "mounted": 99334
+        "default": 119421,
+        "mounted": 119421
       },
-      "installer_encoded_assets": 5589,
-      "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
+      "installer_encoded_assets": 5595,
+      "codec": "actual src.import.CacheBlob encode/decode"
     },
-    "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
+    "policy": "Test only latest published G1R; old engine matrix retired at user request."
   },
   "move_table": {
     "rows": 935,
@@ -317,8 +325,14 @@
     "native_bridges": 77,
     "reviewed_surge_handlers": 4,
     "pending_effects": 230,
-    "automatic_source_assignment_complete": false,
-    "source_popup_and_transfer_rules_complete": false
+    "automatic_source_assignment_complete": true,
+    "source_popup_and_transfer_rules_complete": false,
+    "supported_base_species": 386,
+    "source_c_slot_cases": 3860,
+    "legendary_overrides": 9,
+    "hidden_acquisition_complete": false,
+    "sparse_PC_migration": true,
+    "setting_and_summary_refresh": true
   },
   "title": {
     "source_banner_left_x": 98,
@@ -340,7 +354,10 @@
       "GB cry remaps",
       "Hardware SFX arbitration",
       "Audible/analog PSG parity"
-    ]
+    ],
+    "gba_force_75_wave_override": true,
+    "all_distinct_tracks_channel_audited": 104,
+    "pokemart_wave_pcm_verified": true
   },
   "follower_motion": {
     "source_idle_poses_and_bobbing": true,
@@ -360,7 +377,9 @@
       8
     ],
     "prior_build_negative_control_failed_checks": 6,
-    "idle_animation_player_confirmed": true
+    "idle_animation_player_confirmed": true,
+    "walking_gap_retains_pose": true,
+    "running_animation_player_confirmed": true
   },
   "pokegear_feedback": {
     "source_menu_label": "{POKE}GEAR",
@@ -374,6 +393,19 @@
       "SE_SELECT"
     ],
     "source_se_player_channels": true,
-    "duplicate_close_sound_prevented": true
+    "duplicate_close_sound_prevented": true,
+    "sounds_player_confirmed": true,
+    "compound_label_uses_native_menu_ink": true
+  },
+  "field_effects": {
+    "persistent_shadows": true,
+    "source_shadow_pixels": 2496,
+    "source_shadow_size_rows": 1229,
+    "source_grass_pixels": 2304,
+    "follower_grass_sequences": 2,
+    "remaining": [
+      "Weather shadow suppression",
+      "Complete non-grass follower ground effects"
+    ]
   }
 }
