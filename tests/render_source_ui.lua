@@ -200,6 +200,17 @@ if w.battleVisuals then
       end
     end
   end
+  assert(load(mod:read('battle_fields.lua')))()(mod,w,collection)
+  Bu._mode='menu';shortcut.ballX=14
+  for _,style in ipairs({'gen3','gen4'})do
+    choices.ITEM_BATTLE_NEW_BATTLEUI=style=='gen4'and 1 or 0
+    for _,kind in ipairs({'ELECTRIC','GRASSY','MISTY','PSYCHIC'})do
+      Battle._st.hnsTerrain=kind
+      snap('battle_field_'..style..'_'..kind,function()Bu.draw(240,160)end)
+    end
+    Battle._st.hnsTerrain=nil
+    snap('battle_restore_'..style,function()Bu.draw(240,160)end)
+  end
   -- Source entry timing while retaining complete native battle drawing. The
   -- current bgslide phase/progress is a controlled animation-clock boundary.
   local Intro=require('src.core.game3.battle.intro_seq')

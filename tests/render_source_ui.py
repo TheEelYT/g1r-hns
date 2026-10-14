@@ -23,6 +23,13 @@ for frame in frames:
             assert not any(c['op']=='image'and 'ballPrompt'in c['file']for c in calls),name
         if mode=='none':
             assert any(c['op']=='image'and c['y']==121 and c['x']==16 and 'normal' in c['file']for c in calls),name
+    elif name.startswith('battle_field_'):
+        _,_,style,kind=name.split('_');first=next(c for c in calls if c['op']=='image')
+        assert first['file']==f'battle/field_{kind}.rgba'and first['q']==[0,0,240,112],name
+        assert any(c['op']=='image'and c['file']=='ui/frame.rgba'for c in calls),name
+    elif name.startswith('battle_restore_'):
+        first=next(c for c in calls if c['op']=='image')
+        assert first['file']=='battle/GRASS_modern_Day.rgba',name
     elif name.startswith('battle_entry_gen'):
         background=[c for c in calls if c['op']=='image'and c['file']=='battle/GRASS_modern_Day_intro_bg.rgba']
         assert background and all(c['iw']==512 for c in background),name

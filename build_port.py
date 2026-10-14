@@ -516,7 +516,7 @@ def build(args):
         move_data=move_table.build(source,engine,dex_data['moveInfo'],expanded_data,campaign_data['roostMove'])
         roost=expanded_data['moves']['ROOST']
         campaign_data['moves']={'HNS_ROOST':dict(roost,id='HNS_ROOST',index=roost['id'],type=TYPE_NAMES[roost['type']])}
-        battle_data=battle_assets.build(source,engine,stage,packed_maps,source_maps)
+        battle_data=battle_assets.build(source,engine,stage,packed_maps,source_maps,field_data)
         boot_data=boot_assets.build(source,engine,stage)
         follower_data=followers.build(source,engine,stage,opening_data,scripts,parse_palette)
         audio_data=audio.build(source,engine,stage,packed_maps,source_maps,trainer_data,prepared_trainers,scripts)

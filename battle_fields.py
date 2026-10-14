@@ -10,7 +10,7 @@ def build(source,quest):
     body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=prefix+'#include "data/items.h"\n',text=True)
     rows=dict(re.findall(r'\[ITEM_(\w+)\]\s*=\s*\{(.*?)(?=\n\s*\[ITEM_|\Z)',body,re.S))
     expressions={n:re.search(r'\.price\s*=\s*([^,]+)',rows[n])[1]for n in ITEMS}
-    code='#include <stdio.h>\n'+prefix+'int main(void){'+''.join('printf("'+n+' %d\\n",'+v+');'for n,v in expressions.items())+'printf("BOOST %d\\n",B_TERRAIN_TYPE_BOOST);}'
+    code='#include <stdio.h>\n'+prefix+'int main(void){'+''.join('printf("'+n+' %d\\n",'+v+');'for n,v in expressions.items())+'printf("BOOST %d\\nBG_CHANGE %d\\nNEW_BG %d\\n",B_TERRAIN_TYPE_BOOST,B_TERRAIN_BG_CHANGE,B_NEW_TERRAIN_BACKGROUNDS);}'
     with tempfile.TemporaryDirectory()as tmp:
         root=Path(tmp);(root/'oracle.c').write_text(code)
         subprocess.run(['gcc','-std=c99','-I'+str(source/'include'),str(root/'oracle.c'),'-o',str(root/'oracle')],check=True)
@@ -28,4 +28,5 @@ def build(source,quest):
         text[n]=''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',r)).replace('{B_SCR_NAME_WITH_PREFIX}','{B_SCR_ACTIVE_NAME_WITH_PREFIX}')
     assert 'STRINGID_GRASSYTERRAINHEALS'in text
     return {'items':items,'texts':text,'terrainTurns':5,'extendedTurns':8,'typeBoost':5325 if values['BOOST']>=8 else 6144,
-            'limits':'Four core terrains and weather/terrain duration items. Native grounded states, damage/status/priority, healing and expiry are connected. Terrain background replacement, terrain-triggered abilities/seeds, special terrain attacks and remaining source field rules are pending; item rewards/shops are not invented.'}
+            'backgroundChanges':bool(values['BG_CHANGE']),'newBackgrounds':bool(values['NEW_BG']),
+            'limits':'Core terrains, eight terrain-dependent attacks, source backgrounds and weather/terrain duration items. Terrain-triggered abilities/seeds and remaining source field rules are pending; item rewards/shops are not invented.'}

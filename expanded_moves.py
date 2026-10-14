@@ -35,6 +35,8 @@ def build(source,engine,roost_id=901):
     inp='#define TRUE 1\n#define FALSE 0\n#include "config/general.h"\n#include "config/battle.h"\n#include "config/contest.h"\n#include "data/moves_info.h"\n'
     body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=inp,text=True)
     native=set(re.findall(r'MOVE_(\w+)',(engine/'src/core/game3/constants/emerald/moves.lua').read_text()))
+    constants=(source/'include/constants/moves.h').read_text()
+    transformations=set(re.findall(r'MOVE_(\w+)',constants[constants.index('FIRST_Z_MOVE ='):constants.index('LAST_MAX_MOVE =')]))
     effects=dict((name,int(n))for name,n in re.findall(r'^  (\w+) = (\d+),',(engine/'src/core/game3/battle/effect_ids.lua').read_text(),re.M))
     for name,target in re.findall(r'EffectIds\.(\w+) = EffectIds\.(\w+)',(engine/'src/core/game3/battle/effect_ids.lua').read_text()):
         if target in effects:effects[name]=effects[target]
@@ -42,7 +44,7 @@ def build(source,engine,roost_id=901):
     # Explicitly reviewed dispatches: HIT and its additional-effect list,
     # 50% absorption, high critical stage 1 and native-compatible status moves.
     compatible={'HIT','ABSORB','ALWAYS_HIT','ATTACK_UP','DEFENSE_UP','SPEED_UP','SPECIAL_ATTACK_UP','SPECIAL_DEFENSE_UP','ATTACK_DOWN','DEFENSE_DOWN','SPEED_DOWN','SPECIAL_ATTACK_DOWN','SPECIAL_DEFENSE_DOWN','SLEEP','POISON','TOXIC','PARALYZE','CONFUSE','RECOVER','REST','REFRESH','INGRAIN','WISH','PAIN_SPLIT','HEAL_BELL','SAFEGUARD','REFLECT','LIGHT_SCREEN','MIST','HAZE','FOCUS_ENERGY','SUBSTITUTE','PROTECT','ENDURE','SPIKES','LEECH_SEED','HELPING_HAND'}
-    compatible.update({'RECOIL','RESTORE_HP','SPEED_UP_2','SPECIAL_ATTACK_UP_2','DEFENSE_UP_2'})
+    compatible.update({'RECOIL','RESTORE_HP','SPEED_UP_2','SPECIAL_ATTACK_UP_2','DEFENSE_UP_2','EXPLOSION'})
     records={};omitted=[]
     def num(row,field,default=None):
         m=re.search(r'\.'+field+r'\s*=\s*([^,}\n]+)',row)
@@ -61,12 +63,24 @@ def build(source,engine,roost_id=901):
         reason=None;extra=[];effect=eff[1];handler={}
         if effect in {'GRASSY_TERRAIN','ELECTRIC_TERRAIN','MISTY_TERRAIN','PSYCHIC_TERRAIN'}:
             handler={'hnsHandler':'terrain','hnsTerrain':effect.removesuffix('_TERRAIN')};effect='HIT'
+        if effect=='TERRAIN_BOOST':
+            boost=re.search(r'\.argument\.terrainBoost\s*=\s*\{([^}]+)',row)
+            terrain=re.search(r'\.terrain\s*=\s*\(1 << (\d+)\)',boost[1])if boost else None
+            ground=re.search(r'\.groundCheck\s*=\s*GROUND_CHECK_(\w+)',boost[1])if boost else None
+            if terrain and ground and terrain[1]in {'6','7','8','9'}and ground[1]in {'NONE','USER','TARGET'}:
+                handler={'hnsHandler':'terrainAttack','terrainBoost':{'terrain':{'6':'GRASSY','7':'MISTY','8':'ELECTRIC','9':'PSYCHIC'}[terrain[1]],
+                         'percent':num(boost[1],'percent'),'groundCheck':ground[1],'hitsBothFoes':num(boost[1],'hitsBothFoes',0)==1}}
+                effect='EXPLOSION'if num(row,'explosion',0)else'HIT'
+            else:reason='unreviewed terrain boost argument'
+        if effect in {'TERRAIN_PULSE','GRASSY_GLIDE','STEEL_ROLLER','ICE_SPINNER'}:
+            handler={'hnsHandler':'terrainAttack','terrainEffect':effect};effect='HIT'
         if effect in stages:handler={'hnsHandler':'stats','stageChanges':stages[effect]};effect='HIT'
         # Roost's reviewed campaign handler heals and removes Flying for the
         # remainder of the turn. Its row now shares this source-owned table.
         if name=='ROOST':effect='RESTORE_HP'
         if (effect not in compatible and name!='ROOST') or effect not in effects:reason='expanded effect handler required: '+effect
         if re.search(r'\.(?:isZMove|isMaxMove)\s*=\s*1',row):reason='special battle transformation required'
+        if name in transformations:reason='special battle transformation required'
         # Unreviewed arguments must not silently disappear.
         args=re.search(r'\.argument\s*=\s*\{([^}]+)',row)
         if args:
@@ -88,7 +102,7 @@ def build(source,engine,roost_id=901):
         typ=re.search(r'\.type\s*=\s*TYPE_(\w+)',row)
         target=re.search(r'\.target\s*=\s*TARGET_(\w+)',row)
         if not category or not typ or typ[1]not in TYPE_NAMES:reason='expanded type/category required'
-        if target and target[1]not in {'SELECTED','USER','BOTH','ALL_BATTLERS','OPPONENTS_FIELD'}and not(target[1]=='FIELD'and handler.get('hnsHandler')=='terrain'):reason='expanded target required'
+        if target and target[1]not in {'SELECTED','USER','BOTH','ALL_BATTLERS','OPPONENTS_FIELD'}and not(target[1]=='FIELD'and handler.get('hnsHandler')=='terrain')and not(target[1]=='FOES_AND_ALLY'and effect=='EXPLOSION'):reason='expanded target required'
         for flag in ('multiHit','ignoresSubstitute','ignoresTargetAbility','ignoresDefenseBoosts','ignoresEvasion','alwaysCriticalHit','twoTurnMove','damagesUnderground','damagesUnderwater','damagesAirborne'):
             if num(row,flag,0):reason='expanded move flag required: '+flag
         if reason:omitted.append({'move':name,'reason':reason});continue
@@ -106,7 +120,7 @@ def build(source,engine,roost_id=901):
             if (field in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and not value)or(field not in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and value):flags|=bit
         rec={'id':roost_id if name=='ROOST'else 1000+ordinal,'name':display,'description':description,'effect':effects['HIGH_CRITICAL']if crit==1 and effect=='HIT'else effects[effect],
             'power':num(row,'power',0),'accuracy':num(row,'accuracy',0),'pp':num(row,'pp',0),'priority':num(row,'priority',0),
-            'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'FIELD':16,'BOTH':8,'ALL_BATTLERS':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
+            'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'FIELD':16,'BOTH':8,'ALL_BATTLERS':32,'FOES_AND_ALLY':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
             'additionalEffects':extra,'thawsUser':num(row,'thawsUser',0)==1}
         if rec['thawsUser']and effect=='HIT':rec['effect']=effects['THAW_HIT']
         rec.update(handler);rec['sourceEffect']=eff[1]

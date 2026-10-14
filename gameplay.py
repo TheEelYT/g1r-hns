@@ -106,7 +106,7 @@ def derivatives(engine,stage):
     src=replace_once(src,'  if tonumber(move.effect) == EffectIds.EXPLOSION then\n    defense = math.floor(defense / 2)\n  end\n','')
     src=replace_once(src,'status_of(attacker) == "BRN" and aAb ~= "GUTS"','status_of(attacker) == "BRN" and aAb ~= "GUTS" and tonumber(move.effect) ~= EffectIds.FACADE')
     src=replace_once(src,'  local physical = HNS.physical(move, moveType)\n  local foresight',
-                    '  if HNS.fieldPower then power=HNS.fieldPower(opts.adapter,attacker,defender,move,power,moveType)end\n  local physical = HNS.physical(move, moveType)\n  local foresight')
+                    '  if HNS.fieldPower then power,moveType=HNS.fieldPower(opts.adapter,attacker,defender,move,power,moveType)end\n  local physical = HNS.physical(move, moveType)\n  local foresight')
     (stage/'hns_damage.lua').write_text('-- Derived from pinned native damage.lua; see GEN1RECOMP_LICENSE.md.\n'+src)
     src=(engine/'src/core/game3/battle/rules.lua').read_text()
     crit=src[src.index('local function rollZeroTo'):src.index('function Rules.crit.multiplier')]

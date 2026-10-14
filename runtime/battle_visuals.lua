@@ -25,9 +25,19 @@ return function(mod,w,game)
     return w.battleVisuals.terrains[key]or w.battleVisuals.terrains['BUILDING_'..style..'_'..period],key
   end
   local function image(a)return U.image(a.file,a.width,a.height)end
+  function V.fieldBackground()
+    local fields=game._hnsFields;local kind=fields and fields.fields.terrain(B._st)
+    return w.battleFields.backgroundChanges and kind and w.battleVisuals.fieldBackgrounds[kind]
+  end
   local draw=old.draw or Bg.draw
   Bg.draw=function(id,eo,po,bo)
     if not H.battle(B._st)then return draw(id,eo,po,bo)end
+    local field=V.fieldBackground()
+    if field then
+      love.graphics.setColor(1,1,1,1)
+      love.graphics.draw(image(field.full),love.graphics.newQuad(0,0,240,112,field.full.width,field.full.height),0,0)
+      return true
+    end
     local row,key=V.terrain(id);local own='hns_'..key
     if row.entry then
       local Intro=require('src.core.game3.battle.intro_seq');local step=Intro._steps and Intro._steps[Intro._i]

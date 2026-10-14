@@ -31,7 +31,7 @@ def check(source,engine,mod,luajit,world):
     expr=re.search(r'if \(IsGrassyTerrainAffected\(battlerAtk, ctx->abilityAtk, ctx->holdEffectAtk, ctx->fieldStatuses\) && moveType == TYPE_GRASS\)\s*modifier = uq4_12_multiply\(modifier,\s*(.*?)\);',util,re.S)[1]
     prefix='#include <stdio.h>\ntypedef unsigned int u32;typedef int s32;typedef unsigned short u16;typedef short s16;\n#define TRUE 1\n#define FALSE 0\n#include "config/general.h"\n#include "config/battle.h"\n#include "fpmath.h"\n'
     code=prefix+'int main(void){u32 factors[]={UQ_4_12(0.5),UQ_4_12(1.0),'+expr+'};for(int i=0;i<3;i++)for(int p=1;p<=512;p++)printf("%u\\n",uq4_12_multiply_by_int_half_down(factors[i],p));}\n'
-    script="package.path='./?.lua;./?/init.lua;'..package.path;love=require('tests.love_stub');require('src.core.GameVersion').set('emerald');local w=dofile(arg[1]..'/world.lua');local game={_hnsRules={rules={battle=function()return true end}}};assert(loadfile(arg[1]..'/battle_fields.lua'))()({},w,game);local F=game._hnsFields.fields;local ad={_st={hnsTerrain='MISTY'},abilityOf=function()end,hasType=function()return false end};local u,d={},{};for _,row in ipairs({{'MISTY',16},{'NONE',0},{'ELECTRIC',13}})do ad._st.hnsTerrain=row[1];for p=1,512 do io.write(F.power(ad,u,d,{},p,row[2]),'\\n')end end"
+    script="package.path='./?.lua;./?/init.lua;'..package.path;love=require('tests.love_stub');require('src.core.GameVersion').set('emerald');local w=dofile(arg[1]..'/world.lua');local game={_hnsRules={rules={battle=function()return true end}}};assert(loadfile(arg[1]..'/battle_fields.lua'))()({hooks={wrap=function()end}},w,game);local F=game._hnsFields.fields;local ad={_st={hnsTerrain='MISTY'},abilityOf=function()end,hasType=function()return false end};local u,d={},{};for _,row in ipairs({{'MISTY',16},{'NONE',0},{'ELECTRIC',13}})do ad._st.hnsTerrain=row[1];for p=1,512 do io.write(F.power(ad,u,d,{},p,row[2]),'\\n')end end"
     with tempfile.TemporaryDirectory()as temp:
         tmp=Path(temp);(tmp/'oracle.c').write_text(code)
         subprocess.run(['gcc','-std=c99','-I'+str(source/'include'),str(tmp/'oracle.c'),'-o',str(tmp/'oracle')],check=True)
@@ -39,4 +39,6 @@ def check(source,engine,mod,luajit,world):
         (tmp/'actual.lua').write_text(script)
         actual=subprocess.check_output([str(luajit),str(tmp/'actual.lua'),str(mod)],cwd=engine)
         assert actual==expected,'installed field-power rounding differs from source fpmath.h'
-    return {'source_title_glyph_mask_pixels':samples,'source_c_terrain_power_cases':1536,'source_core_terrain_moves':4,'source_duration_items':len(fields['items'])}
+    from check_terrain_attacks import check as check_attacks
+    result={'source_title_glyph_mask_pixels':samples,'source_c_terrain_power_cases':1536,'source_core_terrain_moves':4,'source_duration_items':len(fields['items'])}
+    result.update(check_attacks(source,engine,mod,luajit,world));return result

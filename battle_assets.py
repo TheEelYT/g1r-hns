@@ -6,7 +6,7 @@ from PIL import Image
 from boot_assets import palette,tiles,text_map
 
 
-def build(source,engine,stage,maps,source_maps):
+def build(source,engine,stage,maps,source_maps,fields):
     root=stage/'battle';root.mkdir();out={'terrains':{},'ui':{},'scenes':{}}
     paths=dict(re.findall(r'(\w+)\[\]\s*=\s*INCBIN_\w+\("([^\"]+)"\)',(source/'src/data/graphics/battle_environment.h').read_text()))
     code=(source/'src/data/battle_environment.h').read_text()
@@ -81,6 +81,16 @@ def build(source,engine,stage,maps,source_maps):
                 out['terrains'][key]=row
     out['scenes']=dict(re.findall(r'\{(MAP_BATTLE_SCENE_\w+),\s*BATTLE_ENVIRONMENT_(\w+)\}',code))
     for mid,m in maps.items():m['hnsBattleScene']=source_maps[m['hnsSourceId']]['battle_scene']
+    out['fieldBackgrounds']={}
+    for kind in ('ELECTRIC','GRASSY','MISTY','PSYCHIC'):
+        root=source/'graphics/battle_anims/backgrounds';name=('new_'if fields['newBackgrounds']else'')+kind.lower()+'_terrain'
+        png=root/(name+'.png');tilemap=root/(name+'.bin');pal=root/(name+'.pal')
+        words=struct.unpack('<'+str(tilemap.stat().st_size//2)+'H',tilemap.read_bytes())
+        # LoadMoveBg relocates the map to BG palette bank 2. These source
+        # move backgrounds use one palette regardless of arena and time.
+        local=[v&4095 for v in words];colors=palette(pal)
+        out['fieldBackgrounds'][kind]={'full':save('field_'+kind,256,160,rgba(text_map(tiles(png),local,256,160),colors)),
+            'sourceTiles':str(png.relative_to(source)),'sourceMap':str(tilemap.relative_to(source)),'sourcePalette':str(pal.relative_to(source))}
     graphics=(source/'src/graphics.c').read_text()
     for style,rel in [('gen3','hns'),('gen4','gen4')]:
         d=source/'graphics/battle_interface'/rel;ui={};pal=palette(d/'healthbox_singles_player.pal')[:16];hpPal=palette(d/'hpbar.pal')[:16]
