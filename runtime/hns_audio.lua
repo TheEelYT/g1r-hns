@@ -108,11 +108,12 @@ return function(mod,world,game)
   Audio.playFanfare=function(id)return playFanfare(translate(id)) end
   -- HnS battle_anim_throw.c uses HG_EVOLVED as the SE at capture frame 95;
   -- battle_message.c then starts HG_CAUGHT after that SE finishes.
-  local intro=Audio.resolveSong('MUS_CAUGHT_INTRO')
+  local captureIntros={}
+  for _,name in ipairs({'MUS_CAUGHT_INTRO','MUS_RG_CAUGHT_INTRO'})do captureIntros[Audio.resolveSong(name)]=true end
   local playSe=old.playSe or Audio.playSe
   local waitSe=old.waitSe or Audio.waitSe
   local function captureCue(id)
-    if own() and intro and Audio.resolveSong(id)==intro then return world.audio.roles.evolved end
+    if own() and captureIntros[Audio.resolveSong(id)]then return world.audio.roles.evolved end
     return id
   end
   Audio.playSe=function(id,opts)return playSe(captureCue(id),opts)end

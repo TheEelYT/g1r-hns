@@ -58,9 +58,15 @@ return function(T,game,w,s,lead,keep)
     T.eq(a.cellY,P.cellY-1,'latest trailing destination is retained after release')
   end
 
+  P.moving=false
   a.moving=false;a.visible=true;a.poseDuration=w.followers.motion.walkPoseDuration;a.poseIndex=2;a.poseDelay=3
   F.tick();T.eq(a.poseIndex,2,'one-frame walking gap retains source pose');T.eq(a.poseDelay,2,'walking gap advances pose timer')
   F.step(a.cellX,a.cellY+1,16);T.eq(a.poseIndex,2,'next walking step preserves previous foot phase');a.moving=false
+  P.moving=true;a.stepFrames=16;a.poseIndex=2;a.poseDelay=3;a.idleClock=0;a.raiseY=0
+  F.tick();T.eq(a.poseIndex,2,'player walking gap cannot enter idle pose');T.eq(a.poseDelay,3,'walking gap does not tick idle animation');T.eq(a.idleClock,0,'walking gap never starts idle clock')
+  P.moving=false
+  local Motion=assert(load(T.readAsset('follower_motion.lua')))()
+  for f=1,16 do T.eq(Motion.walkBob(f),(f>=2 and f<=9)and -1 or 0,'source walking bob timer '..f)end
   -- Idle frames are independently exercised through actual sprite draw dispatch.
   local Ow=require('src.core.game3.ow_sprites');local lg=love.graphics;keep(lg,{'draw'})
   local quads={};lg.draw=function(_,quad)quads[#quads+1]=quad end

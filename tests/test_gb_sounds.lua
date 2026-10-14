@@ -20,6 +20,21 @@ return function(T,game,w,s,keep)
   T.check(noise and channels[1]and channels[2]and channels[3]and channels[4],'source four-channel GB title runs both pulses, wave and sampled drum noise')
   T.check(peak>=3,'New Bark GBS plays both pulses and wave');T.check(energy>1,'native GBS mixer produces audible PCM')
   for f=1,12000 do Player.updateSlot(slot,1)end;T.eq(slot.done,false,'GB bytecode keeps looping without truncating long songs')
+  local martId
+  for id,name in pairs(w.audio.songs)do if name=='MUS_HG_POKE_MART'then martId=tonumber(id)end end
+  local mart={};T.check(Player.start(Audio._pack,Audio._cache,mart,assert(martId)),'GB mart starts through actual native player')
+  local fix=assert(G.spec.loopFixes.gbs_hg_poke_mart_Header);local repeats={0,0,0,0}
+  T.eq(fix.introUnits,32,'reviewed mart intro ends at source HG MIDI marker')
+  for i,t in ipairs(mart.hnsGB.source.tracks)do T.check(t.pc<fix.loopStarts[i],'first play includes mart intro on channel '..i)end
+  for f=1,20000 do
+    local prev={};for i,t in ipairs(mart.hnsGB.source.tracks)do prev[i]=t.pc end
+    Player.updateSlot(mart,1)
+    for i,t in ipairs(mart.hnsGB.source.tracks)do if t.pc<prev[i]then
+      repeats[i]=repeats[i]+1
+      T.check(t.pc>=fix.loopStarts[i]and t.pc<=fix.loopStarts[i]+8,'mart repeat enters body, never intro, channel '..i)
+    end end
+  end
+  for i,n in ipairs(repeats)do T.check(n>=3,'mart channel '..i..' completes at least three repeats')end
   local heal=w.audio.roles.heal;local cue={};T.check(Player.start(Audio._pack,Audio._cache,cue,heal),'GB healing fanfare starts')
   for f=1,300 do Player.updateSlot(cue,1)end
   T.eq(cue.done,true,'GB healing cue terminates');T.eq(#cue.voices,0,'finished GB fanfare releases voices')

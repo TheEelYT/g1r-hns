@@ -1,18 +1,32 @@
 return function(mod,w,game)
-  local old=game._hnsFieldShadows or {};local S={spec=w.fieldShadows,grass={}}
+  local old=game._hnsFieldShadows or {};local S={spec=w.fieldShadows,grass={},short={}}
   local Fx=require('src.core.game3.field_effects');local P=require('src.core.game3.player');local Rt=require('src.core.game3.runtime')
   local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local function own()local s=Rt.getSession();return s and w.maps[s.map]end
   local function grassName(beh)return beh==MB.id('LONG_GRASS')and'long_grass'or beh==MB.id('TALL_GRASS')and'tall_grass'end
+  function S.leaveShort(a)S.short[a]=nil end
+  function S.finish(a,x,y)
+    if Coll.behavior(x,y)==MB.id('SHORT_GRASS')and a.visible then
+      S.short[a]=S.short[a]or{actor=a,timer=0,x=a.px,y=a.py}
+    else S.short[a]=nil end
+  end
   function S.step(a,x,y,jump)
     if not own()or not a.visible then return end
     local beh=Coll.behavior(x,y);local name=grassName(beh)
+    if beh==MB.id('SHORT_GRASS')and Coll.behavior(a.cellX,a.cellY)==beh and not jump then S.finish(a,x,y)else S.short[a]=nil end
     if name then S.grass[#S.grass+1]={x=x,y=y,name=name,timer=0,actor=a}
     elseif jump then Fx.startDust(x,y)
     elseif beh==MB.id('PUDDLE')then Fx.startRipple(x,y)end
   end
   function S.tick()
+    for a,g in pairs(S.short)do
+      if not a.visible or a.jumping then S.short[a]=nil
+      else
+        local moved=a.px~=g.x or a.py~=g.y;g.x,g.y=a.px,a.py
+        if g.timer>=8 and moved then g.timer=0 else g.timer=math.min(8,g.timer+1)end
+      end
+    end
     for i=#S.grass,1,-1 do
       local g=S.grass[i];g.timer=g.timer+1;local total=0
       for _,p in ipairs(S.spec.grass[g.name].sequence)do total=total+p[2]end
@@ -43,6 +57,12 @@ return function(mod,w,game)
           draw=function(_,cx,cy)love.graphics.setColor(1,1,1,alpha);love.graphics.draw(U.image(art.file,art.width,art.height),sx-cx,sy-cy);love.graphics.setColor(1,1,1,1)end}
       end
     end
+    for a,g in pairs(S.short)do if a.visible then
+      local art=S.spec.grass.short_grass;local frame=g.timer<4 and 0 or 1
+      local sx,sy=a.px,a.py
+      actors[#actors+1]={kind='hns_follower_short_grass',x=sx,y=sy,elevation=a.currentElevation,disguiseObject=a,sortY=sy+.5,i=95500,
+        draw=function(_,cx,cy)love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(art.file,art.width,art.height),love.graphics.newQuad(0,frame*16,16,16,art.width,art.height),sx-cx,sy-cy)end}
+    end end
     for i,g in ipairs(S.grass)do if g.actor.visible then
       local art=S.spec.grass[g.name];local time=g.timer;local frame=0
       for _,p in ipairs(art.sequence)do frame=p[1];if time<p[2]then break end;time=time-p[2]end
@@ -58,7 +78,7 @@ return function(mod,w,game)
   Fx.collectActors=function(actors,...)collect(actors,...);S.collect(actors)end
   if not old.hook then
     mod.hooks:wrap('input.step',function(next,g,dt)if g==game then S.tick()end;return next(g,dt)end)
-    mod.events:on('map.entered',function()S.grass={}end)
+    mod.events:on('map.entered',function()S.grass={};S.short={}end)
   end
   game._hnsFieldShadows={shadows=S,collect=collect,hook=true}
 end

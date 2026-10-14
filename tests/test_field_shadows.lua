@@ -20,5 +20,18 @@ return function(T,game,w,s,F,keep)
   for i=1,10 do S.tick()end;T.eq(S.grass[1].timer,10,'rustle source timer advances independently of player')
   Coll.behavior=function()return MB.id('LONG_GRASS')end;S.step(a,4,4,false);T.eq(S.grass[2].name,'long_grass','source long-grass sequence is selected')
   a.visible=false;S.step(a,5,4,false);T.eq(#S.grass,2,'hidden follower cannot trigger grass')
+  a.visible=true;S.grass={};S.short={};Coll.behavior=function()return MB.id('SHORT_GRASS')end
+  a.moving=false;a.jumping=false;F.step(a.cellX+1,a.cellY,16)
+  T.check(S.short[a],'actual follower step enters source short grass')
+  actors={};S.collect(actors);T.eq(#actors,1,'short grass creates one attached overlay')
+  T.eq(actors[1].kind,'hns_follower_short_grass','source short-grass effect is selected');T.eq(actors[1].disguiseObject,a,'overlay links native parent subpriority')
+  T.eq(actors[1].x,a.px,'short-grass X follows actor');T.eq(actors[1].y,a.py,'short-grass Y follows ground anchor rather than follower bob')
+  for i=1,8 do a.px=a.px+1;S.tick()end
+  T.eq(S.short[a].timer,8,'two four-frame short-grass poses finish')
+  for i=1,16 do S.tick()end;T.eq(S.short[a].timer,8,'stationary short-grass effect holds end pose')
+  a.px=a.px+1;S.tick();T.eq(S.short[a].timer,0,'moving parent restarts completed short-grass animation')
+  Coll.behavior=function()return MB.id('NORMAL')end;S.finish(a,2,3);T.eq(S.short[a],nil,'leaving short grass clears overlay')
+  Coll.behavior=function()return MB.id('SHORT_GRASS')end;S.finish(a,2,3);a.visible=false;S.tick();T.eq(S.short[a],nil,'hidden follower cannot leave stale short-grass overlay')
+  a.moving=false;S.short={}
   S.grass={};a.visible=true;lg.draw=draw;lg.setColor=color;Coll.behavior=behavior;Coll.isWater=water
 end

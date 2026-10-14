@@ -19,7 +19,7 @@ def check(source,mod,world):
             for x in range(0,im.width,16):
                 for v in im.crop((x,y,x+16,y+16)).tobytes():expected.extend([round((c//8)*255/31)for c in cols[v]]+[255 if v else 0])
         assert (mod/r['file']).read_bytes()==bytes(expected);grass+=im.width*im.height
-        body=re.search(r'sAnim_'+('TallGrass'if n=='tall_grass'else'LongGrass')+r'\[\]\s*=\s*\{([^}]+)',anim)[1]
+        body=re.search(r'sAnim_'+{'tall_grass':'TallGrass','long_grass':'LongGrass','short_grass':'ShortGrass'}[n]+r'\[\]\s*=\s*\{([^}]+)',anim)[1]
         assert r['sequence']==[list(map(int,m))for m in re.findall(r'ANIMCMD_FRAME\((\d+),\s*(\d+)\)',body)]
     assert all(r.get('shadowSize')in range(4)for r in world['opening']['sprites'].values())
     return {'source_shadow_mask_pixels':pixels,'source_shadow_size_rows':len(world['opening']['sprites']),'source_follower_grass_pixels':grass,'source_follower_grass_sequences':len(spec['grass'])}

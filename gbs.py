@@ -14,6 +14,9 @@ def compile_source(source,root):
     asm=translated((source/'asm/macros/asm.inc').read_text())+'\n'+translated((source/'asm/macros/gbs.inc').read_text())+'\n.set voicegroup000,0\n'
     for path in sorted(set(by_header.values())):
         text=re.sub(r'^\s*\.(?:include|section)\b[^\n]*','',path.read_text(),flags=re.M)
+        if path.name=='gbs_hg_poke_mart.s':
+            from gbs_loop_fix import fix
+            text,_=fix(source,text)
         asm+=translated(re.sub(r'\bvoicegroup\d+\b','voicegroup000',text))+'\n'
     (root/'songs.s').write_text(asm)
     for args in [('as','-o',root/'songs.o',root/'songs.s'),('ld','-Ttext=0','-o',root/'songs.elf',root/'songs.o'),('objcopy','-O','binary',root/'songs.elf',root/'songs.bin')]:run(list(map(str,args)))
@@ -45,8 +48,11 @@ def build(source,stage,audio):
         root=Path(temp);symbols,files=compile_source(source,root)
         dest=stage/'gbs';dest.mkdir();shutil.copyfile(root/'songs.bin',dest/'songs.bin')
         data=tables(source);(dest/'tables.lua').write_text('return '+lua(data))
+        from gbs_loop_fix import fix
+        _,mart_fix=fix(source,(source/'sound/songs/gbs/music/gbs_hg_poke_mart.s').read_text())
+        mart_fix['loopStarts']=[symbols[f'gbs_hg_poke_mart_Ch{ch}.mainloop']for ch in range(1,5)]
         records={sid:{'header':symbols[h],'source':files[h].relative_to(source).as_posix(),'name':h}for sid,h in selected.items()}
     fingerprint=hashlib.sha256((dest/'songs.bin').read_bytes()+(dest/'tables.lua').read_bytes()).hexdigest()
     return {'songs':records,'file':'gbs/songs.bin','tables':'gbs/tables.lua','trackCount':len(set(selected.values())),'songCount':len(selected),'sourceFingerprint':fingerprint,
-            'flag':0x20,'onText':'The GB Player was turned on.\nSounds from the past fill the air.','offText':'The GB Player was turned off.\nSounds of nostalgia fade away.',
+            'loopFixes':{'gbs_hg_poke_mart_Header':mart_fix},'flag':0x20,'onText':'The GB Player was turned on.\nSounds from the past fill the air.','offText':'The GB Player was turned off.\nSounds of nostalgia fade away.',
             'limits':'Source GBS music/fanfare bytecode, fractional timing, loops, envelopes, modulation and drums use the native PSG mixer. GB cry remaps, hardware SFX arbitration and exact analog PSG behavior remain pending.'}

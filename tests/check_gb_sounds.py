@@ -21,7 +21,7 @@ for i=1,tonumber(arg[3])do local r=Q.frame(s);local out={};for n=0,63 do out[n+1
         (root/'actual.lua').write_text(script)
         for name,row in records.items():
             assert row['header']==symbols[name]
-            count=int(gbs.run([str(root/'trace'),str(root/'songs.bin'),str(symbols[name]),str(root/'expected.bin'),'2400'],text=True).stdout)
+            count=int(gbs.run([str(root/'trace'),str(root/'songs.bin'),str(symbols[name]),str(root/'expected.bin'),'20000'if name=='gbs_hg_poke_mart_Header'else'2400'],text=True).stdout)
             expected=(root/'expected.bin').read_bytes()
             actual=subprocess.check_output([str(luajit),str(root/'actual.lua'),str(mod),str(row['header']),str(count)],cwd=engine)
             if expected!=actual:

@@ -13,5 +13,7 @@ function M.begin(a,spec,fast)
   a.poseDelay=a.poseDuration
   M.tick(a)
 end
+-- MovementType_FollowPlayer_Moving toggles y2 at timer 2, 10, ...
+function M.walkBob(progress)return math.floor((progress-2)/8)%2==0 and -1 or 0 end
 function M.frame(a,spec)return spec.poseImages[(a.poseIndex or 0)+1]end
 return M
