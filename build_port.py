@@ -506,8 +506,10 @@ def build(args):
         import service_assets
         import teaching
         teaching_data=teaching.build(source,dex_data,quest_data)
+        import battle_fields
+        field_data=battle_fields.build(source,quest_data)
         teaching.pickups(teaching_data,source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette)
-        services=service_assets.build(source,engine,stage,pairs,packed_maps,source_maps,text,scripts,opening_data,lua,parse_palette,teaching_data,dex_data)
+        services=service_assets.build(source,engine,stage,pairs,packed_maps,source_maps,text,scripts,opening_data,lua,parse_palette,teaching_data,dex_data,field_data)
         expanded_data=expanded_moves.build(source,engine,campaign_data['roostMove'])
         import move_table
         from gameplay import TYPE_NAMES
@@ -523,7 +525,7 @@ def build(args):
         events_data["spriteCount"]=len(opening_data["sprites"])
         data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
-                "teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
+                "battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent
         # top-level datasets in their own functions as this port grows.
         world_lua="-- Private source-converted data. Rebuild with build_port.py.\nlocal world={}\n"

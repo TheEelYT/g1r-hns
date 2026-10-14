@@ -5,6 +5,7 @@ require('src.core.GameVersion').set('emerald')
 require('src.import.gba.versions').select('emerald')
 local root=assert(arg[1]);local output=assert(arg[2]);local w=dofile(root..'/world.lua')
 local mod={read=function(_,file)local f=assert(io.open(root..'/'..file,'rb'));local b=f:read('*a');f:close();return b end}
+mod.hooks={wrap=function()end} -- Fixed-step callbacks are exercised by native integration, not this draw recorder.
 local frames={};local draws={};local color={1,1,1,1};local clip
 love.graphics.setScissor=function(...)clip=select('#',...)>0 and {...}or nil end
 love.graphics.getScissor=function()if clip then return unpack(clip)end end
@@ -24,6 +25,17 @@ local img=U.image
 U.image=function(file,x,y)local im=img(file,x,y);im.file=file;return im end
 local M=assert(load(mod:read('settings.lua')))()(w.startup.settings,U)
 local function snap(name,fn)draws={};fn();frames[#frames+1]={name=name,draws=draws}end
+local Banner=assert(load(mod:read('title_caption.lua')))()(U,w.bootPresentation.title.captionFont)
+local version='v2.0.6 · Mod v'..assert(mod:read('manifest.json'):match('"version"%s*:%s*"([^"]+)"'))
+for _,mode in ipairs({'normal','white','black'})do
+  snap('title_version_'..mode,function()
+    Banner.draw(version,128-Banner.width(version)/2,144,function(n)
+      if mode=='white'then return {1,1,1,1}elseif mode=='black'then return {0,0,0,1}end
+      local c=w.bootPresentation.title.palettes.pressStart[n+1]
+      return {c%32/31,math.floor(c/32)%32/31,math.floor(c/1024)%32/31,1}
+    end)
+  end)
+end
 local m=M.new('challenge')
 local pc=M.new('challenge',nil,false);pc.tab=#pc.pages
 snap('pc_last_challenges',function()M.draw(pc)end)

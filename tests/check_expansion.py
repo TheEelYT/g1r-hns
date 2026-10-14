@@ -217,6 +217,8 @@ def check(source,engine,mod,luajit):
         rows=world['scripts'][pickup['script']]
         grant=next(r for r in rows if r['op']=='additem');assert grant['item']==pickup['itemId']and grant['quantity']==1
     count['source_machine_pickups']=len(world['teaching']['pickups'])
+    from check_fields import check as check_fields
+    count.update(check_fields(source,engine,mod,luajit,world))
     return {'result':'pass','counts':count,'limits':['Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
 
 if __name__=='__main__':

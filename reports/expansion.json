@@ -16,11 +16,15 @@
     "follower_normal_shiny_sheets": 826,
     "source_follower_emote_frames": 22,
     "source_c_tint_colors": 196608,
-    "expanded_supported_moves": 182,
-    "expanded_explicit_omissions": 398,
+    "expanded_supported_moves": 186,
+    "expanded_explicit_omissions": 394,
     "source_c_machine_catalogue": 100,
     "source_ordered_setup_scripts": 7,
-    "source_machine_pickups": 12
+    "source_machine_pickups": 12,
+    "source_title_glyph_mask_pixels": 1190,
+    "source_c_terrain_power_cases": 1536,
+    "source_core_terrain_moves": 4,
+    "source_duration_items": 5
   },
   "limits": [
     "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",

@@ -89,13 +89,25 @@ return function(mod,w,game)
     else S.rHeld=false;S.cycled=false end
     return input(keys)
   end
-  Ui.tick=function(...)
-    local result=tick(...);local enabled=Ui._st and S.enabled(Ui._st)and Ui._mode=='menu'and not Ui.busy()
-    S.ballX=enabled and math.min(14,S.ballX+1)or math.max(-14,S.ballX-1);if not enabled then S.ball=nil end
-    return result
+  Ui.tick=tick
+  function S.step()
+    if not Ui._st or not H.battle(Ui._st)then S.ballX=-14;S.ball=nil;S.rHeld=false;S.cycled=false;return end
+    local enabled=S.enabled(Ui._st)and Ui._mode=='menu'and not Ui.busy()and not Ui._pendingCommand
+    if enabled and not S.ball then
+      local balls=S.balls(Ui._st);local last=(Ui._st.session.modData or {}).hnsLastBall
+      S.ball=balls[1];for _,id in ipairs(balls)do if id==last then S.ball=id;break end end
+    end
+    S.ballX=enabled and math.min(14,S.ballX+1)or math.max(-14,S.ballX-1)
+    if not enabled then S.rHeld=false;S.cycled=false end
+    if S.ballX==-14 then S.ball=nil end
   end
+  if not old.frameHook then mod.hooks:wrap('input.step',function(next,g,dt)
+    local result=next(g,dt)
+    if g==game then local current=game._hnsBattleSettings;if current then current.settings.step()end end
+    return result
+  end)end
   function S.drawPrompt()
-    if S.ballX>-14 and Ui._st and H.battle(Ui._st)and game._hnsBattleVisuals and S.enabled(Ui._st)then
+    if S.ballX>-14 and Ui._st and H.battle(Ui._st)and game._hnsBattleVisuals then
       local row=game._hnsBattleVisuals.visuals.row();local a=S.rHeld and row.ballPrompt or row.ballPromptIdle
       local y=Ui._st.double and 78 or 68
       love.graphics.setColor(1,1,1,1);love.graphics.draw(U.image(a.file,a.width,a.height),S.ballX-16,y-8-32)
@@ -118,5 +130,5 @@ return function(mod,w,game)
     if consumed and H.battle(st)and Items.isBall(id)then s.modData=s.modData or {};s.modData.hnsLastBall=id end
     return a,b,consumed,d,e
   end
-  game._hnsBattleSettings={begin=begin,pushTimed=pushTimed,anim=anim,update=update,use=use,settings=S}
+  game._hnsBattleSettings={begin=begin,pushTimed=pushTimed,anim=anim,update=update,use=use,settings=S,frameHook=true}
 end

@@ -1,12 +1,12 @@
-# Player testing notes — 0.7.9
+# Player testing notes — 0.7.10
 
-Suggested checks for the current update; confirmed checks are removed. Roost, credits, capture naming, Modern terrain, followers and Gen 3/4 battle UI were already reported as working.
+Suggested checks for the current update. TM09 Bullet Seed pickup on Route 32 and teaching Bellsprout were confirmed working; that check is removed. Earlier confirmed Roost, capture, credits, terrain presentation and UI checks remain removed.
 
-- [ ] Check the title footer reads `v2.0.6 · Mod v0.7.9`, below PRESS START, and fades with the title.
-- [ ] Check a newly restored TM item ball (for example TM54 in Ilex Forest or TM60 on Route 39). It should grant once, remain if the bag is full, and stay collected after saving/reloading.
-- [ ] When you obtain a new machine, check its number, description and colored disc in the TM pocket. Teach a compatible Pokémon, decline replacement on a full move list, and check inventory/moves after reloading. Pending effects such as Fling should give a clear unavailable message.
-- [ ] As moves become available, check draining/recoil and setup moves such as Quiver Dance, Coil or Shell Smash in an actual battle. Confirm START details and PP; report incorrect animations separately, since distinct expanded move animations remain pending.
+- [ ] Check `v2.0.6 · Mod v0.7.10` on the title: its outlines, block lettering and shading should match the original banner, with a clean centered line and normal palette fades.
+- [ ] Enter FIGHT very quickly, choose a move immediately, back out, and throw a ball before the prompts finish entering. The R-ball and START-info prompts should always finish sliding off during the turn, without hanging until the next turn. Also check ordinary slower selection, message waits, target selection and both Gen 3/4 UI styles.
+- [ ] When a terrain move becomes available, check its five-turn duration and core effect. Electric prevents grounded sleep; Misty prevents new grounded status/confusion; Psychic blocks opposing priority against grounded targets; Grassy heals grounded Pokémon at turn end. Terrain background replacement and dependent abilities/items remain pending.
+- [ ] Outstanding: check newly taught expanded moves after saving/reloading, and draining/recoil/setup behavior as those moves become available. A pending-effect TM should give the explicit unavailable message.
 
 ## Updating these notes
 
-Refresh this file with every release using the latest feedback. Remove confirmed checks, add new changes/unresolved bugs, and re-add a confirmed check only after a change or reported regression. The permanent progress checklist stays in [README.md](README.md), with completed work struck through; automated results stay in `reports/`.
+Refresh with each release and the latest feedback. Remove confirmed checks, add new changes/unresolved bugs, and re-add a confirmed check only after a change or reported regression. The permanent checklist stays in [README.md](README.md), with completed work struck through; automated results stay in `reports/`.

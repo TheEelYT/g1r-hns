@@ -59,6 +59,8 @@ def build(source,engine,roost_id=901):
         eff=re.search(r'\.effect\s*=\s*EFFECT_(\w+)',row)
         if not eff:continue
         reason=None;extra=[];effect=eff[1];handler={}
+        if effect in {'GRASSY_TERRAIN','ELECTRIC_TERRAIN','MISTY_TERRAIN','PSYCHIC_TERRAIN'}:
+            handler={'hnsHandler':'terrain','hnsTerrain':effect.removesuffix('_TERRAIN')};effect='HIT'
         if effect in stages:handler={'hnsHandler':'stats','stageChanges':stages[effect]};effect='HIT'
         # Roost's reviewed campaign handler heals and removes Flying for the
         # remainder of the turn. Its row now shares this source-owned table.
@@ -86,7 +88,7 @@ def build(source,engine,roost_id=901):
         typ=re.search(r'\.type\s*=\s*TYPE_(\w+)',row)
         target=re.search(r'\.target\s*=\s*TARGET_(\w+)',row)
         if not category or not typ or typ[1]not in TYPE_NAMES:reason='expanded type/category required'
-        if target and target[1]not in {'SELECTED','USER','BOTH','ALL_BATTLERS','OPPONENTS_FIELD'}:reason='expanded target required'
+        if target and target[1]not in {'SELECTED','USER','BOTH','ALL_BATTLERS','OPPONENTS_FIELD'}and not(target[1]=='FIELD'and handler.get('hnsHandler')=='terrain'):reason='expanded target required'
         for flag in ('multiHit','ignoresSubstitute','ignoresTargetAbility','ignoresDefenseBoosts','ignoresEvasion','alwaysCriticalHit','twoTurnMove','damagesUnderground','damagesUnderwater','damagesAirborne'):
             if num(row,flag,0):reason='expanded move flag required: '+flag
         if reason:omitted.append({'move':name,'reason':reason});continue
@@ -104,7 +106,7 @@ def build(source,engine,roost_id=901):
             if (field in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and not value)or(field not in ('ignoresProtect','mirrorMoveBanned','ignoresKingsRock')and value):flags|=bit
         rec={'id':roost_id if name=='ROOST'else 1000+ordinal,'name':display,'description':description,'effect':effects['HIGH_CRITICAL']if crit==1 and effect=='HIT'else effects[effect],
             'power':num(row,'power',0),'accuracy':num(row,'accuracy',0),'pp':num(row,'pp',0),'priority':num(row,'priority',0),
-            'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'BOTH':8,'ALL_BATTLERS':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
+            'type':TYPE_NAMES.index(typ[1]),'category':category[1].lower(),'flags':flags,'target':{'SELECTED':0,'USER':16,'FIELD':16,'BOTH':8,'ALL_BATTLERS':32,'OPPONENTS_FIELD':64}.get(target[1]if target else 'SELECTED',0),
             'additionalEffects':extra,'thawsUser':num(row,'thawsUser',0)==1}
         if rec['thawsUser']and effect=='HIT':rec['effect']=effects['THAW_HIT']
         rec.update(handler);rec['sourceEffect']=eff[1]

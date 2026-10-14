@@ -3,7 +3,7 @@ import json,re,struct,subprocess
 from PIL import Image
 
 
-def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette_parser,teaching=None,dex=None):
+def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette_parser,teaching=None,dex=None,fields=None):
     prefix='#define TRUE 1\n#define FALSE 0\n#define POKEMON_HNS 1\n#include "constants/global.h"\n#include "config/general.h"\n#include "config/item.h"\n#include "config/overworld.h"\n#include "config/battle.h"\n'
     def pp(path):return subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=prefix+'#include "'+path+'"\n',text=True,stderr=subprocess.DEVNULL)
     def paths(body):return dict(re.findall(r'\b(\w+)\[\].*?=\s*INCBIN_\w+\("([^"]+)"',body))
@@ -44,6 +44,7 @@ def build(source,engine,stage,pairs,maps,source_maps,text,scripts,ow,lua,palette
     bag['images']['ball']=save('services/bag_ball.rgba',indexed('graphics/bag/rotating_ball.png',pal('graphics/bag/rotating_ball.pal')))
     itembody=pp('data/items.h');itempaths=paths(pp('data/graphics/items.h'));native={name:int(n)for n,name in re.findall(r'\[(\d+)\]\s*=\s*"ITEM_(\w+)"',(engine/'src/core/game3/constants/emerald/items.lua').read_text())}
     native.update({'GB_PLAYER':902,'EXP_SHARE':903,'MYSTERY_EGG':900,'TM_ROOST':901})
+    if fields:native.update({n:r['index']for n,r in fields['items'].items()})
     strings={name:''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',b))for name,b in re.findall(r'(?:static )?const u8 (\w+)\[\]\s*=\s*_\((.*?)\);',itembody,re.S)}
     for name,b in re.findall(r'\[ITEM_(\w+)\]\s*=\s*\{(.*?)(?=\n\s*\[ITEM_|\Z)',itembody,re.S):
         if name not in native:continue

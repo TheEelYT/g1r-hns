@@ -105,6 +105,8 @@ def derivatives(engine,stage):
     src=replace_once(src,'local power = math.floor(40 * powerBits / 63) + 30','local power = 60')
     src=replace_once(src,'  if tonumber(move.effect) == EffectIds.EXPLOSION then\n    defense = math.floor(defense / 2)\n  end\n','')
     src=replace_once(src,'status_of(attacker) == "BRN" and aAb ~= "GUTS"','status_of(attacker) == "BRN" and aAb ~= "GUTS" and tonumber(move.effect) ~= EffectIds.FACADE')
+    src=replace_once(src,'  local physical = HNS.physical(move, moveType)\n  local foresight',
+                    '  if HNS.fieldPower then power=HNS.fieldPower(opts.adapter,attacker,defender,move,power,moveType)end\n  local physical = HNS.physical(move, moveType)\n  local foresight')
     (stage/'hns_damage.lua').write_text('-- Derived from pinned native damage.lua; see GEN1RECOMP_LICENSE.md.\n'+src)
     src=(engine/'src/core/game3/battle/rules.lua').read_text()
     crit=src[src.index('local function rollZeroTo'):src.index('function Rules.crit.multiplier')]
@@ -115,6 +117,8 @@ def derivatives(engine,stage):
     src=(engine/'src/core/game3/battle/engine.lua').read_text()
     accuracy=src[src.index('function Ctx:accuracyCheck'):src.index('-- pokefirered/src/battle_script_commands.c:912')]
     accuracy=replace_once(accuracy,'Types.isPhysical(self.moveType or self.move.type)','HNS.physical(self.move, self.moveType or self.move.type)')
+    accuracy=replace_once(accuracy,'  local ad, user, target = self.adapter, self.user, self.target',
+                        '  local ad, user, target = self.adapter, self.user, self.target\n  if HNS.blockPriority and HNS.blockPriority(self)then return false end')
     prefix='return function(HNS)\nlocal Ctx={}\nlocal Rules=require("src.core.game3.battle.rules")\nlocal E=require("src.core.game3.battle.effect_ids")\nlocal HeldItems=require("src.core.game3.battle.held_items")\nlocal Oak=require("src.core.game3.battle.oak_advice")\nlocal ModRuntime=require("src.mods.Runtime")\nlocal function roll(ad,lo,hi)return ad:roll(lo,hi)end\n'
     (stage/'hns_accuracy.lua').write_text('-- Derived from native Ctx:accuracyCheck; see GEN1RECOMP_LICENSE.md.\n'+prefix+accuracy+'\nreturn Ctx.accuracyCheck\nend\n')
     selfhit=src[src.index('function Engine.selfHit'):src.index('-- pokefirered/src/battle_util.c:1253')]

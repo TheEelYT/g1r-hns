@@ -30,8 +30,9 @@ return function(mod,w,game)
   -- Replace the baked source-version banner with a centered caption. Read the
   -- installed mod version from the native API so every release stays current.
   local versionText='v2.0.6 · Mod v'..assert(mod.version,'HnS mod version missing')
+  local banner=assert(load(mod:read('title_caption.lua')))()(U,B.title.captionFont)
   Title.createCopyrightBanner=function(self,x,y)
-    self.versionText=versionText;self.versionX=x;self.versionY=y-8
+    self.versionText=versionText;self.versionX=x;self.versionY=y-4
   end
   local titleDraw=Title.draw
   Title.draw=function(self)
@@ -43,7 +44,7 @@ return function(mod,w,game)
       local c=ppu.palette.pltt[256+bank*16+index]
       return {c%32/31,math.floor(c/32)%32/31,math.floor(c/1024)%32/31,1}
     end
-    U.text(self.versionText,self.versionX-U.width(self.versionText,'small')/2,self.versionY,color(5),color(1),'small')
+    banner.draw(self.versionText,self.versionX-banner.width(self.versionText)/2,self.versionY,color)
   end
   local loadScreen=old.loadScreen or BM.load
   BM.load=function(name)if name=='hns.intro'then return Intro elseif name=='hns.title'then return Title end;return loadScreen(name)end
@@ -57,5 +58,5 @@ return function(mod,w,game)
   end
   Boot.new=function(g)return g==game and configure(new(g))or new(g)end
   configure(game.boot)
-  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,Credits=Credits,ui=U,versionText=versionText}
+  game._hnsBoot={new=new,loadScreen=loadScreen,Intro=Intro,Title=Title,Movie=Movie,Credits=Credits,ui=U,versionText=versionText,banner=banner}
 end

@@ -38,7 +38,14 @@ return function(mod,world,game)
     else P.details=false;P.hintX=math.max(-30,P.hintX-1)end
   end
   local tick=old.tick or Ui.tick
-  Ui.tick=function(...)local result=tick(...);P.step();return result end
+  -- Ui.tick runs only when input is processed. Source sprite callbacks also
+  -- run during attacks, text, target/party choices and capture sequences.
+  Ui.tick=tick
+  if not old.frameHook then mod.hooks:wrap('input.step',function(next,g,dt)
+    local result=next(g,dt)
+    if g==game then local current=game._hnsBattlePresentation;if current then current.presentation.step()end end
+    return result
+  end)end
   function P.draw()
     if not own(Ui._st)then return end
     if P.hintX<=-30 then return end
@@ -73,5 +80,5 @@ return function(mod,world,game)
     -- with no waitmessage or input wait. Native capture/result flow is retained.
     return begin(st,id,caught,shakes,copy)
   end
-  game._hnsBattlePresentation={input=input,draw=draw,tick=tick,reset=reset,begin=begin,presentation=P}
+  game._hnsBattlePresentation={input=input,draw=draw,tick=tick,reset=reset,begin=begin,presentation=P,frameHook=true}
 end

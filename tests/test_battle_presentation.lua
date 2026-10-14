@@ -10,6 +10,16 @@ return function(T,game,world)
   local enemy={species=19,level=3,hp=15,maxHp=15,moves={33},pp={35}}
   local st=State.new({session=s,wild=true,playerParty={mon},foeParty={enemy}});st.session=s
   local P=game._hnsBattlePresentation.presentation
+  local S=game._hnsBattleSettings.settings
+  local Bag=require('src.core.game3.bag');s.bag=Bag.new();Bag.add(s.bag,4,20)
+  local Space=require('src.core.game3.scripting.space');local Flags=require('src.core.game3.scripting.flags');local oldStore=Space.store
+  Space.store=Flags.newStore();Flags.setFlag(Space.store,nil,world.startup.settings.initializedFlag,true)
+  for _,page in ipairs(world.startup.settings.pages)do for _,r in ipairs(page.rows)do Flags.setVar(Space.store,nil,r.var,r.id=='ITEM_BATTLE_BALL_PROMPT'and 0 or r.default)end end
+  -- Exercise the real fixed-step dispatcher; only its unrelated arena front
+  -- end is a fixture. Menu input must not advance these callbacks twice.
+  local Game3=require('src.core.Game3');local phase,arena,alias=game.phase,game.arena,game._aliasLA
+  game._aliasLA=function()end;game.phase='arena';game.arena={update=function()end}
+  local function frame()Game3.fixedUpdate(game,1/60)end
   local Audio=require('src.core.game3.audio');local fanfare=Audio.playFanfare;local waitSe=Audio._waitSe
   local played;Audio.playFanfare=function(id)played=id;return true end
   Audio.playSe(Audio.resolveSong('MUS_CAUGHT_INTRO'))
@@ -17,14 +27,14 @@ return function(T,game,world)
   Audio._waitSe={};Audio.waitSe(Audio.resolveSong('MUS_CAUGHT_INTRO'),function()end)
   T.eq(Audio._waitSe[1].id,world.audio.roles.evolved,'native capture wait follows source click cue')
   Audio.playFanfare=fanfare;Audio._waitSe=waitSe
-  local function key(k)return {wasPressed=function(_,v)return v==k end}end
+  local function key(k)return {wasPressed=function(_,v)return v==k end,isDown=function()return false end}end
   Ui.reset({headless=true});Ui._headless=false;Ui._st=st
   Ui.openMenu(0);Ui.handleInput(key('a'))
   T.eq(Ui._mode,'moves','actual Fight action enters native move selection')
   T.check(P.eligible(),'HnS move selection displays START hint')
   P.hintX=-30
-  for i=1,28 do Ui.tick();T.eq(P.hintX,-30+i,'source hint slides one pixel/frame '..i)end
-  Ui._mode='menu';Ui.tick();T.eq(P.hintX,-3,'source hint slides away on leaving move selection');Ui._mode='moves';Ui.tick()
+  for i=1,28 do Ui.tick();frame();T.eq(P.hintX,-30+i,'source hint slides once per native frame '..i)end
+  Ui._mode='menu';frame();T.eq(P.hintX,-3,'source hint slides away on leaving move selection');Ui._mode='moves';frame()
   Ui.handleInput(key('start'));T.check(P.details,'START opens source move information')
   local move,row=P.selected();T.eq(move.numId,33,'details describe highlighted move');T.eq(row.description,world.startup.rules.moves.TACKLE.description,'details use HnS description')
   P.draw();Ui.handleInput(key('right'));T.eq(Ui._moveIndex,2,'directions select another move while details stay open');T.check(P.details,'details remain open on cursor move')
@@ -69,6 +79,29 @@ return function(T,game,world)
   for _,row in ipairs(textSaved)do RomText.overrides[row[1]]=row[2]end
   Battle._st=battleSt;H.value=value;Moves._rom[roost]=rom;mon.moves=beforeMoves;mon.pp=beforePp;st.player.moves=beforeMoves
   s.map='EM_LITTLEROOT_TOWN';T.eq(P.eligible(),false,'vanilla selection has no HnS overlay');s.map=world.startup.start.map
+  for _,wait in ipairs({1,8,28,60})do
+    Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);S.ballX=-14
+    for i=1,wait do frame()end
+    T.eq(S.ballX,math.min(14,-14+wait),'ball prompt enters at source speed')
+    Ui._mode='moves';P.hintX=-30
+    for i=1,wait do frame()end
+    T.eq(S.ballX,-14,'ball prompt completes hide while selecting moves')
+    local before=P.hintX;Ui._pendingCommand={kind='move'};Ui._mode='none'
+    Ui.push('Battle message');for i=1,28 do frame()end
+    T.eq(P.hintX,-30,'move prompt completes hide during a queued message '..wait)
+    T.eq(P.details,false,'turn selection closes details')
+    T.check(before>=-30,'animation fixture remains bounded')
+  end
+  Ui.reset({headless=true});Ui._st=st;Ui.openMenu(0);S.ballX=14
+  Ui._pendingCommand={kind='bag'};Ui._mode='none'
+  for i=1,28 do frame()end;T.eq(S.ballX,-14,'ball prompt completes exit during throw/capture without menu input')
+  Ui.openMenu(0);S.ballX=-14;for i=1,28 do frame()end
+  T.eq(S.ball,4,'prompt retains the displayed ball icon')
+  Bag.remove(s.bag,4,20);Ui._mode='none';frame()
+  T.eq(S.ballX,13,'using the final ball still begins animated exit');T.eq(S.ball,4,'final ball icon remains during exit')
+  S.drawPrompt();for i=1,27 do frame()end;T.eq(S.ballX,-14,'final ball exit completes');T.eq(S.ball,nil,'final ball icon releases after exit')
+  Ui._st=nil;frame();T.eq(S.ballX,-14,'closed battle clears ball animation');T.eq(P.hintX,-30,'closed battle clears START animation')
+  game.phase,game.arena,game._aliasLA=phase,arena,alias
   -- Only unavailable imported battle strings/font metrics are supplied below.
   -- The native message printer, timed queue and catch-step state machine run.
   local Text=require('src.core.game3.battle.battle_text');local get=Text.get
@@ -90,6 +123,6 @@ return function(T,game,world)
   Catch.reset();Msg.reset();Ui.reset({headless=true})
   st.session.map='EM_LITTLEROOT_TOWN';delivered=0
   Catch.begin(st,4,false,0,options);Catch.update();T.eq(delivered,1,'vanilla capture keeps original announcement callback')
-  Catch.reset();Ui.reset({headless=true});Text.get=get;Font.wrap=wrap;Anim._headless=animHeadless;Rt.session=oldSession
+  Catch.reset();Ui.reset({headless=true});Text.get=get;Font.wrap=wrap;Anim._headless=animHeadless;Rt.session=oldSession;Space.store=oldStore
   print('HnS battle presentation: ROM-free Roost in both UIs, START/details navigation and native automatic throw continuation')
 end

@@ -1,0 +1,31 @@
+"""Reviewed source field rules and five duration items; no free story rewards."""
+import json,re,subprocess,tempfile
+from pathlib import Path
+
+ITEMS={'DAMP_ROCK':945,'HEAT_ROCK':946,'SMOOTH_ROCK':947,'ICY_ROCK':948,'TERRAIN_EXTENDER':949}
+
+
+def build(source,quest):
+    prefix='#define TRUE 1\n#define FALSE 0\n#define POKEMON_HNS 1\n#include "constants/global.h"\n#include "config/general.h"\n#include "config/battle.h"\n#include "config/item.h"\n'
+    body=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-I'+str(source/'src'),'-'],input=prefix+'#include "data/items.h"\n',text=True)
+    rows=dict(re.findall(r'\[ITEM_(\w+)\]\s*=\s*\{(.*?)(?=\n\s*\[ITEM_|\Z)',body,re.S))
+    expressions={n:re.search(r'\.price\s*=\s*([^,]+)',rows[n])[1]for n in ITEMS}
+    code='#include <stdio.h>\n'+prefix+'int main(void){'+''.join('printf("'+n+' %d\\n",'+v+');'for n,v in expressions.items())+'printf("BOOST %d\\n",B_TERRAIN_TYPE_BOOST);}'
+    with tempfile.TemporaryDirectory()as tmp:
+        root=Path(tmp);(root/'oracle.c').write_text(code)
+        subprocess.run(['gcc','-std=c99','-I'+str(source/'include'),str(root/'oracle.c'),'-o',str(root/'oracle')],check=True)
+        values={n:int(v)for n,v in (line.split()for line in subprocess.check_output([str(root/'oracle')],text=True).splitlines())}
+    items={}
+    for n,index in ITEMS.items():
+        r=rows[n];desc=re.search(r'\.description\s*=\s*COMPOUND_STRING\((.*?)\),',r,re.S)[1]
+        name=re.search(r'\.name\s*=\s*(?:ITEM_NAME|COMPOUND_STRING(?:_SIZE_LIMIT)?)\("([^"]+)"',r)[1]
+        effect=re.search(r'\.holdEffect\s*=\s*HOLD_EFFECT_(\w+)',r)[1];key='HNS_'+n
+        record={'id':key,'index':index,'name':name,'price':values[n],'description':''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',desc)),
+                'importance':0,'registrability':0,'battleUsage':0,'fieldUse':'none','pocket':'ITEMS','holdEffect':0}
+        quest['items'][key]=record;items[n]={'index':index,'effect':effect,'record':record}
+    text={};body=(source/'src/battle_message.c').read_text()
+    for n,r in re.findall(r'\[(STRINGID_\w*TERRAIN\w*)\]\s*=\s*COMPOUND_STRING\((.*?)\),',body,re.S):
+        text[n]=''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',r)).replace('{B_SCR_NAME_WITH_PREFIX}','{B_SCR_ACTIVE_NAME_WITH_PREFIX}')
+    assert 'STRINGID_GRASSYTERRAINHEALS'in text
+    return {'items':items,'texts':text,'terrainTurns':5,'extendedTurns':8,'typeBoost':5325 if values['BOOST']>=8 else 6144,
+            'limits':'Four core terrains and weather/terrain duration items. Native grounded states, damage/status/priority, healing and expiry are connected. Terrain background replacement, terrain-triggered abilities/seeds, special terrain attacks and remaining source field rules are pending; item rewards/shops are not invented.'}

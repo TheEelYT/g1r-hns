@@ -107,6 +107,8 @@ def build(source,engine,stage):
     title['palettes']['version']=sprite('version_banner_left','emerald_version.png',64,32,0,1,8)
     sprite('version_banner_right','emerald_version.png',64,32,32,1,8)
     title['palettes']['pressStart']=sprite('press_start','press_start.png',32,8,1,10,4)[:16]
+    import title_font
+    title['captionFont']=title_font.build(source,stage)
     sprite('logo_shine','logo_shine.png',64,64,0,1,4)
     title['alphaBlend']=[[16,min(i,16)]if i<=16 else[max(0,32-i),16]for i in range(64)]
     # Keep the pinned engine untouched. Patch only private copies of its machines.

@@ -1,8 +1,8 @@
 {
-  "version": "0.7.9",
+  "version": "0.7.10",
   "native_checks": {
-    "default": 97772,
-    "mounted": 97772
+    "default": 97897,
+    "mounted": 97897
   },
   "converter_tests": 19,
   "modkit": {
@@ -10,9 +10,9 @@
     "findings": [],
     "notes": []
   },
-  "cpu_ui_captures": 108,
+  "cpu_ui_captures": 111,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.8",
+  "cart_version": "1.0.9",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -146,11 +146,15 @@
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
         "source_c_tint_colors": 196608,
-        "expanded_supported_moves": 182,
-        "expanded_explicit_omissions": 398,
+        "expanded_supported_moves": 186,
+        "expanded_explicit_omissions": 394,
         "source_c_machine_catalogue": 100,
         "source_ordered_setup_scripts": 7,
-        "source_machine_pickups": 12
+        "source_machine_pickups": 12,
+        "source_title_glyph_mask_pixels": 1190,
+        "source_c_terrain_power_cases": 1536,
+        "source_core_terrain_moves": 4,
+        "source_duration_items": 5
       },
       "limits": [
         "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
@@ -159,7 +163,7 @@
     }
   },
   "limitations": [
-    "Full enhanced battle mechanics/abilities/species/items, tutor NPC menus/fees/unlocks, remaining machine rewards/shops/field-HM progression, challenge effects and later campaign are unfinished.",
+    "Full enhanced battle mechanics/abilities/species/items, terrain backgrounds/dependent attacks/surge abilities/seeds and duration-item rewards/shops, tutor services, remaining challenges and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
@@ -187,27 +191,33 @@
     "All 100 source machines: native preflight/teaching/consumption, duplicate/full move-list cancellation, Egg/unsupported rejection, HM08 Whirlpool and HM forgetting protection",
     "Twelve source machine pickup VMs: full-bag retry, duplicate prevention, saved inventory and flags",
     "Source-name tutor compatibility, source PP/move save persistence and level relearner beyond twenty rows",
-    "Manifest-derived source-font Mod title caption with real palette fade"
+    "Manifest-derived source-font Mod title caption with real palette fade",
+    "Source-size outlined/shaded bitmap caption: reused banner glyph mask pixels, manifest-derived text, source palette colors and exit fade",
+    "Actual Game3.fixedUpdate input-step dispatcher: one prompt pixel per step, early selection at 1/8/28/60 frames, queued-message exit, throw and final-ball icon lifetime, closed-battle cleanup",
+    "Actual four terrain moves: original FIELD metadata, five/eight-turn setup, duplicate and sky-battle failure, source status/grounding and expiry",
+    "Source 1/16 Grassy healing, Electric sleep and Misty status/confusion protection, Psychic Quick Attack protection with PP use, native damage power modifiers",
+    "Five source duration items and native weather setting, repeated-weather failure and five/eight-turn durations",
+    "1,536 installed terrain power results match compiled source fpmath.h across half/neutral/type-boost modifiers"
   ],
   "tested_build_content_equivalence": {
-    "files": 7791,
+    "files": 7803,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.9",
-    "cart_version": "1.0.8",
+    "mod_version": "0.7.10",
+    "cart_version": "1.0.9",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.8.g1rcart",
-        "bytes": 1028179,
-        "sha256": "2e76a42db952cadbb25e5b8f99a412f81d78f3fdf036793c3ad0d02cbcc67029"
+        "name": "pokemon_heart_soul-1.0.9.g1rcart",
+        "bytes": 1028180,
+        "sha256": "67a28436ef91a6a8b786a233c3b432f540e239c8ca9ef05f672569d47af7f855"
       },
       {
-        "name": "hns_exploration-0.7.9.zip",
-        "bytes": 10071366,
-        "sha256": "3073be9e7b0016e4ef4620e8927997615ff38a21d58bad7d559aa9790ce77977"
+        "name": "hns_exploration-0.7.10.zip",
+        "bytes": 10080508,
+        "sha256": "66a766c94db5280de53d14c786029f276ffc00e783b5a2f62900ab4f1b662918"
       }
     ]
   },
@@ -215,21 +225,21 @@
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 97772,
-        "mounted": 97772
+        "default": 97897,
+        "mounted": 97897
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 97777,
-        "mounted": 97777
+        "default": 97902,
+        "mounted": 97902
       },
       "compressed_native_checks": {
-        "default": 97777,
-        "mounted": 97777
+        "default": 97902,
+        "mounted": 97902
       },
-      "installer_encoded_assets": 5571,
+      "installer_encoded_assets": 5581,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
     },
     "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
@@ -237,9 +247,9 @@
   "move_table": {
     "rows": 935,
     "native_bridges": 354,
-    "implemented_custom": 182,
-    "pending_moves": 398,
-    "pending_source_effect_families": 193
+    "implemented_custom": 186,
+    "pending_moves": 394,
+    "pending_source_effect_families": 189
   },
   "teaching": {
     "machines": 100,
@@ -250,5 +260,14 @@
     "port_TM52_to_TM92_IDs": "904..944",
     "stable_Roost_item_move_ID": 901,
     "tutor_NPC_services_complete": false
+  },
+  "battle_fields": {
+    "terrain_moves": 4,
+    "five_turn_default": 5,
+    "extended_turns": 8,
+    "duration_item_ids": "945..949",
+    "terrain_background_replacement_complete": false,
+    "special_attacks_surge_abilities_seeds_complete": false,
+    "source_c_power_cases": 1536
   }
 }
