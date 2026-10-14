@@ -68,5 +68,6 @@ return function(T,game,w,s,mon,keep)
   local foreign={session={map='EM_LITTLEROOT_TOWN'},hnsTerrain='MISTY'}
   T.eq(F.terrain(foreign),false,'terrain effects are scoped to HnS')
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_terrain_attacks.lua')(T,game,w,s,mon,keep)
+  if w.abilities then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_terrain_seeds.lua')(T,game,w,s,mon,keep)end
   print('Source terrains: actual setup, grounded status/damage/priority, healing/expiry, and duration items')
 end

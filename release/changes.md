@@ -1,10 +1,9 @@
-Changes in 0.7.11:
+Changes in 0.7.12:
 
-- Restores original source `v2.0.6` flashing with PRESS START; the separate manifest-derived Mod version stays visible in the lower-right corner. Fixes the custom zero glyph including its neighboring period.
-- Imports Electric, Grassy, Misty and Psychic field backgrounds with source configuration. They replace the arena background while terrain is active and restore it after expiry/removal, on both Gen 3/4 UI and old/Modern arenas.
-- Adds Terrain Pulse, Rising Voltage, Expanding Force, Misty Explosion, Psyblade, Grassy Glide, Steel Roller and Ice Spinner. Source ground checks/rounding, type changes, double-battle targeting, Damp/self-faint behavior, priority and successful-hit terrain removal use native battle paths.
-- Excludes Z/Max move rows until their transformation mechanics are ported, correcting 26 previously eligible special-form rows. The full 935-row source table remains retained: 354 native bridges, 168 reviewed custom moves and 412 pending effects, plus the empty row.
-- Reserves Mod 1.0.0 for complete romhack parity. Development releases remain 0.x patch iterations, independently of cart packaging versions.
-- Removes player-confirmed prompt-animation checks. Individual move checks remain automated unless normal play reveals a crash or mismatch.
+- Moves the HEART & SOUL bubble eight pixels upward using the actual HnS title macros. The confirmed original version blink and steady lower-right Mod caption are retained.
+- Imports all 311 source ability identities, descriptions and field expressions: 77 native bridges, four reviewed Surge handlers and 230 pending effects. Stable numeric IDs preserve native identities; an assignment API rejects pending effects. Automatic source species/hidden-slot assignment, acquisition/transfer/suppression differences and ability popups remain pending.
+- Adds Electric/Grassy/Misty/Psychic Seed items with source metadata/icons, IDs 950–953, native Defense/Sp. Def changes, consumption and party persistence. Seeds work for airborne holders, and remain held when the stat is capped or the terrain does not match.
+- Adds four Surge entry handlers with source five/eight-turn duration, same-terrain/sky-battle rejection and immediate seed activation. Native battle-start, switching and post-action paths are exercised automatically. Source species able to acquire these abilities still need their assignment/content bridges.
+- Removes the player-confirmed version-label check and refreshes README progress plus separate testing notes. Mod 1.0.0 remains reserved for complete parity.
 
-Terrain-triggered abilities/seeds, item acquisition, remaining field/weather effects and full enhanced battle/campaign parity are still pending. Live Windows presentation remains a player check.
+Remaining expanded ability effects, source ability assignment/content, held-item acquisition and full battle/campaign parity are still pending.

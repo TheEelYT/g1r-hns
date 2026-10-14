@@ -18,6 +18,11 @@ return function(T,game,title,machine,input)
   T.eq(caption.y,151,'Mod caption sits in the lower-right corner')
   T.eq(banner.font.height,7,'caption uses outlined source-size bitmap lettering')
   T.eq(caption.fg[1],1,'Mod caption uses the source white palette')
+  local bubble=0
+  for _,s in pairs(machine.ppu.sprites.sprites)do
+    if s.inUse and(s.x==98 or s.x==162)and s.y==58 then bubble=bubble+1 end
+  end
+  T.eq(bubble,2,'both HEART & SOUL sprites reach the HnS source goal, eight pixels above Emerald')
   local start,version={},{}
   for _,s in pairs(machine.ppu.sprites.sprites)do
     if s.inUse and s.y==138 then start[#start+1]=s

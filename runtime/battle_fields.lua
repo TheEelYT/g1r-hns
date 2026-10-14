@@ -8,6 +8,7 @@ return function(mod,w,game)
   local Text=require('src.core.game3.rom_text');local IR=require('src.core.game3.scripting.text_ir')
   local Engine=require('src.core.game3.battle.engine');local State=require('src.core.game3.battle.state')
   local Hit=require('src.core.game3.battle.effects.hit')
+  local Held=require('src.core.game3.battle.held_items');local Ab=require('src.core.game3.battle.abilities')
   for id,text in pairs(F.spec.texts)do Text.overrides[id]=IR.fromAscii(text)end
   local byId={};for name,r in pairs(F.spec.items)do byId[r.index]=name end
   function F.held(b)return byId[tonumber(b and(b.item or b.mon and(b.mon.heldItem or b.mon.item)))or 0]end
@@ -79,6 +80,36 @@ return function(mod,w,game)
     local st=ad._st;local kind=st.hnsTerrain
     if kind then st.hnsTerrain=nil;st.hnsTerrainTurns=0;ad:sayText('STRINGID_'..kind..'TERRAINENDS')end
   end
+  function F.seed(ad,b)
+    local name=F.held(b);local row=name and F.spec.items[name]
+    if not(row and row.terrain and F.terrain(ad._st)==row.terrain)or ad:hp(b)<=0 or(b.stages[row.stat]or 0)>=6 then return false end
+    -- Source TryHandleSeed has no grounded check. Native stage change and
+    -- held-item consumption keep party persistence and animation events.
+    ad:playAnim('general','HELD_ITEM_EFFECT',b,b)
+    Secondary.changeStat(ad,b,row.stat,1,{user=true,allowPtr=true,noMsg=true})
+    ad:sayText('STRINGID_USINGITEMSTATOFPKMNROSE',{lastItem=row.index,buff1=Secondary.statName(row.stat),scrActive=b,buff2=Text.plain('STRINGID_STATROSE')})
+    Held.consume(ad,b);return true
+  end
+  function F.activateSeeds(ad)
+    for _,id in ipairs(State.speedOrder(ad._st,ad))do F.seed(ad,State.battler(ad._st,id))end
+  end
+  function F.changeTerrain(ad,b,kind)
+    local st=ad._st
+    if st.isSkyBattle or st.hnsTerrain==kind then return false end
+    st.hnsTerrain=kind;st.hnsTerrainTurns=F.held(b)=='TERRAIN_EXTENDER'and F.spec.extendedTurns or F.spec.terrainTurns
+    ad:sayText('STRINGID_TERRAINBECOMES'..kind);F.activateSeeds(ad);return true
+  end
+  local normal=old.normal or Held.normal;local switchItem=old.switchItem or Held.onSwitchIn
+  Held.normal=function(ad,b,...)if H.battle(ad._st)and F.seed(ad,b)then return true end;return normal(ad,b,...)end
+  Held.onSwitchIn=function(ad,b,...)
+    local result=switchItem(ad,b,...);if H.battle(ad._st)and F.seed(ad,b)then return true end;return result
+  end
+  local switchAbility=old.switchAbility or Ab.switchIn
+  Ab.switchIn=function(ad,b)
+    local kind=w.abilities and w.abilities.surges[ad:abilityOf(b)]
+    if H.battle(ad._st)and kind and b and not ad:isFainted(b)then return F.changeTerrain(ad,b,kind)end
+    return switchAbility(ad,b)
+  end
   local finish=old.finish or Engine.moveEndEffects
   Engine.moveEndEffects=function(M)
     finish(M)
@@ -103,9 +134,8 @@ return function(mod,w,game)
     if not(H.battle(ad._st)and move.hnsHandler=='terrain')then return run(ad,user,target,id,M)end
     local st=ad._st;local kind=move.hnsTerrain
     if st.hnsTerrain==kind or st.isSkyBattle then if M then M.failed=true end;ad:sayFail();return true end
-    st.hnsTerrain=kind;st.hnsTerrainTurns=F.held(user)=='TERRAIN_EXTENDER'and F.spec.extendedTurns or F.spec.terrainTurns
     if M then M:attackAnimation()end
-    ad:sayText('STRINGID_TERRAINBECOMES'..kind);return true
+    F.changeTerrain(ad,user,kind);return true
   end
   local make=old.make or Adapter.new
   Adapter.new=function(st,...)
@@ -164,5 +194,5 @@ return function(mod,w,game)
     end)
   end
   game._hnsFields={fields=F,run=run,make=make,secondary=secondary,sleep=sleep,weather=weather,residual=true,
-    targets=targets,hit=hit,finish=finish,orderHook=true}
+    targets=targets,hit=hit,finish=finish,orderHook=true,normal=normal,switchItem=switchItem,switchAbility=switchAbility}
 end

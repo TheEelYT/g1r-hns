@@ -40,5 +40,7 @@ def check(source,engine,mod,luajit,world):
         actual=subprocess.check_output([str(luajit),str(tmp/'actual.lua'),str(mod)],cwd=engine)
         assert actual==expected,'installed field-power rounding differs from source fpmath.h'
     from check_terrain_attacks import check as check_attacks
-    result={'source_title_glyph_mask_pixels':samples,'source_c_terrain_power_cases':1536,'source_core_terrain_moves':4,'source_duration_items':len(fields['items'])}
+    result={'source_title_glyph_mask_pixels':samples,'source_c_terrain_power_cases':1536,'source_core_terrain_moves':4,'source_duration_items':5}
+    from check_abilities import check as check_abilities
+    result.update(check_abilities(source,engine,world))
     result.update(check_attacks(source,engine,mod,luajit,world));return result

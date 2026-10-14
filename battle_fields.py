@@ -2,7 +2,10 @@
 import json,re,subprocess,tempfile
 from pathlib import Path
 
-ITEMS={'DAMP_ROCK':945,'HEAT_ROCK':946,'SMOOTH_ROCK':947,'ICY_ROCK':948,'TERRAIN_EXTENDER':949}
+ITEMS={'DAMP_ROCK':945,'HEAT_ROCK':946,'SMOOTH_ROCK':947,'ICY_ROCK':948,'TERRAIN_EXTENDER':949,
+       'ELECTRIC_SEED':950,'GRASSY_SEED':951,'MISTY_SEED':952,'PSYCHIC_SEED':953}
+SEEDS={'ELECTRIC_SEED':('ELECTRIC','defense'),'GRASSY_SEED':('GRASSY','defense'),
+       'MISTY_SEED':('MISTY','spDef'),'PSYCHIC_SEED':('PSYCHIC','spDef')}
 
 
 def build(source,quest):
@@ -23,10 +26,11 @@ def build(source,quest):
         record={'id':key,'index':index,'name':name,'price':values[n],'description':''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',desc)),
                 'importance':0,'registrability':0,'battleUsage':0,'fieldUse':'none','pocket':'ITEMS','holdEffect':0}
         quest['items'][key]=record;items[n]={'index':index,'effect':effect,'record':record}
+        if n in SEEDS:items[n].update(terrain=SEEDS[n][0],stat=SEEDS[n][1])
     text={};body=(source/'src/battle_message.c').read_text()
     for n,r in re.findall(r'\[(STRINGID_\w*TERRAIN\w*)\]\s*=\s*COMPOUND_STRING\((.*?)\),',body,re.S):
         text[n]=''.join(json.loads(s)for s in re.findall(r'"(?:[^"\\]|\\.)*"',r)).replace('{B_SCR_NAME_WITH_PREFIX}','{B_SCR_ACTIVE_NAME_WITH_PREFIX}')
     assert 'STRINGID_GRASSYTERRAINHEALS'in text
     return {'items':items,'texts':text,'terrainTurns':5,'extendedTurns':8,'typeBoost':5325 if values['BOOST']>=8 else 6144,
             'backgroundChanges':bool(values['BG_CHANGE']),'newBackgrounds':bool(values['NEW_BG']),
-            'limits':'Core terrains, eight terrain-dependent attacks, source backgrounds and weather/terrain duration items. Terrain-triggered abilities/seeds and remaining source field rules are pending; item rewards/shops are not invented.'}
+            'limits':'Core terrains, eight terrain-dependent attacks, source backgrounds and weather/terrain duration items. Four seeds and Surge entry handlers are connected; automatic source ability assignment, other terrain abilities and remaining field rules are pending. Item rewards/shops are not invented.'}

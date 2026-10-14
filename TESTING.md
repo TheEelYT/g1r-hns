@@ -1,12 +1,12 @@
-# Player testing notes — 0.7.11
+# Player testing notes — 0.7.12
 
-Battle-menu prompt animations are confirmed working; their manual check is removed. Earlier confirmed TM09/Bellsprout, Roost, capture, credits, ordinary arena backgrounds and Gen 3/4 UI checks remain removed.
+The flashing original `v2.0.6` and steady Mod version are confirmed correct; their check is removed. Battle-menu prompt animations and earlier confirmed UI/gameplay checks remain removed.
 
-- [ ] Check that the original `v2.0.6` flashes with PRESS START while the separate Mod version stays visible in the lower-right corner, with single periods and matching source lettering.
-- [ ] If a terrain move becomes available in normal play, check its background appears and the map/arena background returns after terrain expires or is removed. No need to test every move by hand.
+- [ ] Check the HEART & SOUL bubble fits the notch under the Pokémon logo after its eight-pixel upward correction.
+- [ ] If a terrain move becomes available in normal play, check its field background and restoration after expiry/removal.
 
-Individual move effects, terrain rules, spread targeting, priority and removal are accepted provisionally when their automated checks pass. Report a crash or behavior mismatch encountered during normal play; add a focused regression and manual check then. Save/reload and teaching are covered by the native automated suite as well.
+Move effects and the new seed/Surge handlers rely on automated checks for now; there is no need to test every move or ability by hand. Source ability assignment/hidden slots and item acquisition are not completed by importing identities or handlers. Report crashes or mismatches encountered in normal play; add a focused regression and manual check then.
 
 ## Updating these notes
 
-Refresh with each release and the latest feedback. Remove confirmed checks, add new changes/unresolved bugs, and re-add a confirmed check only after a change or reported regression. The permanent checklist stays in [README.md](README.md), with completed work struck through; automated results stay in `reports/`.
+Refresh with each release and feedback. Remove confirmed checks, retain unresolved ones, and keep the permanent progress checklist in README with completed entries struck through. Automated evidence stays in `reports/`.

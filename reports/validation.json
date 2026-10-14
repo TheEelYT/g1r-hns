@@ -1,8 +1,8 @@
 {
-  "version": "0.7.11",
+  "version": "0.7.12",
   "native_checks": {
-    "default": 99083,
-    "mounted": 99083
+    "default": 99214,
+    "mounted": 99214
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.10",
+  "cart_version": "1.0.11",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -155,6 +155,12 @@
         "source_c_terrain_power_cases": 1536,
         "source_core_terrain_moves": 4,
         "source_duration_items": 5,
+        "source_ability_rows": 311,
+        "native_ability_bridges": 77,
+        "reviewed_surge_handlers": 4,
+        "pending_ability_effects": 230,
+        "source_seed_items": 4,
+        "source_title_banner_goal_y": 58,
         "source_field_background_pixels": 163840,
         "source_c_terrain_attack_power_cases": 40960,
         "reviewed_terrain_dependent_attacks": 8,
@@ -167,7 +173,7 @@
     }
   },
   "limitations": [
-    "Full enhanced battle mechanics/abilities/species/items, terrain surge abilities/seeds and duration-item rewards/shops, tutor services, remaining challenges and later campaign are unfinished.",
+    "Automatic source species/hidden-slot ability assignment, expanded ability interactions/acquisition/transfer/suppression and source popups, held-item acquisition, remaining battle/settings and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
@@ -204,26 +210,30 @@
     "1,536 installed terrain power results match compiled source fpmath.h across half/neutral/type-boost modifiers",
     "Original version OAM sprites blink with PRESS START over both phases while the lower-right Mod caption stays visible; source zero glyph excludes the adjacent period.",
     "Eight terrain attacks through actual native damage/type, absorption, double spread, Damp/self-faint, successful-hit removal including substitutes/Protect/misses/contact survival, and single/double priority ordering.",
-    "Four field backdrops compare 163840 source pixels and actual Gen 3/4 UI draw calls plus arena restoration; 40960 power cases compare actual source C functions, and all 87 Z/Max source rows remain pending."
+    "Four field backdrops compare 163840 source pixels and actual Gen 3/4 UI draw calls plus arena restoration; 40960 power cases compare actual source C functions, and all 87 Z/Max source rows remain pending.",
+    "Both source title banner sprites reach HnS y=58, rather than inherited Emerald y=66.",
+    "Nine held-item metadata rows; four seeds use source stats without grounded restriction, retain capped/nonmatching/fainted-held items and persist native consumption.",
+    "Four numeric Surge identities resolve through actual adapter/formatter/save-mon normalization, native battle start/switching, five/eight-turn/same-terrain/sky/suppression/scope and immediate seed triggers.",
+    "All 311 source ability enum IDs and name/description bytes compare with compiled C; every raw source field expression is independently token-audited."
   ],
   "tested_build_content_equivalence": {
-    "files": 7807,
+    "files": 7812,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.11",
-    "cart_version": "1.0.10",
+    "mod_version": "0.7.12",
+    "cart_version": "1.0.11",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.10.g1rcart",
+        "name": "pokemon_heart_soul-1.0.11.g1rcart",
         "bytes": 1028181,
-        "sha256": "f3a18fb53f5e95bfe972eb1ff91ca27846d90a60ed0412a5a57eb746830fe745"
+        "sha256": "f4d78aff41a46d98eff70b2ce51b49165336b824b604773bf311867d823c4666"
       },
       {
-        "name": "hns_exploration-0.7.11.zip",
-        "bytes": 10095957,
-        "sha256": "3812902595cf1a6a831914dd0f5e35f4bd9377696a3beba758d2ff362afe0b57"
+        "name": "hns_exploration-0.7.12.zip",
+        "bytes": 10113125,
+        "sha256": "a7dbba4ef92f5be4b5cd8a365a64a51818614a289c88f26772dff456cf405952"
       }
     ],
     "repo": "TheEelYT/g1r-hns"
@@ -232,21 +242,21 @@
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 99083,
-        "mounted": 99083
+        "default": 99214,
+        "mounted": 99214
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 99088,
-        "mounted": 99088
+        "default": 99219,
+        "mounted": 99219
       },
       "compressed_native_checks": {
-        "default": 99088,
-        "mounted": 99088
+        "default": 99219,
+        "mounted": 99219
       },
-      "installer_encoded_assets": 5585,
+      "installer_encoded_assets": 5589,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
     },
     "negative_control": "0.7.6 with files encoded by the 0.3.53 installer fails the raw ImageData size boundary and native mids.idx magic"
@@ -277,9 +287,28 @@
     "terrain_background_replacement_complete": true,
     "source_c_power_cases": 1536,
     "reviewed_dependent_attacks": 8,
-    "surge_abilities_seeds_complete": false,
     "source_c_attack_power_cases": 40960,
-    "source_field_background_pixels": 163840
+    "source_field_background_pixels": 163840,
+    "seed_items": 4,
+    "seed_item_ids": "950..953",
+    "surge_entry_handlers": 4,
+    "seed_entry_and_terrain_change_triggers_complete": true
   },
-  "version_policy": "Mod 1.0.0 requires full HnS parity; 0.x patches are development iterations, not completion percentages. Cart versions are independent."
+  "version_policy": "Mod 1.0.0 requires full HnS parity; 0.x patches are development iterations, not completion percentages. Cart versions are independent.",
+  "abilities": {
+    "source_rows": 311,
+    "native_bridges": 77,
+    "reviewed_surge_handlers": 4,
+    "pending_effects": 230,
+    "automatic_source_assignment_complete": false,
+    "source_popup_and_transfer_rules_complete": false
+  },
+  "title": {
+    "source_banner_left_x": 98,
+    "source_banner_right_x": 162,
+    "source_banner_goal_y": 58,
+    "native_emerald_goal_y": 66,
+    "correction_pixels": -8,
+    "version_labels_player_confirmed": true
+  }
 }

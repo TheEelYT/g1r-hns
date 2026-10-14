@@ -109,10 +109,19 @@ def build(source,engine,stage):
     title['palettes']['pressStart']=sprite('press_start','press_start.png',32,8,1,10,4)[:16]
     import title_font
     title['captionFont']=title_font.build(source,stage)
+    source_title=(source/'src/title_screen.c').read_text()
+    macros=source_title[source_title.index('#define VERSION_BANNER_RIGHT_TILEOFFSET'):source_title.index('#define START_BANNER_X')]
+    import subprocess
+    defines=subprocess.check_output(['cpp','-dM','-I'+str(source/'include'),'-'],input='#define POKEMON_HNS 1\n#include "constants/global.h"\n'+macros,text=True)
+    positions={k:int(v)for k,v in re.findall(r'#define VERSION_BANNER_(LEFT_X|RIGHT_X|Y|Y_GOAL)\s+(\d+)',defines)}
+    assert len(positions)==4
+    title['bannerPosition']=positions
     sprite('logo_shine','logo_shine.png',64,64,0,1,4)
     title['alphaBlend']=[[16,min(i,16)]if i<=16 else[max(0,32-i),16]for i in range(64)]
     # Keep the pinned engine untouched. Patch only private copies of its machines.
     code=(engine/'src/ui/game3/rse/title_rse.lua').read_text()
+    code=re.sub(r'local VERSION_BANNER_LEFT_X, VERSION_BANNER_RIGHT_X = \d+, \d+',f"local VERSION_BANNER_LEFT_X, VERSION_BANNER_RIGHT_X = {positions['LEFT_X']}, {positions['RIGHT_X']}",code)
+    code=re.sub(r'local VERSION_BANNER_Y, VERSION_BANNER_Y_GOAL = \d+, \d+',f"local VERSION_BANNER_Y, VERSION_BANNER_Y_GOAL = {positions['Y']}, {positions['Y_GOAL']}",code)
     code=re.sub(r'Title\.MANIFEST = "[^"]+"','Title.MANIFEST = nil -- source manifest supplied by the port',code)
     code=code.replace('local Title = {}','local Source\nlocal Title = {}\nfunction Title.configure(s) Source=s end')
     code=code.replace('machine:manifest(Title.MANIFEST)','Source.manifest').replace('Machine.layer(', 'Source.layer(').replace('Machine.template(', 'Source.template(')

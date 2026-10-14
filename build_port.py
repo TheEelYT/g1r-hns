@@ -497,6 +497,8 @@ def build(args):
         quest_data=quest.build(source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette,trainer_data,prepared_trainers,events_data["marts"])
         scenes.build(source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette,quest_data)
         dex_data=pokedex.build(source,stage,prepared_trainers["known"]["species"])
+        import abilities
+        ability_data=abilities.build(source,engine,dex_data)
         residents.build(source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette,events_data,quest_data)
         campaign_data=campaign.build(source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette,trainer_data,prepared_trainers,quest_data)
         field_mon_data=field_pokemon.build(source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette,prepared_trainers['known']['species'])
@@ -525,7 +527,7 @@ def build(args):
         events_data["spriteCount"]=len(opening_data["sprites"])
         data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
-                "battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
+                "abilities":ability_data,"battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent
         # top-level datasets in their own functions as this port grows.
         world_lua="-- Private source-converted data. Rebuild with build_port.py.\nlocal world={}\n"
