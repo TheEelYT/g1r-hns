@@ -127,7 +127,7 @@ def build(source,engine,stage,maps,source_maps,labels,text,scripts,ow,palette_pa
         speech['gText_Birch_'+tail]=opening.source_text('gText_Oak_'+tail,labels)
     for tail in ('WhatChallenge','ChallengeSelected'):speech['gText_Oak_'+tail]=opening.source_text('gText_Oak_'+tail,labels)
     speech['gText_ThisIsAPokemon']=json.loads('"'+re.search(r'gText_ThisIsAPokemon\[\]\s*=\s*_\("((?:\\.|[^"\\])*)"\)',(source/'src/strings.c').read_text())[1].replace(r'\p',r'\\p')+'"')
-    q['items']['HNS_GB_PLAYER']={'id':'HNS_GB_PLAYER','index':GB_ITEM,'name':'GB SOUNDS','price':0,'pocket':'KEY_ITEMS','fieldUse':'none','importance':1,'description':'The GB music player. Alternate GB tracks are not yet available in this port.'}
+    q['items']['HNS_GB_PLAYER']={'id':'HNS_GB_PLAYER','index':GB_ITEM,'name':'GB SOUNDS','price':0,'pocket':'KEY_ITEMS','fieldUse':'gb_sounds','importance':1,'registrability':1,'description':'A music player that allows you to listen to nostalgic songs.'}
     config={'houseState':HOUSE_STATE,'newGameFlag':NEW_GAME,'clockFlag':CLOCK_SET,'shoesFlag':SHOES,'clockNative':CLOCK_NATIVE,'gbItem':GB_ITEM,'avatars':avatar,'areas':{str(v['id']):v['name'] for v in area.values()},'portraits':portraits,'speech':speech,
       'start':{'map':h2,'x':9,'y':4,'facing':'up'},'limits':['Pokegear/phone services remain unported','Expanded HnS challenge/battle rules and alternate GB tracks remain unported; startup exposes supported native options','EXP. SHARE uses the current native held-item rules']}
 

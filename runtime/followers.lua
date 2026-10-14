@@ -6,6 +6,7 @@ return function(mod,w,game)
   local Flags=require('src.core.game3.scripting.flags');local Space=require('src.core.game3.scripting.space')
   local C=require('src.core.game3.constants').of('emerald');local H=game._hnsRules.rules
   local Field=require('src.core.game3.field');local Warp=require('src.core.game3.warp')
+  local Map=require('src.core.game3.map');local Coll=require('src.core.game3.collision')
   local Ow=require('src.core.game3.ow_sprites');local Fx=require('src.core.game3.field_effects')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local rows={};for name,r in pairs(w.followers.species)do rows[C:require('species','SPECIES_'..name)]=r end
@@ -30,6 +31,7 @@ return function(mod,w,game)
     return true
   end
   function F.refresh()
+    if F.seamlessTransfer then return F.actor end
     local s=Rt.getSession();local mon=H.own(s)and F.lead(s)
     if not F.allowed(s,mon)then
       if F.actor and F.actor.visible and not F.transition then F.beginBall('enter')end
@@ -42,22 +44,28 @@ return function(mod,w,game)
       F.transition=nil
       F.actor={localId=0xFD,def={hnsGraphicsId=gid,graphicsId=gid,hnsFollower=true,scriptKey='HNS_FOLLOWER_TALK'},
         graphicsId=gid,cellX=P.cellX,cellY=P.cellY,px=P.cellX*16,py=P.cellY*16,
-        facing=P.facing,currentElevation=P.currentElevation,visible=false,hidden=false,animClock=0,
+        facing=P.facing,currentElevation=P.currentElevation,visible=false,hidden=false,animClock=0,idleClock=0,
         moving=false,stepFrames=16,passable=true,mapDef=game.data.maps[s.map]}
     end
     return F.actor
   end
-  function F.step(x,y,frames)
+  function F.step(x,y,frames,playerJump)
     local a=F.refresh();if not a then return end
     if F.transition then return end
     if not a.visible then
+      -- Source invisible followers shadow jumps rather than emerging mid-hop.
+      if playerJump then a.cellX=P.cellX;a.cellY=P.cellY;a.px=a.cellX*16;a.py=a.cellY*16;return end
       a.cellX=x;a.cellY=y;a.px=x*16;a.py=y*16;a.facing=P.facing;a.moving=false
       F.beginBall('exit',frames and frames<16);return
     end
+    local dir=x>a.cellX and 'right'or x<a.cellX and 'left'or y>a.cellY and 'down'or 'up'
+    local lx,ly=Coll.ledgeLanding(game,a.cellX,a.cellY,dir)
+    a.jumping=lx~=nil
+    if lx then x,y=lx,ly;frames=32 elseif playerJump then frames=32 end
     a.visible=true;a.startPx=a.px;a.startPy=a.py;a.targetX=x;a.targetY=y
     local dx,dy=x*16-a.px,y*16-a.py
     if dx~=0 then a.facing=dx<0 and 'left'or 'right'elseif dy~=0 then a.facing=dy<0 and 'up'or 'down'end
-    a.moving=dx~=0 or dy~=0;a.progress=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
+    a.moving=dx~=0 or dy~=0;a.progress=0;a.animClock=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
   end
   function F.tick()
     local a=F.refresh();if not a then return end
@@ -81,8 +89,12 @@ return function(mod,w,game)
     if a.moving then
       a.progress=a.progress+1;local f=math.min(1,a.progress/a.stepFrames)
       a.px=a.startPx+(a.targetX*16-a.startPx)*f;a.py=a.startPy+(a.targetY*16-a.startPy)*f
-      a.raiseY=(a.progress%a.stepFrames==math.floor(a.stepFrames/2))and -1 or 0
-      if f==1 then a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.raiseY=0;O.updateElevation(a)end
+      if a.jumping then a.raiseY=w.followers.motion.jumpY[math.floor((a.progress-1)/2)+1]or 0
+      elseif w.followers.motion.bobbing then a.raiseY=math.floor((a.progress+2)/8)%2==0 and -1 or 0 end
+      if f==1 then a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)end
+    elseif not F.interaction and a.visible then
+      a.idleClock=(a.idleClock or 0)+1
+      a.raiseY=w.followers.motion.bobbing and(math.floor((a.idleClock+2)/8)%2==1 and -1 or 0)or 0
     end
   end
   function F.beginBall(kind,fast,done)
@@ -114,7 +126,33 @@ return function(mod,w,game)
   local move=old.move or P.tryMove
   P.tryMove=function(dir,g,run)
     local x,y=P.cellX,P.cellY;local result=move(dir,g,run)
-    if g==game and result=='step'then F.step(x,y,P.stepFrames)end;return result
+    if g==game then
+      if result=='step'or result=='ledge'then F.step(x,y,P.stepFrames,result=='ledge')
+      elseif result=='connection'then F.step(P.cellX,P.cellY,P.stepFrames)end
+    end;return result
+  end
+  -- Seamless loads change the coordinate origin, not follower visibility.
+  local mapLoad=old.mapLoad or Map.load
+  Map.load=function(modArg,g,id,opts)
+    local a=F.actor
+    if g==game and opts and opts.seamless and a and w.maps[id]and H.own(g.session or g.save)then
+      local d=({left={-1,0},right={1,0},up={0,-1},down={0,1}})[opts.facing]
+      if d then
+        local dx,dy=opts.x-d[1]-P.cellX,opts.y-d[2]-P.cellY
+        a.cellX=a.cellX+dx;a.cellY=a.cellY+dy;a.px=a.px+dx*16;a.py=a.py+dy*16
+        if a.targetX then a.targetX=a.targetX+dx;a.targetY=a.targetY+dy;a.startPx=a.startPx+dx*16;a.startPy=a.startPy+dy*16 end
+        F.map=id;a.mapDef=g.data.maps[id];F.seamlessTransfer=true
+      end
+    end
+    local ok,result=pcall(mapLoad,modArg,g,id,opts);F.seamlessTransfer=nil
+    if not ok then error(result,0)end;return result
+  end
+  local walkPhase=old.walkPhase or O.walkPhase
+  O.walkPhase=function(a)
+    if a==F.actor and a.visible and not(a.moving or F.transition or F.interaction)then
+      return math.floor(a.animClock/8)%2
+    end
+    return walkPhase(a)
   end
   local list=old.list or O.forDraw;local at=old.at or O.at
   O.forDraw=function(...)
@@ -128,6 +166,14 @@ return function(mod,w,game)
   local owDraw=old.owDraw or Ow.draw
   Ow.draw=function(id,px,py,cx,cy,facing,phase,flip,opts)
     local a=F.actor
+    if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and not(a.moving or F.transition or F.interaction)then
+      local out={};for k,v in pairs(opts or {})do out[k]=v end
+      local spr=Ow.get(id);local right=facing=='right'and spr and spr.frameCount==12
+      local base=right and 10 or({down=0,up=1,left=2,right=2})[facing]or 0
+      local second=right and 11 or({down=4,up=6,left=8,right=8})[facing]or 4
+      local pos=((a.idleClock or 1)-1)%24;out.frame=pos>=6 and pos<18 and second or base
+      return owDraw(id,px,py,cx,cy,right and'left'or facing,phase,flip,out)
+    end
     if not(a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and F.transition)then
       return owDraw(id,px,py,cx,cy,facing,phase,flip,opts)
     end
@@ -182,5 +228,5 @@ return function(mod,w,game)
       F.interaction={text=text,emotion=emotion,elapsed=0,y=0,velocity=-5};return true
     end)
   end
-  game._hnsFollower={follower=F,move=move,list=list,at=at,owDraw=owDraw,collect=collect,entrance=entrance,exit=exit,hook=true}
+  game._hnsFollower={follower=F,move=move,mapLoad=mapLoad,walkPhase=walkPhase,list=list,at=at,owDraw=owDraw,collect=collect,entrance=entrance,exit=exit,hook=true}
 end

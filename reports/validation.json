@@ -1,8 +1,8 @@
 {
-  "version": "0.7.12",
+  "version": "0.7.13",
   "native_checks": {
-    "default": 99214,
-    "mounted": 99214
+    "default": 99283,
+    "mounted": 99283
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.11",
+  "cart_version": "1.0.12",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -142,6 +142,10 @@
         "source_credits_pixels": 114688,
         "source_title_pixels": 106496,
         "source_escape_flags": 564,
+        "source_gbs_mapped_songs": 123,
+        "source_gbs_distinct_tracks": 104,
+        "source_c_gbs_frames": 215638,
+        "source_c_gbs_register_bytes": 13800832,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -176,7 +180,8 @@
     "Automatic source species/hidden-slot ability assignment, expanded ability interactions/acquisition/transfer/suppression and source popups, held-item acquisition, remaining battle/settings and later campaign are unfinished.",
     "Outdoor tint matches ordinary 15-bit palette arithmetic but does not yet preserve source palette-bank light immunity/alternate-light high-bit behavior.",
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
-    "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available."
+    "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available.",
+    "GB music/fanfares run source bytecode through native PSG synthesis; GB cry remaps, hardware SFX channel arbitration and audible/analog fidelity remain pending."
   ],
   "targeted_regressions": [
     "Real native grass-step rolls in Morning/Day/Evening/Night",
@@ -214,26 +219,31 @@
     "Both source title banner sprites reach HnS y=58, rather than inherited Emerald y=66.",
     "Nine held-item metadata rows; four seeds use source stats without grounded restriction, retain capped/nonmatching/fainted-held items and persist native consumption.",
     "Four numeric Surge identities resolve through actual adapter/formatter/save-mon normalization, native battle start/switching, five/eight-turn/same-terrain/sky/suppression/scope and immediate seed triggers.",
-    "All 311 source ability enum IDs and name/description bytes compare with compiled C; every raw source field expression is independently token-audited."
+    "All 311 source ability enum IDs and name/description bytes compare with compiled C; every raw source field expression is independently token-audited.",
+    "Actual imported Azalea triple ledges: follower begins and completes movement on every native player hop; hidden followers defer release until walking.",
+    "Source follower idle draw alternates two imported poses and one-pixel offsets; seamless loads preserve identity/visibility and rebase coordinates in four directions, while door recall remains covered.",
+    "GB SOUNDS uses native Bag and registered SELECT dispatch without consumption, preserves the enable flag in save serialization, restores normal music and clears stale player/fanfare caches.",
+    "123 source GBS remaps/104 tracks, 215638 C frames and 13800832 register bytes; fractional note carry, loops/calls, changing tempo, modulation, waves/drums match actual source; native PSG voices produce buffered PCM."
   ],
   "tested_build_content_equivalence": {
-    "files": 7812,
+    "files": 7816,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.12",
-    "cart_version": "1.0.11",
+    "result": "pass",
+    "mod_version": "0.7.13",
+    "cart_version": "1.0.12",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.11.g1rcart",
+        "name": "pokemon_heart_soul-1.0.12.g1rcart",
         "bytes": 1028181,
-        "sha256": "f4d78aff41a46d98eff70b2ce51b49165336b824b604773bf311867d823c4666"
+        "sha256": "5f2e0363a19fee873d5b11206074efd4e386f1569814ce2efe7ea5e7fe19e7c4"
       },
       {
-        "name": "hns_exploration-0.7.12.zip",
-        "bytes": 10113125,
-        "sha256": "a7dbba4ef92f5be4b5cd8a365a64a51818614a289c88f26772dff456cf405952"
+        "name": "hns_exploration-0.7.13.zip",
+        "bytes": 10177078,
+        "sha256": "99e42bea50c7310de4e85a513aa4922c246017fc1855dc25f3567be5a169151f"
       }
     ],
     "repo": "TheEelYT/g1r-hns"
@@ -242,19 +252,19 @@
     "v0.3.44": {
       "commit": "20ab97abf8092c37344d108f2136ec4e5d131500",
       "raw_native_checks": {
-        "default": 99214,
-        "mounted": 99214
+        "default": 99283,
+        "mounted": 99283
       }
     },
     "v0.3.53": {
       "commit": "bbb83af3a0e0e106863f2ad33449e0ca0c3aa0d8",
       "raw_native_checks": {
-        "default": 99219,
-        "mounted": 99219
+        "default": 99288,
+        "mounted": 99288
       },
       "compressed_native_checks": {
-        "default": 99219,
-        "mounted": 99219
+        "default": 99288,
+        "mounted": 99288
       },
       "installer_encoded_assets": 5589,
       "codec": "actual src.import.CacheBlob.encode/decode with zlib backend"
@@ -310,5 +320,26 @@
     "native_emerald_goal_y": 66,
     "correction_pixels": -8,
     "version_labels_player_confirmed": true
+  },
+  "gb_sounds": {
+    "mapped_songs": 123,
+    "distinct_tracks": 104,
+    "source_c_frames": 215638,
+    "source_c_register_bytes": 13800832,
+    "bag_and_native_select": true,
+    "saved_enable_flag": 32,
+    "native_buffered_psg_pcm": true,
+    "remaining": [
+      "GB cry remaps",
+      "Hardware SFX arbitration",
+      "Audible/analog PSG parity"
+    ]
+  },
+  "follower_motion": {
+    "source_idle_poses_and_bobbing": true,
+    "actual_azalea_three_ledge_hops": true,
+    "hidden_hop_does_not_release_ball": true,
+    "seamless_actor_preserved_four_directions": true,
+    "door_recall_retained": true
   }
 }

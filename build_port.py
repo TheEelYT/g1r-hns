@@ -56,6 +56,7 @@ import field_pokemon
 import field_presentation
 import startup
 import followers
+import gbs
 import boot_assets
 import battle_assets
 import expanded_moves
@@ -522,6 +523,7 @@ def build(args):
         boot_data=boot_assets.build(source,engine,stage)
         follower_data=followers.build(source,engine,stage,opening_data,scripts,parse_palette)
         audio_data=audio.build(source,engine,stage,packed_maps,source_maps,trainer_data,prepared_trainers,scripts)
+        audio_data['gbSounds']=gbs.build(source,stage,audio_data)
         imported_objects={(mid,o["localId"]-1) for mid,m in packed_maps.items() for o in m["objects"]}
         events_data["omittedObjects"]=[o for o in events_data["omittedObjects"] if (o["map"],o["sourceIndex"]) not in imported_objects]
         events_data["spriteCount"]=len(opening_data["sprites"])
@@ -560,7 +562,7 @@ def build(args):
         # Fail atomically on any conversion error: never install a half-built world.
         stage.rename(out)
     except BaseException:
-        shutil.rmtree(stage)
+        shutil.rmtree(stage,ignore_errors=True)
         raise
     if args.previews:
         opening.preview_sprites(out,{"sprites":{k:v for k,v in opening_data["sprites"].items() if int(k)<0xE006}},args.previews)

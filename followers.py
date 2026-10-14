@@ -33,6 +33,9 @@ def build(source,engine,stage,opening_data,scripts,palette_parser):
     for n in im.tobytes():
         c=colors[n];raw.extend((round((c&31)*255/31),round((c>>5&31)*255/31),round((c>>10&31)*255/31),255 if n else 0))
     file='ow/follower_emotes.rgba';(stage/file).write_bytes(raw)
-    return {'species':species,'messages':messages,'disabledFlag':0x6060,'ball':ball,
+    movement=(source/'src/event_object_movement.c').read_text()
+    jump=list(map(int,re.findall(r'-?\d+',re.search(r'sJumpY_High\[\]\s*=\s*\{(.*?)\}',movement,re.S)[1])))
+    bob=re.search(r'#define OW_FOLLOWERS_BOBBING\s+(\w+)',(source/'include/config/overworld.h').read_text())[1]=='TRUE'
+    return {'species':species,'messages':messages,'disabledFlag':0x6060,'ball':ball,'motion':{'jumpY':jump,'bobbing':bob,'idleFrames':16},
             'emotes':{'file':file,'width':im.width,'height':im.height,'durations':[30,25,30]},
             'limits':'Native species, shiny palettes, trailing steps, source ball transitions and basic named dialogue/emotes. Full conditional interaction scripts, caught-ball variants and female-specific graphics remain pending.'}

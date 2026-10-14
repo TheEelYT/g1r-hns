@@ -3,6 +3,7 @@ import argparse,json,re,struct,subprocess,tempfile
 from pathlib import Path
 from PIL import Image
 from check_battle_entry import check_entry
+from check_gb_sounds import check as check_gb
 
 
 def colors(path):
@@ -144,6 +145,10 @@ def check(source,engine,mod,luajit):
     for m in world['maps'].values():assert m['allowEscaping']==int(srcmaps[m['hnsSourceId']]['allow_escaping']),m['hnsSourceId']
     count['source_escape_flags']=len(world['maps'])
     assert len(world['followers']['species'])==413
+    motion=world['followers']['motion'];movement=(source/'src/event_object_movement.c').read_text()
+    jump=list(map(int,re.findall(r'-?\d+',re.search(r'sJumpY_High\[\]\s*=\s*\{(.*?)\}',movement,re.S)[1])))
+    assert motion['jumpY']==jump and motion['bobbing']is True and motion['idleFrames']==16
+    count.update(check_gb(source,engine,mod,luajit,world))
     count['follower_species_and_forms']=413;count['follower_normal_shiny_sheets']=826
     art=world['followers']['emotes'];im=Image.open(source/'graphics/misc/emotes.png');pal=colors(source/'graphics/misc/emotes.pal')
     raw=bytes(v for n in im.tobytes()for v in pal[n]+(255 if n else 0,))

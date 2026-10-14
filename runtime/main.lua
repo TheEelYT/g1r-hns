@@ -317,6 +317,7 @@ return function(mod)
     if world.presentation then assert(load(mod:read("field_presentation.lua"),"@hns/field_presentation.lua"))()(mod,world,game) end
     if world.services then assert(load(mod:read('field_services.lua'),'@hns/field_services.lua'))()(mod,world,game) end
     if world.followers then assert(load(mod:read('followers.lua')))()(mod,world,game) end
+    if world.audio.gbSounds then assert(load(mod:read('gb_sounds.lua')))()(mod,world,game)end
     if world.encounters.timed then assert(load(mod:read('time_cycle.lua')))()(mod,world,game) end
     local Marts = require("src.core.game3.marts")
     Marts.ensure()

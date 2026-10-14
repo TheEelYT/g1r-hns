@@ -1,11 +1,14 @@
-# Player testing notes — 0.7.12
+# Player testing notes — 0.7.13
 
-The flashing original `v2.0.6` and steady Mod version are confirmed correct; their check is removed. Battle-menu prompt animations and earlier confirmed UI/gameplay checks remain removed.
+The title/bubble, original flashing version, steady Mod version and battle-menu prompt animations are confirmed correct; their checks are removed. Earlier confirmed checks remain removed.
 
-- [ ] Check the HEART & SOUL bubble fits the notch under the Pokémon logo after its eight-pixel upward correction.
+- [ ] Use GB SOUNDS from the Bag, then toggle it off. Listen during travel, a wild/trainer battle, healing and item receipt; check that the saved selection survives loading.
+- [ ] Leave a follower idle facing different directions; check its two poses and subtle bobbing.
+- [ ] Hop Azalea's three ledges consecutively. Check that the follower advances on each hop without waiting for another walking input.
+- [ ] Cross town/route borders in both directions. Check that a visible follower stays out, while building doors still recall/release it.
 - [ ] If a terrain move becomes available in normal play, check its field background and restoration after expiry/removal.
 
-Move effects and the new seed/Surge handlers rely on automated checks for now; there is no need to test every move or ability by hand. Source ability assignment/hidden slots and item acquisition are not completed by importing identities or handlers. Report crashes or mismatches encountered in normal play; add a focused regression and manual check then.
+Move effects and seed/Surge handlers rely on automated checks for now; there is no need to test every move or ability by hand. Source ability assignment/hidden slots and item acquisition remain unfinished. Report crashes or mismatches encountered in normal play; add a focused regression and manual check then.
 
 ## Updating these notes
 

@@ -78,6 +78,7 @@ return function(T,game,w,maps)
   end
   if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_move_expansion.lua')(T,game,w,s,mon,keep)end
   if w.battleFields then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_battle_fields.lua')(T,game,w,s,mon,keep)end
+  if w.audio.gbSounds then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_gb_sounds.lua')(T,game,w,s,keep)end
   -- Record escape entry using native Warp.request, then retain it across stairs.
   Map.current='EM_HNS_VIOLET_CITY_HNS';P.facing='up';Warp._busy=false
   Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_1F_HNS',8,14,'up',{doorX=19,doorY=6})
@@ -159,6 +160,8 @@ return function(T,game,w,maps)
   T.eq(O.at(8,8),F.actor,'native talk query finds follower');T.eq(O.blocks(8,8),false,'follower does not block player path')
   local found=false;for _,actor in ipairs(O.forDraw())do if actor==F.actor then found=true end end;T.check(found,'native renderer gets follower')
   local Coll=require('src.core.game3.collision');Coll.bindMap(game,s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_follower_motion.lua')(T,game,w,s,lead,keep)
+  F.step(8,8,16);for i=1,16 do F.tick()end
   T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')
   lead.nickname='';T.check(F.message(lead):find(Pokemon.name(158),1,true)~=nil,'unnicknamed follower shows species name');lead.nickname='MON'
   local Field=require('src.core.game3.field');local Hud=require('src.ui.game3.hud');local ModRt=require('src.mods.Runtime')
