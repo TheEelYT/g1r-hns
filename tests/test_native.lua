@@ -618,7 +618,9 @@ end
 function vanillaOw:exists(rel) return self:read(rel)~=nil end
 function vanillaOw:write() return true end
 game._hnsOpening.baseCache=vanillaOw
+local shadowsBefore=game._hnsFieldShadows and game._hnsFieldShadows.shadows
 Runtime.emit("game.ready",{game=game})
+if shadowsBefore then T.eq(game._hnsFieldShadows.shadows,shadowsBefore,"repeated game.ready preserves effect state referenced by existing collectors")end
 T.eq(game.boot.continueInfo.dexCount,5,"install refreshes pre-mod boot summary for an older HnS save")
 T.eq(game.boot.continueInfo.badges,1,"boot refresh preserves earned badge summary")
 for cycle=1,2 do

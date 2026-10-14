@@ -1,5 +1,7 @@
 return function(mod,w,game)
-  local old=game._hnsFieldShadows or {};local S={spec=w.fieldShadows,grass={},short={}}
+  local old=game._hnsFieldShadows or {}
+  -- Existing collectors/listeners retain this table across game.ready.
+  local S=old.shadows or{grass={},short={}};S.spec=w.fieldShadows
   local Fx=require('src.core.game3.field_effects');local P=require('src.core.game3.player');local Rt=require('src.core.game3.runtime')
   local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)

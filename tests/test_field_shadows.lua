@@ -5,7 +5,7 @@ return function(T,game,w,s,F,keep)
   -- The ROM's field-effect family header is unavailable in this fixture.
   local manifest=Fx._manifest;local fixture={}
   for k,v in pairs(type(manifest)=='table'and manifest or {})do fixture[k]=v end
-  fixture.family='rse';Fx._manifest=fixture
+  fixture.family='rse';fixture._byName=fixture._byName or{};Fx._manifest=fixture
   local MB=require('src.core.game3.mb');local grass=MB.id('SHORT_GRASS')
   Rse.onSpawn({cx=P.cellX,cy=P.cellY},grass,grass);local e=Rse._list[1]
   T.check(e and e.name=='short_grass','native player short-grass controller starts source effect')
