@@ -3,7 +3,10 @@ import re
 from PIL import Image
 
 def check(source,mod,world):
-    spec=world['fieldShadows'];config=(source/'include/config/overworld.h').read_text()
+    spec=world['fieldShadows'];assert spec['paletteTag']==0x1005 and spec['timeBlend']is True
+    header=(source/'include/palette.h').read_text();assert re.search(r'#define BLEND_IMMUNE_FLAG\s+\(1 << 15\)',header)
+    assert 'FLDEFF_PAL_TAG_GENERAL_1' in re.search(r'const struct SpriteTemplate gFieldEffectObjectTemplate_ShortGrass = \{(.*?)\n\};',(source/'src/data/field_effects/field_effect_objects.h').read_text(),re.S)[1]
+    config=(source/'include/config/overworld.h').read_text()
     assert re.search(r'#define OW_OBJECT_VANILLA_SHADOWS\s+FALSE',config)
     assert spec['intensity']==int(re.search(r'#define OW_SHADOW_INTENSITY\s+(\d+)',config)[1])
     assert spec['none']==int(re.search(r'#define SHADOW_SIZE_NONE\s+(\d+)',(source/'include/constants/event_objects.h').read_text())[1])

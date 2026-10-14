@@ -4,6 +4,33 @@ return function(mod,w,game)
   local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local function own()local s=Rt.getSession();return s and w.maps[s.map]end
+  -- The native player controller uses its own ROM effect sheets. Supply the
+  -- same source sheet/palette used by followers, while keeping native timing,
+  -- restart and cleanup. Both draw in the common outdoor tint pass.
+  local loadSheet=old.loadSheet or Fx.loadSheet
+  local manifestObject=old.manifestObject or Fx.manifestObject
+  local shortSheet,shortObject
+  Fx.loadSheet=function(name,...)
+    if own()and name=='short_grass'then
+      if not shortSheet then
+        local art=S.spec.grass.short_grass;local quads={}
+        for i=0,art.height/16-1 do quads[i]=love.graphics.newQuad(0,i*16,16,16,art.width,art.height)end
+        shortSheet={image=U.image(art.file,art.width,art.height),quads=quads,fw=16,fh=16,frames=art.height/16}
+      end
+      return shortSheet
+    end
+    return loadSheet(name,...)
+  end
+  Fx.manifestObject=function(name,...)
+    if own()and name=='short_grass'then
+      if not shortObject then
+        local seq={};for _,p in ipairs(S.spec.grass.short_grass.sequence)do seq[#seq+1]={'frame',p[1],p[2]}end;seq[#seq+1]={'end'}
+        shortObject={anims={seq},fw=16,fh=16,frames=S.spec.grass.short_grass.height/16,paletteTag=S.spec.paletteTag}
+      end
+      return shortObject
+    end
+    return manifestObject(name,...)
+  end
   local function grassName(beh)return beh==MB.id('LONG_GRASS')and'long_grass'or beh==MB.id('TALL_GRASS')and'tall_grass'end
   function S.leaveShort(a)S.short[a]=nil end
   function S.finish(a,x,y)
@@ -80,5 +107,5 @@ return function(mod,w,game)
     mod.hooks:wrap('input.step',function(next,g,dt)if g==game then S.tick()end;return next(g,dt)end)
     mod.events:on('map.entered',function()S.grass={};S.short={}end)
   end
-  game._hnsFieldShadows={shadows=S,collect=collect,hook=true}
+  game._hnsFieldShadows={shadows=S,collect=collect,loadSheet=loadSheet,manifestObject=manifestObject,hook=true}
 end

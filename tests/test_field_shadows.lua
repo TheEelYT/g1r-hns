@@ -1,5 +1,48 @@
 return function(T,game,w,s,F,keep)
   local S=game._hnsFieldShadows.shadows;local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
+  local Fx=require('src.core.game3.field_effects');local Rse=require('src.core.game3.field_effects_rse');local P=require('src.core.game3.player')
+  keep(Rse,{'_list','_state'});Rse._list={};Rse._state={}
+  -- The ROM's field-effect family header is unavailable in this fixture.
+  local manifest=Fx._manifest;local fixture={}
+  for k,v in pairs(type(manifest)=='table'and manifest or {})do fixture[k]=v end
+  fixture.family='rse';Fx._manifest=fixture
+  local MB=require('src.core.game3.mb');local grass=MB.id('SHORT_GRASS')
+  Rse.onSpawn({cx=P.cellX,cy=P.cellY},grass,grass);local e=Rse._list[1]
+  T.check(e and e.name=='short_grass','native player short-grass controller starts source effect')
+  T.eq(e.sheet,Fx.loadSheet('short_grass'),'native player selects shared HnS sheet')
+  T.eq(e.a.cmds[1][3],4,'player grass uses source first-frame duration');T.eq(e.a.cmds[2][3],4,'player grass uses source second-frame duration')
+  T.eq(w.fieldShadows.paletteTag,0x1005,'player/follower grass share source general-1 palette');T.eq(w.fieldShadows.timeBlend,true,'grass palette is not source time-blend immune')
+  local lg=love.graphics;local draw=lg.draw;local images={};lg.draw=function(im)images[#images+1]=im end
+  local follow=F.actor;follow.visible=true;S.short[follow]={actor=follow,timer=0,x=follow.px,y=follow.py}
+  local actors={};Rse.collectActors(actors);S.collect(actors)
+  local playerActor,followerActor
+  for _,a in ipairs(actors)do if a.fxEntry==e then playerActor=a elseif a.kind=='hns_follower_short_grass'then followerActor=a end end
+  T.check(playerActor and followerActor,'both grass effects enter same native actor collection')
+  playerActor:draw(0,0);followerActor:draw(0,0);T.eq(images[1],images[2],'player/follower use identical source texture before common tint')
+  -- Draw the real field with the shader/upload boundary recorded. The two
+  -- textures must share the same day/night canvas and one final time blend.
+  local Field=require('src.core.game3.field_view');local Rtc=require('src.core.game3.rtc');local Time=game._hnsTime.time
+  local calc=Rtc.calcLocalTime;local shader=lg.newShader;local timeShader,timeCanvas=Time.shader,Time.canvas
+  lg.newShader=function()return {send=function()end,hasUniform=function()return true end}end
+  Time.shader=nil;Time.canvas=nil
+  for _,hour in ipairs({12,21})do
+    Rtc.calcLocalTime=function()return {days=0,hours=hour,minutes=0,seconds=0}end
+    local canvases={};local blends=0
+    lg.draw=function(im,...)
+      if im==e.sheet.image then canvases[#canvases+1]=lg.getCanvas()or false end
+      if im==Time.canvas and lg.getShader()==Time.shader then blends=blends+1 end
+      return draw(im,...)
+    end
+    Field.draw(game,240,160)
+    T.eq(#canvases,2,'actual field renders player and follower short-grass at hour '..hour)
+    T.eq(canvases[1],canvases[2],'player/follower grass draw into same lighting canvas at hour '..hour)
+    if hour==21 then T.eq(canvases[1],Time.canvas,'both night grass draws enter time-tint canvas');T.eq(blends,1,'both grass effects receive one common outdoor tint')
+    else T.eq(blends,0,'day grass receives no night tint')end
+  end
+  Rtc.calcLocalTime=calc;lg.newShader=shader;Time.shader=timeShader;if Time.canvas then Time.canvas:release()end;Time.canvas=timeCanvas
+  local map=s.map;s.map='EM_ROUTE101'
+  T.check(Fx.loadSheet('short_grass')~=e.sheet,'vanilla short grass does not receive HnS source sheet');s.map=map
+  lg.draw=draw;Rse._list={};Rse._state={};S.short={}
   local behavior,water=Coll.behavior,Coll.isWater;local lg=love.graphics;local draw,color=lg.draw,lg.setColor;local draws,colors={},{}
   -- Locate an adjacent pair in imported Azalea data, with native collision.
   local P=require('src.core.game3.player');local before=s.map;local px,py,pf=P.cellX,P.cellY,P.facing
@@ -45,5 +88,5 @@ return function(T,game,w,s,F,keep)
   Coll.behavior=function()return MB.id('NORMAL')end;S.finish(a,2,3);T.eq(S.short[a],nil,'leaving short grass clears overlay')
   Coll.behavior=function()return MB.id('SHORT_GRASS')end;S.finish(a,2,3);a.visible=false;S.tick();T.eq(S.short[a],nil,'hidden follower cannot leave stale short-grass overlay')
   a.moving=false;S.short={}
-  S.grass={};a.visible=true;lg.draw=draw;lg.setColor=color;Coll.behavior=behavior;Coll.isWater=water
+  S.grass={};a.visible=true;lg.draw=draw;lg.setColor=color;Coll.behavior=behavior;Coll.isWater=water;Fx._manifest=manifest
 end
