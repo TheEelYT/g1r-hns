@@ -168,7 +168,7 @@ return function(T,game,world,maps)
   T.eq(poisoned.hp,1,'field poison stops at 1 HP');T.eq(poisoned.status,nil,'surviving field poison is cured');T.eq(poisoned.friendship,100,'surviving poison does not deduct friendship')
   T.eq(#Steps._queue,1,'survival enqueues one native message');T.eq(Steps._queue[1].mon,poisoned,'native queue carries actual surviving Pokémon')
   mode('SURVIVE_POISON',0);poisoned.hp=1;poisoned.status='PSN';s.vars[Sem.var(s,'poisonSteps')]=3;Steps.flush();Steps.onStepTaken(s,game)
-  T.eq(poisoned.hp,0,'classic field poison can faint');T.eq(#Steps._queue,2,'classic poison keeps faint and blackout sequence')
+  T.eq(poisoned.hp,0,'classic field poison can faint');T.eq(#Steps._queue,1,'classic poison uses latest native script sequence');T.eq(Steps._queue[1].type,'field_poison_script','native source script owns faint and blackout sequence')
   -- Recreating a boot menu after EXIT retains the HnS new-game module.
   local Boot=require('src.ui.game3.boot');local boot=Boot.new(game);T.eq(boot.custom.mods.newGame,'hns.oak_speech','fresh boot after exit retains Oak intro')
   local vanilla=Boot.new({});T.eq(vanilla.custom.mods.newGame,'src.ui.game3.rse.birch_speech','unowned game keeps Birch intro')

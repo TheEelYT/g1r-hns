@@ -20,7 +20,7 @@ import sys
 import zlib
 
 PIN_HNS = "167aa6d537b109bb229c231ddce4616974c4da71"
-PIN_ENGINE = "20ab97abf8092c37344d108f2136ec4e5d131500"
+PIN_ENGINE = "49d289ce9c00d9586c8b39a44a305c16f38b7b8e"
 EARLY_PREFIXES = ("NewBarkTown", "Route29", "CherrygroveCity", "Route30")
 OPENING_PREFIXES = EARLY_PREFIXES + (
     "Route31", "VioletCity", "SproutTower", "Route27", "TohjoFalls",
@@ -522,6 +522,8 @@ def build(args):
         battle_data=battle_assets.build(source,engine,stage,packed_maps,source_maps,field_data)
         boot_data=boot_assets.build(source,engine,stage)
         follower_data=followers.build(source,engine,stage,opening_data,scripts,parse_palette)
+        import field_shadows
+        shadow_data=field_shadows.build(source,stage,parse_palette)
         audio_data=audio.build(source,engine,stage,packed_maps,source_maps,trainer_data,prepared_trainers,scripts)
         audio_data['gbSounds']=gbs.build(source,stage,audio_data)
         imported_objects={(mid,o["localId"]-1) for mid,m in packed_maps.items() for o in m["objects"]}
@@ -529,7 +531,7 @@ def build(args):
         events_data["spriteCount"]=len(opening_data["sprites"])
         data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
-                "abilities":ability_data,"battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
+                "fieldShadows":shadow_data,"abilities":ability_data,"battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent
         # top-level datasets in their own functions as this port grows.
         world_lua="-- Private source-converted data. Rebuild with build_port.py.\nlocal world={}\n"

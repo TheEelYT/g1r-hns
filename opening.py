@@ -60,6 +60,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
         ow = re.search(r"OVERWORLD\(\s*(\w+),\s*SIZE_(\d+)x(\d+),.*?(sAnimTable_\w+),\s*(\w+),\s*(\w+)",entry,re.S)
         if not ow:raise ValueError('missing follower OVERWORLD declaration: '+gfx)
         images,width,height,anims,pal,shiny_pal = ow.groups(); width,height=int(width),int(height)
+        shadow=re.search(r'OVERWORLD\(\s*\w+,\s*SIZE_\d+x\d+,\s*SHADOW_SIZE_(\w+)',entry)[1]
         if 'OBJ_EVENT_MON_SHINY' in gfx:pal=shiny_pal
         tables=(base/"object_event_pic_tables_followers.h").read_text()
         frames=re.search(r"\b"+images+r"\[\]\s*=\s*\{(.*?)\};",tables,re.S).group(1)
@@ -85,7 +86,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
         directory=stage/"ow";directory.mkdir(exist_ok=True)
         (directory/f"{gid}.meta").write_bytes(meta);(directory/f"{gid}.rgba").write_bytes(rgba)
         return {"graphicsId":gid,"width":width,"height":height,"frameCount":n,"source":gfx,"standingOnly":standing_only,"asymmetric":asymmetric,
-                "sourcePng":str(Path(paths[symbol]).with_suffix('.png')),"sourcePalette":str(Path(paths[pal]).with_suffix('.pal')),"frameOrder":order,"sourceAnimTable":anims}
+                "shadowSize":{'S':0,'M':1,'L':2,'NONE':3}[shadow],"sourcePng":str(Path(paths[symbol]).with_suffix('.png')),"sourcePalette":str(Path(paths[pal]).with_suffix('.pal')),"frameOrder":order,"sourceAnimTable":anims}
     pointers = (base / "object_event_graphics_info_pointers.h").read_text()
     info_name = re.search(r"\[" + re.escape(gfx) + r"\]\s*=\s*&(\w+)", pointers).group(1)
     infos = (base / "object_event_graphics_info.h").read_text()
@@ -95,9 +96,11 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
         tag, images = fields["paletteTag"], fields["images"]
         width, height, slot = int(fields["width"]), int(fields["height"]), 4
         inanimate = fields["inanimate"] == "TRUE"
+        shadow=fields["shadowSize"]
     else:
         fields = [v.strip() for v in block.split(",")]
         tag, width, height, slot, inanimate, images = fields[1], int(fields[4]), int(fields[5]), int(fields[6]), fields[8] == "TRUE", fields[14]
+        shadow=fields[7]
     tables = (base / "object_event_pic_tables.h").read_text()
     frames = re.search(r"\b" + re.escape(images) + r"\[\]\s*=\s*\{(.*?)\};", tables, re.S).group(1)
     rows = re.findall(r"overworld_frame\((\w+),\s*(\d+),\s*(\d+),\s*(\d+)\)", frames)
@@ -153,7 +156,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
     directory = stage / "ow"; directory.mkdir(exist_ok=True)
     (directory / f"{gid}.meta").write_bytes(meta)
     (directory / f"{gid}.rgba").write_bytes(rgba)
-    return {"graphicsId":gid,"width":width,"height":height,"frameCount":len(rows),"source":gfx,"standingOnly":standing_only}
+    return {"graphicsId":gid,"width":width,"height":height,"frameCount":len(rows),"source":gfx,"standingOnly":standing_only,"shadowSize":{'SHADOW_SIZE_S':0,'SHADOW_SIZE_M':1,'SHADOW_SIZE_L':2,'SHADOW_SIZE_NONE':3}[shadow]}
 
 
 def preview_sprites(stage, opening, directory):

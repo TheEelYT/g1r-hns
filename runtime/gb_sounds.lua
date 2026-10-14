@@ -48,7 +48,8 @@ return function(mod,w,game)
         elseif ch==3 then
           v.freq=Mix.periodToPulseHz(period)*.5;v.wave={}
           for i=0,15 do local n=byte(48+i);v.wave[i*2+1]=math.floor(n/16);v.wave[i*2+2]=n%16 end
-          v.gbVolume=({[0]=0,15,7,3})[math.floor(byte(19)/32)%4]or 0
+          -- GBA NR32 bit 7 overrides the ordinary GB level with 75% output.
+          v.gbVolume=byte(19)>=128 and 11 or (({[0]=0,15,7,3})[math.floor(byte(19)/32)%4]or 0)
         else
           local nr=byte(28);local div=({[0]=8,16,32,48,64,80,96,112})[nr%8]
           v.period=Mix.SAMPLE_RATE*div*2^math.floor(nr/16)/4194304;v.shortNoise=math.floor(nr/8)%2==1

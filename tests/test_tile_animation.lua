@@ -4,6 +4,7 @@ return function(T,game,world)
   local Pack=require('src.import.gba.native_pack')
   local savedImage,savedNew=love.image.newImageData,love.graphics.newImage
   local Data={};Data.__index=Data
+  function Data:getFormat()return 'rgba8'end
   function Data:getDimensions()return self.w,self.h end
   function Data:getWidth()return self.w end
   function Data:getHeight()return self.h end
@@ -23,7 +24,7 @@ return function(T,game,world)
     local img={w=d.w,h=d.h,rows={}};for i,r in ipairs(d.rows)do img.rows[i]=r end
     function img:getDimensions()return self.w,self.h end
     function img:setFilter()end
-    function img:replacePixels(data)uploads=uploads+1;self.rows={};for i,r in ipairs(data.rows)do self.rows[i]=r end end
+    function img:replacePixels(data,layer,mipmap,x,y)uploads=uploads+1;for i,r in ipairs(data.rows)do self.rows[i+(y or 0)]=r end end
     return img
   end
   local total,banks,middle,changed=0,0,0,0

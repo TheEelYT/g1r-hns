@@ -306,6 +306,7 @@ return function(mod)
     if world.startup and world.startup.rules then assert(load(mod:read("gameplay.lua"),"@hns/gameplay.lua"))()(mod,world,game) end
     if world.startup and world.pokedex then assert(load(mod:read('battle_mechanics.lua'),'@hns/battle_mechanics.lua'))()(mod,world,game) end
     if world.expandedMoves then assert(load(mod:read("expanded_moves.lua")))()(mod,world,game) end
+    if world.fieldShadows then assert(load(mod:read('field_shadows.lua')))()(mod,world,game)end
     if world.abilities then assert(load(mod:read('abilities.lua')))()(mod,world,game)end
     if world.battleFields then assert(load(mod:read('battle_fields.lua'),'@hns/battle_fields.lua'))()(mod,world,game)end
     if world.teaching then assert(load(mod:read('teaching.lua'),'@hns/teaching.lua'))()(mod,world,game) end

@@ -12,6 +12,7 @@ return function(T,game,w,s,keep)
     Player.updateSlot(slot,1);peak=math.max(peak,#slot.voices)
     local l,r=Player.renderSlot(slot,64,{raw=true});for i=1,#l do energy=energy+math.abs(l[i])+math.abs(r[i])end
   end
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_gb_channels.lua')(T,game,w)
   local four
   for id,name in pairs(w.audio.songs)do if name=='MUS_HG_TITLE'then four=tonumber(id)end end
   local battle={};Player.start(Audio._pack,Audio._cache,battle,assert(four));local noise=false;local channels={}

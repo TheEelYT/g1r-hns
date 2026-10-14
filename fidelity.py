@@ -140,6 +140,10 @@ def build(source,engine,stage,maps,source_maps,labels,text,scripts,ow,palette_pa
     Q['portraits']['oak']=image(source,stage,'graphics/oak_speech_hns/oak_hns.png','startup_oak.rgba',palette_parser,'graphics/oak_speech_hns/oak_hns.pal')
     Q['backdrops']=backdrops(source,stage,palette_parser)
     Q['battleBacks']={}
+    back=(source/'src/data/graphics/trainers.h').read_text()
+    idle=re.search(r'sAnim_GeneralFrame3\[\]\s*=\s*\{([^}]+)',(source/'src/data.c').read_text())[1]
+    throw=re.search(r'sAnimCmd_Hoenn\[\]\s*=\s*\{([^}]+)',back)[1]
+    Q['battleBackAnims']={k:[list(map(int,m))for m in re.findall(r'ANIMCMD_FRAME\((\d+),\s*(\d+)\)',b)]for k,b in [('idle',idle),('throw',throw)]}
     for gender,name in [(0,'gold'),(1,'kris')]:
         info=image(source,stage,'graphics/trainers/back_pics/'+name+'_hns.png','startup_back_'+str(gender)+'.rgba',palette_parser,'graphics/trainers/back_pics/'+name+'_hns.pal');assert info['width']==64 and info['height']==256
         Q['battleBacks'][str(gender)]=info

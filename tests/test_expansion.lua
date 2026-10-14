@@ -35,6 +35,7 @@ return function(T,game,w,maps)
   Moves._rom[86]={effect=E.PARALYZE,power=0,type=13,accuracy=100,pp=20,target=0,flags=0}
   Moves._rom[150]={effect=E.SPLASH,power=0,type=0,accuracy=0,pp=40,target=0,flags=0}
   Pokemon._moveNames[86]='THUNDER WAVE';Pokemon._moveNames[150]='SPLASH'
+  if w.fieldShadows then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_ability_assignment.lua')(T,game,w,s,setting)end
   local function mon(sp)
     return {species=sp or 158,nickname='MON',level=20,hp=100,maxHp=100,attack=60,defense=60,spAtk=60,spDef=60,speed=80,
       ability=0,otId=12345,otName='GENE',personality=8,moves={86,150},pp={20,40},ivs={},evs={}}
@@ -161,6 +162,7 @@ return function(T,game,w,maps)
   local found=false;for _,actor in ipairs(O.forDraw())do if actor==F.actor then found=true end end;T.check(found,'native renderer gets follower')
   local Coll=require('src.core.game3.collision');Coll.bindMap(game,s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_follower_motion.lua')(T,game,w,s,lead,keep)
+  if w.fieldShadows then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_field_shadows.lua')(T,game,w,s,F,keep)end
   F.step(8,8,16);for i=1,16 do F.tick()end
   T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')
   lead.nickname='';T.check(F.message(lead):find(Pokemon.name(158),1,true)~=nil,'unnicknamed follower shows species name');lead.nickname='MON'
