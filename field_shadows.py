@@ -23,4 +23,6 @@ def build(source,stage,palette):
         body=re.search(r'sAnim_'+label+r'\[\]\s*=\s*\{([^}]+)',info)[1]
         seq=[list(map(int,m))for m in re.findall(r'ANIMCMD_FRAME\((\d+),\s*(\d+)\)',body)]
         grass[name]={'file':file,'width':16,'height':len(frames)*16,'sequence':seq,'source':path}
-    return {'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'limits':'Persistent source shadow sizes/masks and follower grass rustles. Weather suppression and complete non-grass follower ground effects remain unfinished.'}
+    tag=int(re.search(r'#define FLDEFF_PAL_TAG_GENERAL_1\s+(0x[0-9A-Fa-f]+)',(source/'include/constants/field_effects.h').read_text())[1],16)
+    assert tag&0x8000==0  # source palette.h BLEND_IMMUNE_FLAG
+    return {'paletteTag':tag,'timeBlend':True,'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'limits':'Persistent source shadow sizes/masks and follower grass rustles. Weather suppression and complete non-grass follower ground effects remain unfinished.'}

@@ -30,6 +30,12 @@ def fix(source,text):
     division,markers=midi_markers(source/midi)
     units=Fraction(markers['['],division)*4;assert units.denominator==1
     units=int(units);assert units==32
+    # The GB arrangement repeats the MIDI's body twice. Its transcription
+    # stops one sixteenth-note unit before that whole-bar boundary.
+    body_units=Fraction(markers[']']-markers['['],division)*4
+    assert body_units.denominator==1;body_units=int(body_units)
+    assert body_units==448
+    repeats=2;expected=units+repeats*body_units;assert expected==928
     totals=[]
     for ch in range(1,5):
         label=f'gbs_hg_poke_mart_Ch{ch}'
@@ -51,6 +57,7 @@ def fix(source,text):
                 inserted=True
             out.append(line)
             if note:elapsed+=int(note[1])
-        assert inserted and elapsed==927,(ch,elapsed)
-        totals.append(elapsed);text=text[:start]+''.join(out)+text[end:]
-    return text,{'sourceMidi':midi,'midiDivision':division,'midiLoopTick':markers['['],'introUnits':units,'trackUnits':totals}
+        assert inserted and elapsed==expected-1,(ch,elapsed)
+        out.append('\trest 1\t@ complete source MIDI whole-bar loop boundary\n')
+        totals.append(elapsed+1);text=text[:start]+''.join(out)+text[end:]
+    return text,{'sourceMidi':midi,'midiDivision':division,'midiLoopTick':markers['['],'midiLoopEndTick':markers[']'],'midiBodyUnits':body_units,'bodyRepeats':repeats,'tailPaddingUnits':1,'introUnits':units,'trackUnits':totals}

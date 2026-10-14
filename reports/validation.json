@@ -1,8 +1,8 @@
 {
-  "version": "0.7.16",
+  "version": "0.7.17",
   "native_checks": {
-    "default": 119494,
-    "mounted": 119494
+    "default": 119526,
+    "mounted": 119526
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.15",
+  "cart_version": "1.0.16",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -249,7 +249,10 @@
     "GB mart initially plays intro on all four channels then repeats body-only at least three times; loop entry uses source HG MIDI bracket and restored octave/envelope.",
     "Native CB.doClick frame 95 and capture_success wait callbacks select HnS evolved/caught cues through actual audio baking/sequencing in normal and GB modes; vanilla wait retains native ID.",
     "128 normal-walking bob frames match compiled source MovementType_FollowPlayer_Moving; held-walking gap cannot advance idle pose/timer.",
-    "Native collision finds actual adjacent Azalea short-grass tiles; follower walking retains attached source overlay, while idle holds end pose, movement restarts and leaving/hiding cleans it."
+    "Native collision finds actual adjacent Azalea short-grass tiles; follower walking retains attached source overlay, while idle holds end pose, movement restarts and leaving/hiding cleans it.",
+    "GB mart whole-bar ending: source 927-unit transcription gets one trailing rest unit per channel, matching 32 intro + twice the 448-unit MIDI body; all four channel repeats hit frames 6091/11971/17851 with fractional carry retained.",
+    "Native player short-grass spawn uses shared HnS sheet/animation. Actual field draws at hours 12/21 put player and follower textures into the same canvas with one common night tint; vanilla assets remain scoped away.",
+    "Repeated game.ready keeps the effect-state table referenced by existing collectors and listeners; full native tests expose stale state when the previous initializer replaces it."
   ],
   "tested_build_content_equivalence": {
     "files": 7828,
@@ -258,33 +261,33 @@
   },
   "release_artifacts": {
     "result": "pass",
-    "mod_version": "0.7.16",
-    "cart_version": "1.0.15",
+    "mod_version": "0.7.17",
+    "cart_version": "1.0.16",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.15.g1rcart",
+        "name": "pokemon_heart_soul-1.0.16.g1rcart",
         "bytes": 1028181,
-        "sha256": "bd68ce7ca01b1ac2c8acd7eeaa92ce9581781b663d49f9d9f4e55f9c564da90a"
+        "sha256": "c30960dce37a51a7e254a44646bdfe7a9f7f8b90ea4fce3e761740cf6075f286"
       },
       {
-        "name": "hns_exploration-0.7.16.zip",
-        "bytes": 10195880,
-        "sha256": "7abf55a200aa96f9ada361e65135945f0774a0aeffe499957d7b9d1a0caa83f0"
+        "name": "hns_exploration-0.7.17.zip",
+        "bytes": 10196582,
+        "sha256": "de03b88bbe6398b24d811bcd0d621e8e5c77fa6240dfac0aa5b8f9baa2a08c3c"
       }
     ]
   },
   "engine_compatibility": {
-    "v0.3.86": {
-      "commit": "49d289ce9c00d9586c8b39a44a305c16f38b7b8e",
+    "v0.3.87": {
+      "commit": "48e91929e1b3d5be6d3e61afb8822c062d141428",
       "latest_release_verified": "2026-10-14",
       "raw_native_checks": {
-        "default": 119494,
-        "mounted": 119494
+        "default": 119526,
+        "mounted": 119526
       },
       "compressed_native_checks": {
-        "default": 119494,
-        "mounted": 119494
+        "default": 119526,
+        "mounted": 119526
       },
       "installer_encoded_assets": 5596,
       "codec": "actual src.import.CacheBlob encode/decode"
@@ -371,7 +374,18 @@
     "capture_native_profile": "MUS_RG_CAUGHT_INTRO",
     "capture_source_intro": "MUS_HG_EVOLVED",
     "capture_source_body": "MUS_HG_CAUGHT",
-    "capture_normal_and_gb_regressions": true
+    "capture_normal_and_gb_regressions": true,
+    "capture_jingles_player_confirmed_normal_and_gb": true,
+    "mart_midi_body_units": 448,
+    "mart_body_repeats": 2,
+    "mart_arrangement_units": 928,
+    "mart_restored_tail_units": 1,
+    "mart_repeat_frames": [
+      6091,
+      11971,
+      17851
+    ],
+    "fractional_timing_preserved": true
   },
   "follower_motion": {
     "source_idle_poses_and_bobbing": true,
@@ -405,7 +419,8 @@
       8,
       9
     ],
-    "walking_gap_blocks_idle_when_player_moving": true
+    "walking_gap_blocks_idle_when_player_moving": true,
+    "walking_animation_player_confirmed": true
   },
   "pokegear_feedback": {
     "source_menu_label": "{POKE}GEAR",
@@ -435,6 +450,13 @@
     ],
     "shadows_player_confirmed": true,
     "short_grass_real_azalea_tiles": true,
-    "short_grass_restart_cleanup": true
+    "short_grass_restart_cleanup": true,
+    "follower_short_grass_appearance_player_confirmed": true,
+    "player_follower_same_source_short_grass_texture": true,
+    "shared_day_night_draw_canvas": true,
+    "common_night_tint_passes": 1,
+    "short_grass_palette_tag": 4101,
+    "short_grass_palette_blend_immune": false,
+    "shared_state_preserved_on_game_ready": true
   }
 }
