@@ -14,7 +14,7 @@ def build(source,stage,palette):
         (stage/file).write_bytes(bytes(c for n in im.tobytes()for c in (0,0,0,255 if n else 0)))
         shadows[str(i)]={'file':file,'width':im.width,'height':im.height,'offset':offsets[i],'source':path}
     colors=palette(source/'graphics/field_effects/palettes/general_1.pal');grass={}
-    for name,label in (('tall_grass','TallGrass'),('long_grass','LongGrass')):
+    for name,label in (('tall_grass','TallGrass'),('long_grass','LongGrass'),('short_grass','ShortGrass')):
         path='graphics/field_effects/pics/'+name+'.png';im=Image.open(source/path)
         frames=[im.crop((x,y,x+16,y+16))for y in range(0,im.height,16)for x in range(0,im.width,16)]
         def rgba(n):

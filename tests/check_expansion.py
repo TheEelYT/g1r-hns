@@ -5,6 +5,7 @@ from PIL import Image
 from check_battle_entry import check_entry
 from check_gb_sounds import check as check_gb
 from check_follower_motion import check as check_follower
+from check_follower_bob import check as check_bob
 from check_field_shadows import check as check_shadows
 
 
@@ -152,6 +153,7 @@ def check(source,engine,mod,luajit):
     assert motion['jumpY']==jump and motion['bobbing']is True and motion['idleFrames']==16
     count.update(check_gb(source,engine,mod,luajit,world))
     count.update(check_follower(source,engine,mod,luajit,world))
+    count.update(check_bob(source,engine,mod,luajit))
     count.update(check_shadows(source,mod,world))
     count['follower_species_and_forms']=413;count['follower_normal_shiny_sheets']=826
     art=world['followers']['emotes'];im=Image.open(source/'graphics/misc/emotes.png');pal=colors(source/'graphics/misc/emotes.pal')

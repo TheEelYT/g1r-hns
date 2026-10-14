@@ -1,8 +1,8 @@
 {
-  "version": "0.7.15",
+  "version": "0.7.16",
   "native_checks": {
-    "default": 119421,
-    "mounted": 119421
+    "default": 119494,
+    "mounted": 119494
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.14",
+  "cart_version": "1.0.15",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -146,14 +146,15 @@
         "source_escape_flags": 564,
         "source_gbs_mapped_songs": 123,
         "source_gbs_distinct_tracks": 104,
-        "source_c_gbs_frames": 215638,
-        "source_c_gbs_register_bytes": 13800832,
+        "source_c_gbs_frames": 233238,
+        "source_c_gbs_register_bytes": 14927232,
         "source_c_follower_pose_frames": 2048,
         "source_c_follower_jump_frames": 56,
+        "source_c_follower_walking_bob_frames": 128,
         "source_shadow_mask_pixels": 2496,
         "source_shadow_size_rows": 1229,
-        "source_follower_grass_pixels": 2304,
-        "source_follower_grass_sequences": 2,
+        "source_follower_grass_pixels": 2816,
+        "source_follower_grass_sequences": 3,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -244,28 +245,32 @@
     "Follower source pose advances through one-frame walking gaps instead of resetting; running/idle retained.",
     "Source field shadows on ordinary ground, suppression on grass/water, ground anchoring while raised, camera offsets/opacity; real follower steps trigger independent tall/long grass with ordered back/feet layers.",
     "386 supported species, 3860 compiled source slot/legendary cases, native creation and battle construction, hidden identity/save serialization, sparse PC and legacy-secondary migration; summaries/settings refresh abilities.",
-    "Latest native trainer-back idle/throw metadata, partial texture-upload bands and native poison-script sequence, retaining HnS survival/Sturdy."
+    "Latest native trainer-back idle/throw metadata, partial texture-upload bands and native poison-script sequence, retaining HnS survival/Sturdy.",
+    "GB mart initially plays intro on all four channels then repeats body-only at least three times; loop entry uses source HG MIDI bracket and restored octave/envelope.",
+    "Native CB.doClick frame 95 and capture_success wait callbacks select HnS evolved/caught cues through actual audio baking/sequencing in normal and GB modes; vanilla wait retains native ID.",
+    "128 normal-walking bob frames match compiled source MovementType_FollowPlayer_Moving; held-walking gap cannot advance idle pose/timer.",
+    "Native collision finds actual adjacent Azalea short-grass tiles; follower walking retains attached source overlay, while idle holds end pose, movement restarts and leaving/hiding cleans it."
   ],
   "tested_build_content_equivalence": {
-    "files": 7827,
+    "files": 7828,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
     "result": "pass",
-    "mod_version": "0.7.15",
-    "cart_version": "1.0.14",
+    "mod_version": "0.7.16",
+    "cart_version": "1.0.15",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.14.g1rcart",
+        "name": "pokemon_heart_soul-1.0.15.g1rcart",
         "bytes": 1028181,
-        "sha256": "4a5b8a1a85d18ffa614c8a60dfcecf455823123d49791609ea9fa430b0ce04cf"
+        "sha256": "bd68ce7ca01b1ac2c8acd7eeaa92ce9581781b663d49f9d9f4e55f9c564da90a"
       },
       {
-        "name": "hns_exploration-0.7.15.zip",
-        "bytes": 10194812,
-        "sha256": "e496a4b608c7aa8f19d1ddd1a11585534be3f58af468fff181bcea533a7b0c31"
+        "name": "hns_exploration-0.7.16.zip",
+        "bytes": 10195880,
+        "sha256": "7abf55a200aa96f9ada361e65135945f0774a0aeffe499957d7b9d1a0caa83f0"
       }
     ]
   },
@@ -274,14 +279,14 @@
       "commit": "49d289ce9c00d9586c8b39a44a305c16f38b7b8e",
       "latest_release_verified": "2026-10-14",
       "raw_native_checks": {
-        "default": 119421,
-        "mounted": 119421
+        "default": 119494,
+        "mounted": 119494
       },
       "compressed_native_checks": {
-        "default": 119421,
-        "mounted": 119421
+        "default": 119494,
+        "mounted": 119494
       },
-      "installer_encoded_assets": 5595,
+      "installer_encoded_assets": 5596,
       "codec": "actual src.import.CacheBlob encode/decode"
     },
     "policy": "Test only latest published G1R; old engine matrix retired at user request."
@@ -345,8 +350,8 @@
   "gb_sounds": {
     "mapped_songs": 123,
     "distinct_tracks": 104,
-    "source_c_frames": 215638,
-    "source_c_register_bytes": 13800832,
+    "source_c_frames": 233238,
+    "source_c_register_bytes": 14927232,
     "bag_and_native_select": true,
     "saved_enable_flag": 32,
     "native_buffered_psg_pcm": true,
@@ -357,7 +362,16 @@
     ],
     "gba_force_75_wave_override": true,
     "all_distinct_tracks_channel_audited": 104,
-    "pokemart_wave_pcm_verified": true
+    "pokemart_wave_pcm_verified": true,
+    "instruments_player_confirmed": true,
+    "mart_loop_intro_units": 32,
+    "mart_loop_source_midi": "sound/songs/midi/mus_hg_poke_mart.mid",
+    "mart_trace_frames": 20000,
+    "mart_repeats_per_channel_at_least": 3,
+    "capture_native_profile": "MUS_RG_CAUGHT_INTRO",
+    "capture_source_intro": "MUS_HG_EVOLVED",
+    "capture_source_body": "MUS_HG_CAUGHT",
+    "capture_normal_and_gb_regressions": true
   },
   "follower_motion": {
     "source_idle_poses_and_bobbing": true,
@@ -379,7 +393,19 @@
     "prior_build_negative_control_failed_checks": 6,
     "idle_animation_player_confirmed": true,
     "walking_gap_retains_pose": true,
-    "running_animation_player_confirmed": true
+    "running_animation_player_confirmed": true,
+    "source_c_walking_bob_frames": 128,
+    "walking_bob_source_frames_minus_one": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "walking_gap_blocks_idle_when_player_moving": true
   },
   "pokegear_feedback": {
     "source_menu_label": "{POKE}GEAR",
@@ -401,11 +427,14 @@
     "persistent_shadows": true,
     "source_shadow_pixels": 2496,
     "source_shadow_size_rows": 1229,
-    "source_grass_pixels": 2304,
-    "follower_grass_sequences": 2,
+    "source_grass_pixels": 2816,
+    "follower_grass_sequences": 3,
     "remaining": [
       "Weather shadow suppression",
       "Complete non-grass follower ground effects"
-    ]
+    ],
+    "shadows_player_confirmed": true,
+    "short_grass_real_azalea_tiles": true,
+    "short_grass_restart_cleanup": true
   }
 }

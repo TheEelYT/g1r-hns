@@ -80,6 +80,7 @@ return function(T,game,w,maps)
   if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_move_expansion.lua')(T,game,w,s,mon,keep)end
   if w.battleFields then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_battle_fields.lua')(T,game,w,s,mon,keep)end
   if w.audio.gbSounds then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_gb_sounds.lua')(T,game,w,s,keep)end
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_capture_audio.lua')(T,game,w,s,keep)
   -- Record escape entry using native Warp.request, then retain it across stairs.
   Map.current='EM_HNS_VIOLET_CITY_HNS';P.facing='up';Warp._busy=false
   Warp.request(nil,game,'EM_HNS_SPROUT_TOWER_1F_HNS',8,14,'up',{doorX=19,doorY=6})

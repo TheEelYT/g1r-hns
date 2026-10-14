@@ -1,13 +1,13 @@
-# Player testing notes — 0.7.15
+# Player testing notes — 0.7.16
 
-Use G1R 0.3.86 for this update. Confirmed Pokégear sounds and follower running-animation checks are removed. Previously confirmed idle, title/version and battle-prompt checks remain removed.
+Use G1R 0.3.86 for this update. Confirmed restored GB instruments, visible shadows and follower running-animation checks are removed. Previously confirmed idle, title/version and battle-prompt checks remain removed.
 
-- [ ] Listen to GB SOUNDS in Pokémart and other music encountered during normal play. Check that the previously missing instrument is audible; retain toggle/save checks if not already verified.
+- [ ] Leave GB SOUNDS playing in Pokémart for several loops. The opening phrase should play once, followed by body-only repeats.
+- [ ] Catch a Pokémon with GB SOUNDS off and on. Check the HnS capture intro/body jingle and that the capture message, registration and nickname flow still complete.
 - [ ] Watch follower walking, including continued movement and changes from idle, direction or running. Check that the pose cycle no longer stutters between steps.
 - [ ] Hold Down across Azalea's three ledges and keep moving afterward. Check that the follower lands and continues following without releasing Down or turning sideways.
 - [ ] Check that the compact Pokégear label has the same ink/shadow color as its neighboring menu rows.
-- [ ] Check player, NPC and follower shadows on ordinary ground, while moving/jumping and at different zoom levels. Grass/water suppression should follow HnS.
-- [ ] Walk the follower through tall and long grass. Check independent rustling and feet cover; ensure hiding/recalling it leaves no stale effect.
+- [ ] Walk the follower through Azalea’s short grass. Check the attached grass overlay, its restart while moving, and cleanup after leaving the grass or recalling the follower.
 - [ ] Check an existing Pokémon's ability in its summary and after loading a save. Legendary Abilities should respond to its setting when the relevant species becomes available.
 - [ ] Cross town/route borders in both directions. Check that a visible follower stays out, while building doors still recall/release it.
 - [ ] If a terrain move becomes available, check its field background and restoration after expiry/removal.
