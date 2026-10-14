@@ -40,7 +40,9 @@ return function(mod,w,game)
       slot=(tonumber(mon.personality)or 0)%2
       local legacy=pair(species);local id=mon.ability or mon.abilityId
       local second=A.spec.records[A.species[species].slots[2]].id
-      if id and id~=0 and ((legacy[2]~=0 and id==legacy[2])or(id==second and second~=A.spec.records[A.species[species].slots[1]].id))then slot=1 end
+      local hidden=A.spec.records[A.species[species].slots[3]].id
+      if id and id~=0 and ((legacy[2]~=0 and id==legacy[2])or(id==second and second~=A.spec.records[A.species[species].slots[1]].id))then slot=1
+      elseif id and id~=0 and id==hidden and hidden~=A.spec.records[A.species[species].slots[1]].id then slot=2 end
     end
     mon.abilityNum=slot;mon.hnsAbilitySlot=slot;mon.ability=A.resolve(species,slot,s);mon.abilityId=mon.ability;return mon
   end
@@ -55,8 +57,9 @@ return function(mod,w,game)
   local function migrate(s)
     if not H.own(s)then return end
     for _,mon in ipairs(s.party or {})do A.sync(mon,s)end
-    for _,box in pairs(s.boxes or {})do for _,mon in ipairs(box.mons or box)do A.sync(mon,s)end end
+    for _,box in pairs((s.storage and s.storage.boxes)or s.boxes or {})do for _,mon in pairs(box.mons or box)do A.sync(mon,s)end end
   end
+  A.migrate=migrate
   if not old.hooks then mod.events:on('map.entered',function()migrate(Rt.getSession())end)end
   migrate(game.session or Rt.getSession())
   local Summary=require('src.core.game3.summary_data');local description=old.description or Summary.abilityDescription

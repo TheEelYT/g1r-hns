@@ -13,6 +13,7 @@ return function(T,game,w,s,F,keep)
   Coll.behavior=function()return MB.id('NORMAL')end;Coll.isWater=function()return true end;actors={npc};S.collect(actors);T.eq(#actors,1,'water suppresses shadow')
   Coll.isWater=function()return false end
   local a=F.actor;a.visible=true;S.grass={};Coll.behavior=function()return MB.id('TALL_GRASS')end
+  a.moving=false;F.step(a.cellX+1,a.cellY,16);T.eq(#S.grass,1,'real follower movement dispatch triggers grass');a.moving=false;S.grass={}
   S.step(a,3,4,false);T.eq(#S.grass,1,'follower step starts its own grass rustle')
   actors={};S.collect(actors);T.eq(#actors,2,'grass has independent back and feet-cover actors')
   T.eq(actors[1].kind,'hns_follower_grass_back','rustle is behind follower');T.eq(actors[2].kind,'hns_follower_grass_front','feet cover is in front')

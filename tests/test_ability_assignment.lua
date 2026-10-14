@@ -20,6 +20,8 @@ return function(T,game,w,s,setting)
   T.check(ok,'native gift succeeds');T.eq(mon.ability,A.spec.records.OVERGROW.id,'native gift gets source normal ability')
   A.sync(mon,s,2);T.eq(mon.ability,A.spec.records.CHLOROPHYLL.id,'source hidden slot applies to native mon')
   local copied=assert(load(Writer.encode(mon)))();T.eq(copied.abilityNum,2,'hidden slot survives serialization')
+  local captured={species=mon.species,ability=mon.ability};A.sync(captured,s);T.eq(captured.abilityNum,2,'captured hidden identity recovers its source slot')
+  local storage=s.storage;s.storage={boxes={{mons={[5]=copied}}}};copied.ability=0;A.migrate(s);T.eq(copied.ability,A.spec.records.CHLOROPHYLL.id,'sparse PC slots migrate correctly');s.storage=storage
   local b=State.makeBattler(copied,'player');T.eq(b.ability,A.spec.records.CHLOROPHYLL.id,'hidden slot survives native battle construction')
   local pending={species=C:require('species','SPECIES_TOTODILE'),personality=1,abilityNum=2,ability=0}
   A.sync(pending,s);T.eq(pending.ability,A.spec.records.SHEER_FORCE.id,'pending effect retains true source identity');T.eq(P.abilityName(pending.ability),A.spec.records.SHEER_FORCE.name,'pending source name displays without ROM lookup')
