@@ -4,6 +4,8 @@ return function(mod,w,game)
   local S=old.shadows or{grass={},short={}};S.spec=w.fieldShadows;S.history=S.history or{}
   local Fx=require('src.core.game3.field_effects');local P=require('src.core.game3.player');local Rt=require('src.core.game3.runtime')
   local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
+  local Weather=require('src.core.game3.field_weather_rse')
+  local Warp=require('src.core.game3.warp');local Special=require('src.core.game3.special_field_anim')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local function own()local s=Rt.getSession();return s and w.maps[s.map]end
   -- The native player controller uses its own ROM effect sheets. Supply the
@@ -68,8 +70,7 @@ return function(mod,w,game)
   for _,id in ipairs(S.spec.suppression.weather)do noWeather[id]=true end
   function S.hidden(actor,eo)
     if eo and(eo.active==false or eo.noShadow or eo.hidden or eo.inHotSprings or eo.inSandPile)then return true end
-    local Weather=package.loaded['src.core.game3.field_weather_rse']
-    if Weather and noWeather[Weather.getCurrentWeather()]then return true end
+    if noWeather[Weather.getCurrentWeather()]then return true end
     if actor.kind=='player'and(P.surfing or P.underwater)then return true end
     local parent=eo or(actor.kind=='player'and P)
     local x,y
@@ -91,8 +92,13 @@ return function(mod,w,game)
   -- shadow behind its owner's current priority, never behind its previous frame.
   local function shadowOrder(a,eo,camY)
     local elev=a.elevation or(a.kind=='player'and P.elevation)or 3
-    local priority=a.oamPriority or(a.kind=='player'and P.oamPriority)or S.spec.elevationPriority[tostring(elev)]or 2
-    if a.kind=='player'and(P.jumping or P.surfHopping)then priority=1 end
+    local priority=a.oamPriority
+    if not priority and a.kind=='player'then
+      if P.jumping or P.surfHopping then priority=1
+      elseif P.oamPriority then priority=P.oamPriority
+      elseif Warp.isEscalatorActive and Warp.isEscalatorActive()or Special.isActive and Special.isActive()then priority=1 end
+    end
+    priority=priority or S.spec.elevationPriority[tostring(elev)]or 2
     local fixed=(eo and eo.fixedPriority)or a.fixedPriority
     local sub
     if fixed then sub=(eo and eo.subpriority)or a.subpriority or 83;priority=(eo and eo.fixedClass)or a.priority or priority

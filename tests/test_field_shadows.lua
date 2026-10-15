@@ -73,6 +73,7 @@ return function(T,game,w,s,F,keep)
   local parent={px=32,py=64,cellX=2,cellY=4,visible=true}
   S.short={[parent]={actor=parent,timer=8}}
   for elevation=0,15 do for cy=0,31 do for bob=-1,0 do
+    parent.currentElevation=elevation
     local owner={kind='npc',eventObject=parent,graphicsId=gid,x=32,y=64+bob,sortY=64,elevation=elevation}
     local stack={owner};S.collect(stack,0,cy);local under,over=sort(stack,{}, {},cy)
     local group=#over>0 and over or under
@@ -96,6 +97,9 @@ return function(T,game,w,s,F,keep)
     elseif v.kind=='hns_follower_short_grass'then rgb={gb:byte(overlap[1],overlap[1]+2)}end
   end
   for i=1,3 do T.eq(rgb[i],gb:byte(overlap[1]+i-1),'overlapping grass keeps source ink rather than shadow-darkened ink')end
+  for _,v in ipairs(stack)do if v.kind=='hns_shadow'then v.fixedPriority=false end end
+  local legacy=sort(stack,{}, {},0)
+  T.eq(legacy[3].kind,'hns_shadow','negative control reproduces former shadow-over-grass ordering')
   parent.fixedPriority=true;parent.fixedClass=1;parent.subpriority=42
   stack={owner};S.collect(stack,0,27);local _,over=sort(stack,{}, {},27)
   T.eq(over[1].kind,'hns_shadow','scripted fixed-priority shadow stays in owner layer');T.eq(over[1].subpriority,43,'fixed shadow follows current scripted subpriority')
