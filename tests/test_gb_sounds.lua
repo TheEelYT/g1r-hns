@@ -25,19 +25,34 @@ return function(T,game,w,s,keep)
   local mart={};T.check(Player.start(Audio._pack,Audio._cache,mart,assert(martId)),'GB mart starts through actual native player')
   local fix=assert(G.spec.loopFixes.gbs_hg_poke_mart_Header);local repeats={0,0,0,0}
   T.eq(fix.midiBodyUnits,448,'source MIDI body has 28 four-beat bars');T.eq(fix.bodyRepeats,2,'GB arrangement contains two body repeats')
-  T.eq(fix.trackUnits[1],928,'mart full arrangement ends on source whole-bar grid')
+  T.eq(fix.trackUnits[1],929,'mart arrangement includes MIDI grid repair and reviewed silent gap');T.eq(fix.listeningGapUnits,1,'listening adjustment extends silence, not notes')
   T.eq(fix.introUnits,32,'reviewed mart intro ends at source HG MIDI marker')
   for i,t in ipairs(mart.hnsGB.source.tracks)do T.check(t.pc<fix.loopStarts[i],'first play includes mart intro on channel '..i)end
+  local silence=0;local seamGaps={};local drumHits=0;local lastNoise
   for f=1,20000 do
+    local tail=silence
     local prev={};for i,t in ipairs(mart.hnsGB.source.tracks)do prev[i]=t.pc end
     Player.updateSlot(mart,1)
+    local sounding=false;for _,v in ipairs(mart.voices)do if v.envVol>0 then sounding=true end end
+    silence=not sounding and silence+1 or 0
+    local st=mart.hnsGB;local nr=st.source.regs
+    if st.channels[4]and st.channels[4]~=lastNoise then
+      drumHits=drumHits+1;local noise=st.channels[4]
+      T.eq(nr[28],0x2A,'mart source drum 6 NR43 is retained')
+      T.eq(noise.shortNoise,true,'source drum explicitly requests pitched 7-bit noise')
+      T.eq(noise.period,Mix.SAMPLE_RATE/32768,'source drum noise clock is 32768 Hz')
+    end
+    lastNoise=st.channels[4]
     for i,t in ipairs(mart.hnsGB.source.tracks)do if t.pc<prev[i]then
       repeats[i]=repeats[i]+1
-      local expected=1+math.floor((fix.introUnits+repeats[i]*fix.midiBodyUnits*fix.bodyRepeats)*12*140/256)
+      if i==1 then seamGaps[#seamGaps+1]=tail;T.check(tail>=12,'all four mart voices rest for two units at the audible seam')end
+      local expected=1+math.floor((fix.introUnits+repeats[i]*(fix.midiBodyUnits*fix.bodyRepeats+fix.listeningGapUnits))*12*140/256)
       T.eq(f,expected,'mart repeat timing has no missing fractional note on channel '..i)
       T.check(t.pc>=fix.loopStarts[i]and t.pc<=fix.loopStarts[i]+8,'mart repeat enters body, never intro, channel '..i)
     end end
   end
+  T.check(drumHits>0,'mart drum audit observes actual source-triggered percussion')
+  print('GB mart: silent seam frames='..table.concat(seamGaps,',')..'; source drum triggers='..drumHits)
   for i,n in ipairs(repeats)do T.check(n>=3,'mart channel '..i..' completes at least three repeats')end
   local heal=w.audio.roles.heal;local cue={};T.check(Player.start(Audio._pack,Audio._cache,cue,heal),'GB healing fanfare starts')
   for f=1,300 do Player.updateSlot(cue,1)end

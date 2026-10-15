@@ -19,6 +19,8 @@
     "source_c_follower_pose_frames": 2048,
     "source_c_follower_jump_frames": 56,
     "source_c_follower_walking_bob_frames": 128,
+    "source_c_shadow_behavior_rows": 243,
+    "source_shadow_no_shadow_weathers": 2,
     "source_shadow_mask_pixels": 2496,
     "source_shadow_size_rows": 1229,
     "source_follower_grass_pixels": 2816,

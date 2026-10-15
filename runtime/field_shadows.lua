@@ -1,9 +1,11 @@
 return function(mod,w,game)
   local old=game._hnsFieldShadows or {}
   -- Existing collectors/listeners retain this table across game.ready.
-  local S=old.shadows or{grass={},short={}};S.spec=w.fieldShadows
+  local S=old.shadows or{grass={},short={}};S.spec=w.fieldShadows;S.history=S.history or{}
   local Fx=require('src.core.game3.field_effects');local P=require('src.core.game3.player');local Rt=require('src.core.game3.runtime')
   local Coll=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
+  local Weather=require('src.core.game3.field_weather_rse')
+  local Warp=require('src.core.game3.warp');local Special=require('src.core.game3.special_field_anim')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local function own()local s=Rt.getSession();return s and w.maps[s.map]end
   -- The native player controller uses its own ROM effect sheets. Supply the
@@ -62,14 +64,48 @@ return function(mod,w,game)
       if g.timer>=total and (not g.actor.visible or g.actor.cellX~=g.x or g.actor.cellY~=g.y)then table.remove(S.grass,i)end
     end
   end
+  local noGrass,noWater,noWeather={},{},{}
+  for _,name in ipairs(S.spec.suppression.grass)do local id=MB.id(name);if id then noGrass[id]=true end end
+  for _,name in ipairs(S.spec.suppression.water)do local id=MB.id(name);if id then noWater[id]=true end end
+  for _,id in ipairs(S.spec.suppression.weather)do noWeather[id]=true end
   function S.hidden(actor,eo)
-    if eo and(eo.noShadow or eo.hidden or eo.inHotSprings or eo.inSandPile)then return true end
+    local parent=eo or(actor.kind=='player'and P)
+    local x,y
+    if parent and parent.cellX then x,y=parent.cellX,parent.cellY
+      if parent.moving and parent.targetX then x,y=parent.targetX,parent.targetY end
+    else x,y=math.floor(actor.x/16),math.floor((eo and eo.py or actor.y)/16)end
+    local beh=Coll.behavior(x,y)
+    local previous
+    if parent then
+      local h=S.history[parent]
+      if not h then h={x=x,y=y,behavior=beh};S.history[parent]=h
+      elseif h.x~=x or h.y~=y then h.previous=h.behavior;h.behavior=beh;h.x,h.y=x,y end
+      previous=h.previous
+    end
+    if eo and(eo.active==false or eo.noShadow or eo.hidden or eo.inHotSprings or eo.inSandPile)then return true end
+    if noWeather[Weather.getCurrentWeather()]then return true end
     if actor.kind=='player'and(P.surfing or P.underwater)then return true end
-    local x,y=math.floor(actor.x/16),math.floor((eo and eo.py or actor.y)/16);local beh=Coll.behavior(x,y)
-    if grassName(beh)or beh==MB.id('PUDDLE')or beh==MB.id('SHALLOW_WATER')then return true end
-    return Coll.isWater(x,y)
+    return noGrass[beh]or beh==MB.id('PUDDLE')or noWater[beh]or noWater[previous]or Coll.isWater(x,y)
   end
-  function S.collect(actors)
+  -- Native ordering derives subpriority from screen-space sprite Y. A one-pixel
+  -- follower bob can cross a row while its grounded shadow does not. Pin the
+  -- shadow behind its owner's current priority, never behind its previous frame.
+  local function shadowOrder(a,eo,camY)
+    local elev=a.elevation or(a.kind=='player'and P.elevation)or 3
+    local priority=a.oamPriority
+    if not priority and a.kind=='player'then
+      if P.jumping or P.surfHopping then priority=1
+      elseif P.oamPriority then priority=P.oamPriority
+      elseif Warp.isEscalatorActive and Warp.isEscalatorActive()or Special.isActive and Special.isActive()then priority=1 end
+    end
+    priority=priority or S.spec.elevationPriority[tostring(elev)]or 2
+    local fixed=(eo and eo.fixedPriority)or a.fixedPriority
+    local sub
+    if fixed then sub=(eo and eo.subpriority)or a.subpriority or 83;priority=(eo and eo.fixedClass)or a.priority or priority
+    else sub=(S.spec.elevationSubpriority[tostring(elev)]or 115)+(16-math.floor(math.floor((a.y or 0)-(camY or 0))/16))*2+1 end
+    return sub+1,priority
+  end
+  function S.collect(actors,camX,camY)
     if not own()then return end
     for i=#actors,1,-1 do
       local a=actors[i];local remove=a.kind=='field_effect_shadow'
@@ -82,7 +118,8 @@ return function(mod,w,game)
       if (a.kind=='npc'or a.kind=='player')and row and row.shadowSize~=nil and row.shadowSize~=S.spec.none and not S.hidden(a,eo)then
         local art=S.spec.shadows[tostring(row.shadowSize)];local sy=(eo and eo.py or a.kind=='player'and P.py or a.y)+16-art.offset-art.height/2
         local sx=a.x+8-art.width/2;local alpha=(a.alpha or 1)*S.spec.intensity/16
-        actors[#actors+1]={kind='hns_shadow',x=sx,y=sy,sortY=(a.sortY or a.y)-0.5,elevation=a.elevation,oamPriority=a.oamPriority,i=94000+i,
+        local sub,priority=shadowOrder(a,eo,camY)
+        actors[#actors+1]={fixedPriority=true,subpriority=sub,priority=priority,kind='hns_shadow',x=sx,y=sy,sortY=(a.sortY or a.y)-0.5,elevation=a.elevation,oamPriority=a.oamPriority,i=94000+i,
           draw=function(_,cx,cy)love.graphics.setColor(1,1,1,alpha);love.graphics.draw(U.image(art.file,art.width,art.height),sx-cx,sy-cy);love.graphics.setColor(1,1,1,1)end}
       end
     end
@@ -104,10 +141,10 @@ return function(mod,w,game)
     end end
   end
   local collect=old.collect or Fx.collectActors
-  Fx.collectActors=function(actors,...)collect(actors,...);S.collect(actors)end
+  Fx.collectActors=function(actors,...)collect(actors,...);S.collect(actors,...)end
   if not old.hook then
     mod.hooks:wrap('input.step',function(next,g,dt)if g==game then S.tick()end;return next(g,dt)end)
-    mod.events:on('map.entered',function()S.grass={};S.short={}end)
+    mod.events:on('map.entered',function()S.grass={};S.short={};S.history={}end)
   end
   game._hnsFieldShadows={shadows=S,collect=collect,loadSheet=loadSheet,manifestObject=manifestObject,hook=true}
 end
