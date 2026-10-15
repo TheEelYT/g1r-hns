@@ -23,6 +23,22 @@ def build(source,stage,palette):
         body=re.search(r'sAnim_'+label+r'\[\]\s*=\s*\{([^}]+)',info)[1]
         seq=[list(map(int,m))for m in re.findall(r'ANIMCMD_FRAME\((\d+),\s*(\d+)\)',body)]
         grass[name]={'file':file,'width':16,'height':len(frames)*16,'sequence':seq,'source':path}
+    movement=(source/'src/event_object_movement.c').read_text()
+    def elevation(name):
+        body=re.search(r'sElevationTo'+name+r'\[\]\s*=\s*\{([^}]+)',movement)[1]
+        return {str(i):int(v) for i,v in enumerate(re.findall(r'\d+',body))}
+    behavior=(source/'src/metatile_behavior.c').read_text()
+    grass_fn=re.search(r'bool8 MetatileBehavior_IsPokeGrass\([^)]*\)\s*\{(.*?)\n\}',behavior,re.S)[1]
+    grasses=re.findall(r'== MB_(\w+)',grass_fn)
+    water=re.findall(r'\[MB_(\w+)\]\s*=\s*([^,]+)',behavior.split('};',1)[0])
+    waters=[name for name,flags in water if 'TILE_FLAG_SURFABLE' in flags]
+    weather=(source/'src/field_weather_effect.c').read_text()
+    no_shadow=[]
+    constants=(source/'include/constants/weather.h').read_text()
+    for fn,name in [('FogDiagonal_InitVars','FOG_DIAGONAL'),('Bubbles_InitVars','UNDERWATER_BUBBLES')]:
+        body=re.search(r'void '+fn+r'\([^)]*\)\s*\{(.*?)\n\}',weather,re.S)[1]
+        assert 'gWeatherPtr->noShadows = TRUE;' in body
+        no_shadow.append(int(re.search(r'#define WEATHER_'+name+r'\s+(\d+)',constants)[1]))
     tag=int(re.search(r'#define FLDEFF_PAL_TAG_GENERAL_1\s+(0x[0-9A-Fa-f]+)',(source/'include/constants/field_effects.h').read_text())[1],16)
     assert tag&0x8000==0  # source palette.h BLEND_IMMUNE_FLAG
-    return {'paletteTag':tag,'timeBlend':True,'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'limits':'Persistent source shadow sizes/masks and follower grass rustles. Weather suppression and complete non-grass follower ground effects remain unfinished.'}
+    return {'paletteTag':tag,'timeBlend':True,'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'elevationSubpriority':elevation('Subpriority'),'elevationPriority':elevation('Priority'),'suppression':{'grass':grasses,'water':waters,'weather':no_shadow},'limits':'Source shadow sizes/masks, ordering and weather/ground suppression; follower grass rustles. Complete non-grass follower ground effects remain unfinished.'}

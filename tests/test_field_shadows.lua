@@ -64,6 +64,61 @@ return function(T,game,w,s,F,keep)
   T.eq(actors[2].y,72,'shadow stays on ground during raised sprite jump')
   lg.draw=function(_,...)draws[#draws+1]={...}end;lg.setColor=function(...)colors[#colors+1]={...}end
   actors[2]:draw(4,8);T.eq(colors[1][4],w.fieldShadows.intensity/16,'shadow uses source opacity');T.eq(draws[1][1],28,'shadow camera X');T.eq(draws[1][2],64,'shadow camera Y')
+  -- Exercise the engine's real row/elevation sorter, including the exact
+  -- one-pixel idle bob that used to put the grounded shadow over short grass.
+  local sort=require('src.core.game3.field_view').applyDrawOrder
+  local Weather=require('src.core.game3.field_weather_rse');local weather=Weather.getCurrentWeather
+  Weather.getCurrentWeather=function()return 0 end
+  Coll.behavior=function()return MB.id('SHORT_GRASS')end
+  local parent={px=32,py=64,cellX=2,cellY=4,visible=true}
+  S.short={[parent]={actor=parent,timer=8}}
+  for elevation=0,15 do for cy=0,31 do for bob=-1,0 do
+    local owner={kind='npc',eventObject=parent,graphicsId=gid,x=32,y=64+bob,sortY=64,elevation=elevation}
+    local stack={owner};S.collect(stack,0,cy);local under,over=sort(stack,{}, {},cy)
+    local group=#over>0 and over or under
+    T.eq(group[1].kind,'hns_shadow','shadow precedes idle-bobbing owner at every camera row/elevation')
+    T.eq(group[2],owner,'short-grass parent follows its ground shadow')
+    T.eq(group[3].kind,'hns_follower_short_grass','short grass remains above shadow and parent')
+  end end end
+  -- Composite a source leaf pixel that actually overlaps the shadow mask.
+  -- A post-grass 25% shadow would darken this exact pixel in the old ordering.
+  local ga=w.fieldShadows.grass.short_grass;local sa=w.fieldShadows.shadows['1']
+  local gb,sb=T.readAsset(ga.file),T.readAsset(sa.file);local overlap
+  for y=0,15 do for x=0,15 do
+    local gi=(16*16+y*16+x)*4+1;local sx=x-(8-sa.width/2);local sy=y-(16-sa.offset-sa.height/2)
+    if sx>=0 and sy>=0 and sx<sa.width and sy<sa.height and gb:byte(gi+3)>0 and sb:byte((sy*sa.width+sx)*4+4)>0 then overlap={gi,x,y};break end
+  end;if overlap then break end end
+  T.check(overlap,'source short-grass leaf really overlaps medium shadow mask')
+  local owner={kind='npc',eventObject=parent,graphicsId=gid,x=32,y=63,sortY=64,elevation=3}
+  local stack={owner};S.collect(stack,0,0);local group=sort(stack,{}, {},0);local rgb={100,100,100}
+  for _,v in ipairs(group)do
+    if v.kind=='hns_shadow'then for i=1,3 do rgb[i]=rgb[i]*(1-w.fieldShadows.intensity/16)end
+    elseif v.kind=='hns_follower_short_grass'then rgb={gb:byte(overlap[1],overlap[1]+2)}end
+  end
+  for i=1,3 do T.eq(rgb[i],gb:byte(overlap[1]+i-1),'overlapping grass keeps source ink rather than shadow-darkened ink')end
+  parent.fixedPriority=true;parent.fixedClass=1;parent.subpriority=42
+  stack={owner};S.collect(stack,0,27);local _,over=sort(stack,{}, {},27)
+  T.eq(over[1].kind,'hns_shadow','scripted fixed-priority shadow stays in owner layer');T.eq(over[1].subpriority,43,'fixed shadow follows current scripted subpriority')
+  parent.fixedPriority=nil;S.short={};S.history={}
+  Coll.behavior=function()return MB.id('NORMAL')end
+  for id=0,23 do
+    Weather.getCurrentWeather=function()return id end
+    local hide=S.hidden(npc,eo)and true or false
+    T.eq(hide,id==9 or id==14,'source weather shadow suppression '..id)
+  end
+  Weather.getCurrentWeather=function()return 0 end
+  for _,name in ipairs(w.fieldShadows.suppression.grass)do
+    local id=MB.id(name);if id then Coll.behavior=function()return id end;T.check(S.hidden(npc,eo),'source PokeGrass suppression '..name)end
+  end
+  for _,name in ipairs(w.fieldShadows.suppression.water)do
+    local id=MB.id(name);if id then Coll.behavior=function()return id end;T.check(S.hidden(npc,eo),'source water behavior suppression '..name)end
+  end
+  Coll.behavior=function(x)return x==2 and MB.id('POND_WATER')or MB.id('NORMAL')end
+  parent.cellX=2;parent.cellY=4;S.history={};T.check(S.hidden(owner,parent),'water step has no shadow')
+  parent.moving=true;parent.targetX=3;parent.targetY=4;T.check(S.hidden(owner,parent),'landing from water retains previous-water suppression')
+  parent.cellX=3;parent.moving=false;T.check(S.hidden(owner,parent),'shore rest retains previous behavior')
+  parent.moving=true;parent.targetX=4;T.check(not S.hidden(owner,parent),'next dry step restores source shadow')
+  parent.moving=false;S.history={};Weather.getCurrentWeather=weather
   Coll.behavior=function()return MB.id('TALL_GRASS')end;actors={npc};S.collect(actors);T.eq(#actors,1,'grass suppresses shadow')
   Coll.behavior=function()return MB.id('NORMAL')end;Coll.isWater=function()return true end;actors={npc};S.collect(actors);T.eq(#actors,1,'water suppresses shadow')
   Coll.isWater=function()return false end

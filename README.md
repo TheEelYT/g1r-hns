@@ -1,12 +1,12 @@
 # Pokémon Heart & Soul → Gen1Recomp 0.7.17
 
-A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.87. Version 0.7.17 completes the GB Pokémart’s whole-bar loop timing and supplies the native player short-grass effect with the same source image/palette as followers. Validation now targets the latest engine release; remaining work stays in the checklist.
+A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.88. Version 0.7.17 completes the GB Pokémart’s whole-bar loop timing and supplies the native player short-grass effect with the same source image/palette as followers. Validation now targets the latest engine release; remaining work stays in the checklist.
 
 **Download `pokemon_heart_soul-1.0.16.g1rcart` from [Releases](https://github.com/TheEelYT/g1r-hns/releases/latest) and import it as a custom cart.** The cart installs the exact hash-pinned mod, isolates HnS saves and ships sealed with mod edits disabled. `hns_exploration-0.7.17.zip` is the alternative manual mod download; a ZIP alone does not create the custom cart.
 
 ## Install
 
-Use Gen1Recomp **v0.3.87**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.17** and the cart version is **1.0.16**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
+Use Gen1Recomp **v0.3.88**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.17** and the cart version is **1.0.16**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
 
@@ -56,7 +56,7 @@ Use Linux/WSL with Python 3.10+, Pillow, LuaJIT, gcc/g++ and GNU binutils. No RO
 git clone https://github.com/PokemonHnS-Development/pokehns-expansion.git hns-source
 git -C hns-source checkout 167aa6d537b109bb229c231ddce4616974c4da71
 git clone https://github.com/bryanthaboi/gen1recomp.git hns-gen1recomp
-git -C hns-gen1recomp checkout 48e91929e1b3d5be6d3e61afb8822c062d141428
+git -C hns-gen1recomp checkout c1561fc6d9d33a90a415985c2870efc5063798f6
 python3 -m pip install 'Pillow>=12,<13'
 HNS_LUAJIT=/absolute/path/to/luajit python3 build_port.py --source hns-source --engine hns-gen1recomp --out build/hns_exploration
 ```
@@ -160,6 +160,6 @@ This list is kept in every update. Checked entries stay struck through. A checke
 
 ## Provenance
 
-HnS `Release-v2.0.6`: `167aa6d537b109bb229c231ddce4616974c4da71`. Gen1Recomp v0.3.87: `48e91929e1b3d5be6d3e61afb8822c062d141428`, the latest release checked for this update. Older-engine validation runs have been retired. Raw and installer-compressed assets are checked against that same pinned release. Maps, dialogue, pixels, audio and data come from matching public HnS source; no ROM is included.
+HnS `Release-v2.0.6`: `167aa6d537b109bb229c231ddce4616974c4da71`. Gen1Recomp v0.3.88: `c1561fc6d9d33a90a415985c2870efc5063798f6`, the latest release checked for this update. Older-engine validation runs have been retired. Raw and installer-compressed assets are checked against that same pinned release. Maps, dialogue, pixels, audio and data come from matching public HnS source; no ROM is included.
 
 Credit PokemonHnS-Development, RHH's pokeemerald-expansion, resetes12's Modern Emerald, pret, the original developers and Gen1Recomp contributors. Upstream credits are retained. Converter, runtime glue and tests were authored for TheEelYT with Codex. Based on the Pokémon Gen 1 Recompilation Project by BOIS CLUB GAMES, LLC (https://github.com/bryanthaboi/gen1recomp). Private native derivatives retain `GEN1RECOMP_LICENSE.md` and its additional terms.

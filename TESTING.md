@@ -1,6 +1,6 @@
 # Player testing notes — 0.7.17
 
-Use G1R 0.3.87 for this update. Confirmed follower walking, capture jingles in both modes, restored GB instruments and visible shadows are removed. Previously confirmed idle, title/version and battle-prompt checks remain removed.
+Use G1R 0.3.88 for this update. Confirmed follower walking, capture jingles in both modes, restored GB instruments and visible shadows are removed. Previously confirmed idle, title/version and battle-prompt checks remain removed.
 
 - [ ] Leave GB SOUNDS playing in Pokémart for several loops. Check the slight missing-note hitch at the loop seam is gone.
 - [ ] Hold Down across Azalea's three ledges and keep moving afterward. Check that the follower lands and continues following without releasing Down or turning sideways.

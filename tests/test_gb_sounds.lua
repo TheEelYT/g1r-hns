@@ -25,7 +25,7 @@ return function(T,game,w,s,keep)
   local mart={};T.check(Player.start(Audio._pack,Audio._cache,mart,assert(martId)),'GB mart starts through actual native player')
   local fix=assert(G.spec.loopFixes.gbs_hg_poke_mart_Header);local repeats={0,0,0,0}
   T.eq(fix.midiBodyUnits,448,'source MIDI body has 28 four-beat bars');T.eq(fix.bodyRepeats,2,'GB arrangement contains two body repeats')
-  T.eq(fix.trackUnits[1],928,'mart full arrangement ends on source whole-bar grid')
+  T.eq(fix.trackUnits[1],929,'mart arrangement includes MIDI grid repair and reviewed silent gap');T.eq(fix.listeningGapUnits,1,'listening adjustment extends silence, not notes')
   T.eq(fix.introUnits,32,'reviewed mart intro ends at source HG MIDI marker')
   for i,t in ipairs(mart.hnsGB.source.tracks)do T.check(t.pc<fix.loopStarts[i],'first play includes mart intro on channel '..i)end
   for f=1,20000 do
@@ -33,7 +33,7 @@ return function(T,game,w,s,keep)
     Player.updateSlot(mart,1)
     for i,t in ipairs(mart.hnsGB.source.tracks)do if t.pc<prev[i]then
       repeats[i]=repeats[i]+1
-      local expected=1+math.floor((fix.introUnits+repeats[i]*fix.midiBodyUnits*fix.bodyRepeats)*12*140/256)
+      local expected=1+math.floor((fix.introUnits+repeats[i]*(fix.midiBodyUnits*fix.bodyRepeats+fix.listeningGapUnits))*12*140/256)
       T.eq(f,expected,'mart repeat timing has no missing fractional note on channel '..i)
       T.check(t.pc>=fix.loopStarts[i]and t.pc<=fix.loopStarts[i]+8,'mart repeat enters body, never intro, channel '..i)
     end end
