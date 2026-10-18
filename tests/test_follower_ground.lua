@@ -5,7 +5,7 @@ return function(T,game,w,s,F,keep)
   local before=R._list;R._list={};local behavior,water,se=C.behavior,C.isSurfable,A.playSe
   local n=MB.id('NORMAL');local old=MB.id('SAND');local cur=n;local sounds=0
   C.behavior=function(x,y)return x==2 and old or cur end;C.isSurfable=function(b)return b==MB.id('POND_WATER')end
-  A.playSe=function(id)T.eq(id,G.spec.puddleSe,'follower uses source puddle sound ID');sounds=sounds+1 end
+  A.playSe=function(id)T.eq(id,w.audio.groundSounds.SE_PUDDLE,'follower uses imported source puddle sequence');sounds=sounds+1 end
   local function reset()G.clear();R._list={};sounds=0 end
   local ids={};for id,row in pairs(w.opening.sprites)do if row.trackType then ids[row.trackType]=tonumber(id)end end
   for _,track in ipairs({'TRACKS_NONE','TRACKS_FOOT','TRACKS_BUG','TRACKS_SPOT','TRACKS_SLITHER'})do T.check(ids[track],'source species metadata contains '..track)end
@@ -28,13 +28,15 @@ return function(T,game,w,s,F,keep)
     reset();a.facing=facing;old=MB.id('SAND');G.begin(a,3,4);local e=R._list[1]
     T.eq(e.a.hflip,facing=='right','source footprint horizontal flip '..facing);T.eq(e.a.vflip,facing=='down','source footprint vertical flip '..facing)
   end
+  reset();old=MB.id('DEEP_SAND');cur=old;G.begin(a,3,4,true);T.eq(R.count('sand_footprints'),0,'deep-sand jump uses deep footprint sheet');T.eq(R.count('deep_sand_footprints'),1,'jump departure leaves source track');T.eq(R.count('sand_pile'),0,'jump suppresses attached covering effect')
   reset();old=MB.id('DEEP_SAND');cur=old;G.begin(a,3,4)
   T.eq(a.inSandPile,true,'deep sand covers follower feet');local pile
   for _,e in ipairs(R._list)do if e.name=='sand_pile'then pile=e end end
   T.check(pile and pile.follow==a,'sand pile follows actual owner');T.eq(pile.a.frame,2,'sand pile spawns at source held pose')
   R.step();T.eq(pile.y,78,'sand pile is grounded at owner feet');S.leaveShort(a);T.eq(a.inSandPile,false,'recall clears sand state')
   for _,e in ipairs(R._list)do T.check(not e.hnsAttached,'recall removes attached effects while detached trails fade')end
-  reset();old=MB.id('PUDDLE');cur=old;G.begin(a,3,4);T.eq(R._list[1].name,'splash','puddle crossing splashes at begin')
+  reset();old=MB.id('PUDDLE');cur=old;G.appear(a,3,4);T.eq(#R._list,0,'appearing in puddle does not synthesize step/finish effects')
+  G.begin(a,3,4);T.eq(R._list[1].name,'splash','puddle crossing splashes at begin')
   G.finish(a,3,4);T.eq(R.count('splash'),2,'puddle has source begin/end splashes');T.eq(R.count('ripple'),1,'puddle landing creates a ripple');T.eq(sounds,2,'source puddle cues at begin/end')
   reset();old=MB.id('SHALLOW_WATER');cur=old;G.begin(a,3,4);local flow=R._list[1]
   T.check(flow and flow.name=='splash'and flow.follow==a,'shallow water attaches looping source splash');R.step();T.eq(sounds,1,'flow sound starts once for owner tile')

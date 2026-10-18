@@ -59,9 +59,11 @@ static void FieldEffectStop(struct Sprite*s,int effect){stopped=1;}
     for key,name in funcs.items():
         body=re.search(r'bool8 MetatileBehavior_'+name+r'\([^)]*\)\s*\{(.*?)\n\}',behavior,re.S)[1]
         assert set(spec['behaviors'][key])==set(re.findall(r'== MB_(\w+)',body))
+    cue=world['audio']['groundSounds']['SE_PUDDLE'];assert world['audio']['songs'][str(cue)]=='SE_PUDDLE'
+    assert cue-world['audio']['base']==spec['puddleSe']
     move=(source/'src/event_object_movement.c').read_text()
     for kind,fn,effect in [('SPOT','FootprintsC','TRACKS_BUG'),('BUG','FootprintsB','TRACKS_SPOT')]:
         assert re.search(r'\[TRACKS_'+kind+r'\] = DoTracksGroundEffect_'+fn,move)
         body=re.search(r'static void DoTracksGroundEffect_'+fn+r'\([^;]*?\)\n\{.*?\n\}',move,re.S)[0];assert 'FLDEFF_'+effect in body
     assert all(r.get('trackType','TRACKS_NONE').startswith('TRACKS_')for r in world['opening']['sprites'].values())
-    return {'source_follower_ground_art_sheets':len(spec['art']),'source_follower_ground_pixels':pixels,'source_c_follower_ground_anim_commands':commands,'source_c_follower_track_fade_frames':len(reference)}
+    return {'source_follower_ground_sound_effects':1,'source_follower_ground_art_sheets':len(spec['art']),'source_follower_ground_pixels':pixels,'source_c_follower_ground_anim_commands':commands,'source_c_follower_track_fade_frames':len(reference)}

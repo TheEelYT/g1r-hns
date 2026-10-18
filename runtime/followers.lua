@@ -72,7 +72,7 @@ return function(mod,w,game)
     a.moving=dx~=0 or dy~=0;a.progress=0;a.animClock=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
     Motion.begin(a,w.followers.motion,(a.stepFrames<=8)and not a.jumping)
     if game._hnsFieldShadows then
-      if a.jumping then game._hnsFieldShadows.shadows.leaveShort(a)else game._hnsFieldShadows.shadows.step(a,x,y,false)end
+      if a.jumping then game._hnsFieldShadows.shadows.leaveShort(a);game._hnsFollowerGround.begin(a,x,y,true)else game._hnsFieldShadows.shadows.step(a,x,y,false)end
     end
   end
   function F.tick()
@@ -82,7 +82,7 @@ return function(mod,w,game)
       local tr=F.transition;tr.elapsed=tr.elapsed+1
       if tr.elapsed>=tr.frames then
         F.transition=nil;a.visible=tr.kind=='exit'
-        if a.visible and game._hnsFieldShadows then game._hnsFieldShadows.shadows.finish(a,a.cellX,a.cellY)end
+        if a.visible and game._hnsFieldShadows then game._hnsFieldShadows.shadows.appear(a,a.cellX,a.cellY)end
         if tr.done then tr.done()end
       end
       return

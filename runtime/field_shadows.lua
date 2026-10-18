@@ -47,12 +47,13 @@ return function(mod,w,game)
   local Ground=assert(load(mod:read('follower_ground.lua')))()(mod,w,game)
   local function grassName(beh)return beh==MB.id('LONG_GRASS')and'long_grass'or beh==MB.id('TALL_GRASS')and'tall_grass'end
   function S.leaveShort(a)S.short[a]=nil;Ground.leave(a)end
-  function S.finish(a,x,y,jumped)
-    Ground.finish(a,x,y,jumped)
+  local function shortCover(a,x,y)
     if Coll.behavior(x,y)==MB.id('SHORT_GRASS')and a.visible then
       S.short[a]=S.short[a]or{actor=a,timer=0,x=a.px,y=a.py}
     else S.short[a]=nil end
   end
+  function S.finish(a,x,y,jumped)Ground.finish(a,x,y,jumped);shortCover(a,x,y)end
+  function S.appear(a,x,y)Ground.appear(a,x,y);shortCover(a,x,y)end
   function S.step(a,x,y,jump)
     if not own()or not a.visible then return end
     if not jump then Ground.begin(a,x,y)end

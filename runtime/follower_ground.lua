@@ -3,7 +3,7 @@
 return function(mod,w,game)
   local G=game._hnsFollowerGround or{cover={}};G.spec=w.fieldShadows.ground
   local R=require('src.core.game3.field_effects_rse');local C=require('src.core.game3.collision');local MB=require('src.core.game3.mb')
-  local Audio=require('src.core.game3.audio');local Rt=require('src.core.game3.runtime')
+  local Audio=require('src.core.game3.audio');local puddleSe=assert(w.audio.groundSounds.SE_PUDDLE)
   local sets={};for key,names in pairs(G.spec.behaviors)do local t={};sets[key]=t;for _,name in ipairs(names)do local id=MB.id(name);if id then t[id]=true end end end
   local function is(key,b)return sets[key][b]==true end
   local dir={down=1,up=2,left=3,right=4}
@@ -44,7 +44,7 @@ return function(mod,w,game)
       st.flow=true;following(a,'splash',{anim=2,stopOnEnd=false,y2=function(h)return h/2-4 end,keep=function()return a.inShallowFlowingWater end,
         onStep=function(e)
           local x,y=a.moving and a.targetX or a.cellX,a.moving and a.targetY or a.cellY
-          if e.lastCellX~=x or e.lastCellY~=y then e.lastCellX,e.lastCellY=x,y;Audio.playSe(G.spec.puddleSe)end
+          if e.lastCellX~=x or e.lastCellY~=y then e.lastCellX,e.lastCellY=x,y;Audio.playSe(puddleSe)end
         end})
     elseif not flow then st.flow=false end
     if hot and not st.hot then
@@ -52,9 +52,9 @@ return function(mod,w,game)
     elseif not hot then st.hot=false end
   end
   local function splash(a)
-    following(a,'splash',{y2=function(h)return h/2-4 end});Audio.playSe(G.spec.puddleSe)
+    following(a,'splash',{y2=function(h)return h/2-4 end});Audio.playSe(puddleSe)
   end
-  function G.begin(a,x,y)
+  function G.begin(a,x,y,jump)
     if not active(a)then return end
     local cur,prev=C.behavior(x,y),C.behavior(a.cellX,a.cellY)
     if not a.directionOverwrite and(is('sand',prev)or is('prints',prev))then
@@ -71,8 +71,11 @@ return function(mod,w,game)
       if name then stationary(a,name,a.cellX,a.cellY,anim)end
     end
     a.hnsPreviousDirection=a.facing
-    cover(a,cur,prev)
+    if jump then G.leave(a)else cover(a,cur,prev)end
     if is('puddle',cur)and is('puddle',prev)then splash(a)end
+  end
+  function G.appear(a,x,y)
+    if active(a)then local cur=C.behavior(x,y);cover(a,cur,cur)end
   end
   function G.finish(a,x,y,jumped)
     if not active(a)then return end
