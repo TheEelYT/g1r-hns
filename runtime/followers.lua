@@ -82,6 +82,7 @@ return function(mod,w,game)
       local tr=F.transition;tr.elapsed=tr.elapsed+1
       if tr.elapsed>=tr.frames then
         F.transition=nil;a.visible=tr.kind=='exit'
+        if a.visible and game._hnsFieldShadows then game._hnsFieldShadows.shadows.finish(a,a.cellX,a.cellY)end
         if tr.done then tr.done()end
       end
       return
@@ -105,9 +106,10 @@ return function(mod,w,game)
         if a.stepFrames==16 then a.raiseY=Motion.walkBob(a.progress)else a.raiseY=math.floor((a.progress+2)/8)%2==0 and -1 or 0 end
       end
       if f==1 then
+        local jumped=a.jumping
         if a.jumping and game._hnsFieldShadows then game._hnsFieldShadows.shadows.step(a,a.targetX,a.targetY,true)end
         a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)
-        if game._hnsFieldShadows then game._hnsFieldShadows.shadows.finish(a,a.cellX,a.cellY)end
+        if game._hnsFieldShadows then game._hnsFieldShadows.shadows.finish(a,a.cellX,a.cellY,jumped)end
         local pending=a.pendingStep;a.pendingStep=nil
         if pending then F.step(pending.x,pending.y,pending.frames,pending.playerJump)end
       end

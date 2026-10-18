@@ -61,6 +61,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
         if not ow:raise ValueError('missing follower OVERWORLD declaration: '+gfx)
         images,width,height,anims,pal,shiny_pal = ow.groups(); width,height=int(width),int(height)
         shadow=re.search(r'OVERWORLD\(\s*\w+,\s*SIZE_\d+x\d+,\s*SHADOW_SIZE_(\w+)',entry)[1]
+        track=re.search(r'SHADOW_SIZE_\w+,\s*(TRACKS_\w+)',entry)[1]
         if 'OBJ_EVENT_MON_SHINY' in gfx:pal=shiny_pal
         tables=(base/"object_event_pic_tables_followers.h").read_text()
         frames=re.search(r"\b"+images+r"\[\]\s*=\s*\{(.*?)\};",tables,re.S).group(1)
@@ -86,7 +87,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
         directory=stage/"ow";directory.mkdir(exist_ok=True)
         (directory/f"{gid}.meta").write_bytes(meta);(directory/f"{gid}.rgba").write_bytes(rgba)
         return {"graphicsId":gid,"width":width,"height":height,"frameCount":n,"source":gfx,"standingOnly":standing_only,"asymmetric":asymmetric,
-                "shadowSize":{'S':0,'M':1,'L':2,'NONE':3}[shadow],"sourcePng":str(Path(paths[symbol]).with_suffix('.png')),"sourcePalette":str(Path(paths[pal]).with_suffix('.pal')),"frameOrder":order,"sourceAnimTable":anims}
+                "shadowSize":{'S':0,'M':1,'L':2,'NONE':3}[shadow],"sourcePng":str(Path(paths[symbol]).with_suffix('.png')),"sourcePalette":str(Path(paths[pal]).with_suffix('.pal')),"frameOrder":order,"sourceAnimTable":anims,"trackType":track}
     pointers = (base / "object_event_graphics_info_pointers.h").read_text()
     info_name = re.search(r"\[" + re.escape(gfx) + r"\]\s*=\s*&(\w+)", pointers).group(1)
     infos = (base / "object_event_graphics_info.h").read_text()
@@ -156,7 +157,7 @@ def sprite(source, gfx, gid, stage, palette_parser, standing_only=False):
     directory = stage / "ow"; directory.mkdir(exist_ok=True)
     (directory / f"{gid}.meta").write_bytes(meta)
     (directory / f"{gid}.rgba").write_bytes(rgba)
-    return {"graphicsId":gid,"width":width,"height":height,"frameCount":len(rows),"source":gfx,"standingOnly":standing_only,"shadowSize":{'SHADOW_SIZE_S':0,'SHADOW_SIZE_M':1,'SHADOW_SIZE_L':2,'SHADOW_SIZE_NONE':3}[shadow]}
+    return {"graphicsId":gid,"width":width,"height":height,"frameCount":len(rows),"source":gfx,"standingOnly":standing_only,"trackType":fields.get("tracks","TRACKS_NONE") if isinstance(fields,dict) else "TRACKS_NONE","shadowSize":{'SHADOW_SIZE_S':0,'SHADOW_SIZE_M':1,'SHADOW_SIZE_L':2,'SHADOW_SIZE_NONE':3}[shadow]}
 
 
 def preview_sprites(stage, opening, directory):

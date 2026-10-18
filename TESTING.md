@@ -1,14 +1,14 @@
-# Player testing notes — 0.7.18
+# Player testing notes — 0.7.19
 
-Use G1R 0.3.88. Confirmed follower hops/landing dust, Pokégear label shade and both-direction outdoor border following are removed. Walking, capture jingles, instruments, visible shadows and earlier title/UI checks remain removed. Ability identity checks rely on automation unless normal play exposes a mismatch.
+Use G1R 0.3.89. The GB mart loop from 0.7.17 is player-confirmed; 0.7.18's extra 1/16-note rest is removed. That loop check is no longer pending. Confirmed hops/dust, walking/running, label shade, outdoor border following, capture jingles and earlier title/UI checks remain removed.
 
-- [ ] Listen to the GB Pokémart loop seam. Its final silent gap is now one sixteenth-note unit longer; the last notes and intro are unchanged. Check whether the pause now matches the romhack.
-- [ ] Compare the tonal percussion hit with the romhack in GB mode. The source mart drum 6 requests pitched 7-bit noise (NR43=0x2A); its source setting is retained. If a different track is affected, record its location and roughly where the hit occurs. Audible/analog PSG parity remains open.
-- [ ] Compare player and follower **short grass in Azalea**, at midday and night. Shadows now draw behind grass even during the follower's idle bob; the leaf colors should match. Tall grass is unchanged.
-- [ ] When encountered naturally, check that diagonal fog/underwater bubbles hide object shadows and a step from water onto shore does not leave a stray shadow. Ordinary rain/horizontal fog and dry ground retain them.
-- [ ] If a terrain move becomes available, check its field background and restoration after expiry/removal.
+- [ ] When crossing sand/footprint terrain, check that followers leave species-specific trails. Footprints should face the direction of travel, slither trails should turn, and marks should hold briefly before flickering away. Species configured without tracks should leave none.
+- [ ] In deep sand, puddles, shallow water or hot springs, check that effects follow the follower's feet, clean up when it leaves/recalls, and do not change walking or hop timing. Ordinary ground landing dust is retained.
+- [ ] Compare player and follower **short grass in Azalea**, at midday and night. The 0.7.18 shadow-order correction is retained; tall grass is unchanged.
+- [ ] When encountered naturally, check source fog/water shadow suppression and terrain backgrounds restoring after expiry/removal.
+- [ ] Compare the reported tonal percussion with the romhack in GB mode. The source mart drum 6 requests pitched 7-bit noise (NR43=0x2A); it is unchanged. If another track is affected, note its location and roughly where the hit occurs.
 
-There is no need to test every move or ability by hand. Hidden acquisition, many expanded ability effects, source popups, remaining weather rules and the full follower ground-effect set remain unfinished. Report crashes or mismatches encountered in normal play.
+There is no need to test every move or ability by hand. Hidden acquisition, many expanded ability effects, source popups, reflections, seaweed/ash effects, further field/weather rules and later campaign remain unfinished. Report mismatches encountered in normal play.
 
 ## Updating these notes
 
