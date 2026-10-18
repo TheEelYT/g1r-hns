@@ -1,8 +1,8 @@
 {
-  "version": "0.7.18",
+  "version": "0.7.19",
   "native_checks": {
-    "default": 126427,
-    "mounted": 126427
+    "default": 127432,
+    "mounted": 127432
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.17",
+  "cart_version": "1.0.18",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -42,8 +42,8 @@
         "campaign_battles": 2,
         "source_map_music": 564,
         "source_gear_sound_effects": 3,
-        "source_songs": 153,
-        "source_instrument_samples": 403,
+        "source_songs": 154,
+        "source_instrument_samples": 421,
         "source_wild_areas": 316,
         "source_wild_slots": 2795,
         "wild_maps": 150,
@@ -157,6 +157,11 @@
         "source_shadow_size_rows": 1229,
         "source_follower_grass_pixels": 2816,
         "source_follower_grass_sequences": 3,
+        "source_follower_ground_sound_effects": 1,
+        "source_follower_ground_art_sheets": 12,
+        "source_follower_ground_pixels": 7680,
+        "source_c_follower_ground_anim_commands": 112,
+        "source_c_follower_track_fade_frames": 57,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -196,7 +201,7 @@
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available.",
     "GB music/fanfares run source bytecode through native PSG synthesis; GB cry remaps, hardware SFX channel arbitration and audible/analog fidelity remain pending.",
-    "Field shadows use source masks, size/offset, opacity, owner-relative ordering and source fog/current-previous water suppression. Complete non-grass follower effects and full weather parity remain pending."
+    "Field shadows use source masks, size/offset, opacity, owner-relative ordering and source fog/current-previous water suppression. Source follower tracks/sand/water effects are connected; reflections, seaweed bubbles, ash, further map-specific ground effects and full weather parity remain pending."
   ],
   "targeted_regressions": [
     "Real native grass-step rolls in Morning/Day/Evening/Night",
@@ -252,49 +257,50 @@
     "Native CB.doClick frame 95 and capture_success wait callbacks select HnS evolved/caught cues through actual audio baking/sequencing in normal and GB modes; vanilla wait retains native ID.",
     "128 normal-walking bob frames match compiled source MovementType_FollowPlayer_Moving; held-walking gap cannot advance idle pose/timer.",
     "Native collision finds actual adjacent Azalea short-grass tiles; follower walking retains attached source overlay, while idle holds end pose, movement restarts and leaving/hiding cleans it.",
-    "GB mart MIDI-grid repair is retained; the separately reviewed additional silent unit gives current repeat frames 6097/11984/17870 without resetting fractional carry.",
     "Native player short-grass spawn uses shared HnS sheet/animation. Actual field draws at hours 12/21 put player and follower textures into the same canvas with one common night tint; vanilla assets remain scoped away.",
     "Repeated game.ready keeps the effect-state table referenced by existing collectors and listeners; full native tests expose stale state when the previous initializer replaces it.",
     "Actual native sorter across 16 elevations, 32 camera offsets and both follower idle heights keeps shadows behind owners/short grass; an overlapping source leaf retains its RGB. A negative control reproduces former shadow-over-grass ordering.",
     "Independently compiled source shadow predicates cover 243 behavior rows; diagonal-fog/bubbles suppression and current/previous water, including actual player Surf-to-shore, are exercised.",
-    "GB mart adds one reviewed silent unit beyond the 928-unit MIDI repair; multi-loop tests measure 13 silent frames and check 1255 source drum-6 triggers, NR43=0x2A, short-noise width and 32768-Hz clock. Audible percussion comparison remains pending."
+    "Confirmed 0.7.17 mart assembly matches byte-for-byte; 0.7.18 extra rest removed. Current repeats are 6091/11971/17851, with seven silent frames per seam and fractional carry unchanged.",
+    "Twelve source follower ground sheets compare 7680 palette pixels and 112 C-compiled animation commands; source footprint-fade callbacks produce 57 reference ticks. Native RSE entries check every hold/flicker/expiry frame.",
+    "Actual follower steps and recall trigger species-owned footprints/turning slither/spot/bug trails, sand cover, puddle/ripple/flow/hot-spring effects and water landing splashes, without changing completed motion/hop/border tests. Spawn and jump covering rules are distinct."
   ],
   "tested_build_content_equivalence": {
-    "files": 7828,
+    "files": 7842,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
   },
   "release_artifacts": {
-    "mod_version": "0.7.18",
-    "cart_version": "1.0.17",
+    "mod_version": "0.7.19",
+    "cart_version": "1.0.18",
     "repo": "TheEelYT/g1r-hns",
     "files": [
       {
-        "name": "pokemon_heart_soul-1.0.17.g1rcart",
+        "name": "pokemon_heart_soul-1.0.18.g1rcart",
         "bytes": 1028181,
-        "sha256": "03a2a95b06befe445e2a49627792a6f121e677dcdf89213b0675577ff89e9f31"
+        "sha256": "e1fce7c51c2a9350a2df448ea1ef27616b66f4ee002c460178e32bdf4596f249"
       },
       {
-        "name": "hns_exploration-0.7.18.zip",
-        "bytes": 10197899,
-        "sha256": "86dd41c8a18086c5bdde647b262af5f751478b22d85e08182667629845b84c25"
+        "name": "hns_exploration-0.7.19.zip",
+        "bytes": 10289785,
+        "sha256": "c9ac212e9e2eff3b053b7d04eaefd2444434a00490ea65df1e1021f132bc0c60"
       }
     ],
     "result": "pass"
   },
   "engine_compatibility": {
-    "v0.3.88": {
-      "commit": "c1561fc6d9d33a90a415985c2870efc5063798f6",
-      "latest_release_verified": "2026-10-15",
+    "v0.3.89": {
+      "commit": "6e610fb9919b0233575ba410cd41a94fdf379d7b",
+      "latest_release_verified": "2026-10-18",
       "raw_native_checks": {
-        "default": 126427,
-        "mounted": 126427
+        "default": 127432,
+        "mounted": 127432
       },
       "compressed_native_checks": {
-        "default": 126427,
-        "mounted": 126427
+        "default": 127432,
+        "mounted": 127432
       },
-      "installer_encoded_assets": 5596,
+      "installer_encoded_assets": 5608,
       "codec": "actual src.import.CacheBlob encode/decode"
     },
     "policy": "Test only latest published G1R; old engine matrix retired at user request."
@@ -383,26 +389,28 @@
     "capture_jingles_player_confirmed_normal_and_gb": true,
     "mart_midi_body_units": 448,
     "mart_body_repeats": 2,
-    "mart_arrangement_units": 929,
+    "mart_arrangement_units": 928,
     "mart_restored_tail_units": 1,
     "mart_repeat_frames": [
-      6097,
-      11984,
-      17870
+      6091,
+      11971,
+      17851
     ],
     "fractional_timing_preserved": true,
-    "mart_reviewed_extra_silent_units": 1,
+    "mart_reviewed_extra_silent_units": 0,
     "mart_silent_seam_frames": [
-      13,
-      13,
-      13
+      7,
+      7,
+      7
     ],
-    "mart_gap_player_confirmed": false,
+    "mart_gap_player_confirmed": true,
     "source_mart_drum_NR43": 42,
     "source_mart_drum_short_noise": true,
     "source_mart_noise_clock_hz": 32768,
-    "source_mart_drum_triggers_audited": 1255,
-    "tonal_percussion_audible_comparison_pending": true
+    "source_mart_drum_triggers_audited": 1256,
+    "tonal_percussion_audible_comparison_pending": true,
+    "mart_assembly_matches_v0717": true,
+    "mart_assembly_sha256": "4b3022d71d809d03d777cf758bebef39100c2538c9f56bbcb50ad53de9176a86"
   },
   "follower_motion": {
     "source_idle_poses_and_bobbing": true,
@@ -465,7 +473,9 @@
     "source_grass_pixels": 2816,
     "follower_grass_sequences": 3,
     "remaining": [
-      "Complete non-grass follower ground effects",
+      "Reflections",
+      "Seaweed bubbles",
+      "Ash and further map-specific follower effects",
       "Full weather parity"
     ],
     "shadows_player_confirmed": true,
@@ -490,6 +500,17 @@
       14
     ],
     "previous_water_suppression": true,
-    "player_surf_shore_history": true
+    "player_surf_shore_history": true,
+    "source_ground_art_sheets": 12,
+    "source_ground_art_pixels": 7680,
+    "source_c_ground_anim_commands": 112,
+    "source_c_track_fade_frames": 57,
+    "source_species_track_types": true,
+    "owner_bound_ground_effects": true,
+    "recall_clears_attached_effects": true,
+    "detached_tracks_expire": true,
+    "jump_departure_tracks": true,
+    "spawn_excludes_step_effects": true,
+    "source_ground_sound_effects": 1
   }
 }

@@ -92,6 +92,8 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
             if row.get('songName'):selected.add(names[row['songName']])
     menu_sounds={name:sid(name)for name in ('SE_POKENAV_ON','SE_POKENAV_OFF','SE_SELECT')}
     selected.update(id-BASE for id in menu_sounds.values())
+    ground_sounds={'SE_PUDDLE':sid('SE_PUDDLE')}
+    selected.update(id-BASE for id in ground_sounds.values())
     selected.add(names['MUS_HG_OAK'])
     selected.update(names[n]for n in ('MUS_HG_INTRO','MUS_HG_TITLE'))
     for name in names:
@@ -225,7 +227,7 @@ def build(source,engine,stage,maps,source_maps,trainers,prepared,scripts):
             if row['op']=='setflag' and row.get('flag')==0x6017:additions.append({'after':i,'rows':[{'op':'playfanfare','songName':'MUS_HG_OBTAIN_BERRY'},{'op':'waitfanfare'}]})
         if key=='HNS_QUEST_RIVAL_CORE':additions.append({'before':1,'rows':[{'op':'playbgm','songName':'MUS_HG_ENCOUNTER_RIVAL'}]})
         if additions:cues[key]=additions
-    return {'base':BASE,'menuSounds':menu_sounds,'songs':{str(BASE+i):table[i][0].upper() for i in sorted(selected)},
+    return {'base':BASE,'menuSounds':menu_sounds,'groundSounds':ground_sounds,'songs':{str(BASE+i):table[i][0].upper() for i in sorted(selected)},
             'roles':{k:sid(v) for k,v in roles.items()},'aliases':aliases,'mapSongs':map_songs,
             'fanfares':{str(sid(k)):{'frames':v,'name':k} for k,v in fanfares.items()},
             'oak':sid('MUS_HG_OAK'),'cues':cues,'songCount':len(selected),'sampleBytes':(target/'samples.bin').stat().st_size,

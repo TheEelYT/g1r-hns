@@ -25,7 +25,7 @@ return function(T,game,w,s,keep)
   local mart={};T.check(Player.start(Audio._pack,Audio._cache,mart,assert(martId)),'GB mart starts through actual native player')
   local fix=assert(G.spec.loopFixes.gbs_hg_poke_mart_Header);local repeats={0,0,0,0}
   T.eq(fix.midiBodyUnits,448,'source MIDI body has 28 four-beat bars');T.eq(fix.bodyRepeats,2,'GB arrangement contains two body repeats')
-  T.eq(fix.trackUnits[1],929,'mart arrangement includes MIDI grid repair and reviewed silent gap');T.eq(fix.listeningGapUnits,1,'listening adjustment extends silence, not notes')
+  T.eq(fix.trackUnits[1],928,'mart arrangement matches player-confirmed 0.7.17 loop');T.eq(fix.listeningGapUnits,0,'no extra listening gap beyond confirmed source-grid rest')
   T.eq(fix.introUnits,32,'reviewed mart intro ends at source HG MIDI marker')
   for i,t in ipairs(mart.hnsGB.source.tracks)do T.check(t.pc<fix.loopStarts[i],'first play includes mart intro on channel '..i)end
   local silence=0;local seamGaps={};local drumHits=0;local lastNoise
@@ -45,7 +45,7 @@ return function(T,game,w,s,keep)
     lastNoise=st.channels[4]
     for i,t in ipairs(mart.hnsGB.source.tracks)do if t.pc<prev[i]then
       repeats[i]=repeats[i]+1
-      if i==1 then seamGaps[#seamGaps+1]=tail;T.check(tail>=12,'all four mart voices rest for two units at the audible seam')end
+      if i==1 then seamGaps[#seamGaps+1]=tail;T.check(tail>=6 and tail<=7,'all four mart voices retain the confirmed one-unit silent seam')end
       local expected=1+math.floor((fix.introUnits+repeats[i]*(fix.midiBodyUnits*fix.bodyRepeats+fix.listeningGapUnits))*12*140/256)
       T.eq(f,expected,'mart repeat timing has no missing fractional note on channel '..i)
       T.check(t.pc>=fix.loopStarts[i]and t.pc<=fix.loopStarts[i]+8,'mart repeat enters body, never intro, channel '..i)

@@ -20,7 +20,7 @@ import sys
 import zlib
 
 PIN_HNS = "167aa6d537b109bb229c231ddce4616974c4da71"
-PIN_ENGINE = "c1561fc6d9d33a90a415985c2870efc5063798f6"
+PIN_ENGINE = "6e610fb9919b0233575ba410cd41a94fdf379d7b"
 EARLY_PREFIXES = ("NewBarkTown", "Route29", "CherrygroveCity", "Route30")
 OPENING_PREFIXES = EARLY_PREFIXES + (
     "Route31", "VioletCity", "SproutTower", "Route27", "TohjoFalls",

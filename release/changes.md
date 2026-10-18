@@ -1,11 +1,11 @@
-## Pokémon Heart & Soul — Mod 0.7.18
+## Pokémon Heart & Soul — Mod 0.7.19
 
-Use the `.g1rcart` download; it installs the pinned mod with isolated saves and mod edits disabled. Cart version is 1.0.17; Mod 1.0 is reserved for complete romhack parity. This release targets the latest G1R 0.3.88.
+Use the `.g1rcart` download for isolated saves and disabled mod edits. Cart version is 1.0.18. Mod 1.0 remains reserved for complete romhack parity. This release targets G1R 0.3.89.
 
-- Fix the follower shadow being drawn over Azalea short-grass leaves during idle bobbing. Ground shadows now stay behind their owner and grass across camera rows/elevations and scripted priorities. Source leaf colors and outdoor tint are retained.
-- Extend the GB Pokémart's final silent gap by one sixteenth-note unit, separately tracked from the existing MIDI-grid repair. All four channels stay synchronized; note lengths, intro exclusion and fractional timing are preserved. This listening adjustment still needs comparison with the romhack.
-- Import source shadow priority tables, diagonal-fog/underwater-bubble suppression and the complete source grass/water behavior sets, including previous-water suppression when reaching shore.
-- Audit the mart percussion: source drum 6 explicitly requests 7-bit noise (NR43=0x2A). Keep that source sound; the reported tonal difference remains open for audible comparison.
-- Update README progress and TESTING.md, removing confirmed hop/dust, label-shade, ability-summary and border-following suggestions.
+- Restore the confirmed 0.7.17 GB Pokémart loop by removing only 0.7.18's extra 1/16-note rest. Keep the source MIDI-grid correction, intro exclusion, note lengths and fractional timing. The converted mart assembly matches 0.7.17 byte for byte.
+- Import species-owned follower track types, directional footprints, spot/bug trails and turning slither tracks, with source palettes, frame flips and track flicker/expiry.
+- Add deep-sand foot cover, owner-bound puddle splashes/ripples and imported source puddle audio, looping shallow-water effects, hot-spring overlays and water-landing splash selection. Recall removes attached effects while detached trails expire; map changes clear old effects.
+- Retain all 0.7.18 short-grass/shadow-order and fog/shoreline shadow fixes. Walking/running, hops/dust and seamless outdoor border following remain covered by regressions.
+- Update the README progress checklist and separate TESTING.md; remove the confirmed mart-loop check.
 
-Validation covers native integration under both cache roots, raw and installer-compressed assets, converter tests, strict Modkit validation, seven source audits and CPU UI captures. Shadow tests exercise all camera-row offsets/elevations/idle heights, an overlapping source leaf/shadow pixel and weather/water transitions. Source predicates are compiled independently for 243 behavior rows. The GB test measures the all-channel silent seam over multiple loops and checks source noise registers/clock. GPU uploads/shaders use recorded boundaries; Windows visual/audio confirmation remains in TESTING.md. Expanded effects and later campaign remain in progress.
+Native tests cover actual follower movement/recall, all source track families, directional flips, every track lifetime tick and sand/water transitions. Independent audits compare imported pixels and compiled source animation commands/track-fade callbacks, alongside existing world/gameplay/UI/audio source checks. Raw and installer-compressed assets use the latest G1R. Real GPU/audio listening remains a player check; reflections, seaweed/ash, further field/weather effects, expanded battle rules and later campaign remain unfinished. Source percussion is unchanged.

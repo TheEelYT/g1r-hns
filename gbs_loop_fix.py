@@ -36,10 +36,6 @@ def fix(source,text):
     assert body_units.denominator==1;body_units=int(body_units)
     assert body_units==448
     repeats=2;expected=units+repeats*body_units;assert expected==928
-    # Player comparison identifies a silent gap, not a short note. Keep the
-    # MIDI-grid repair separate from this one-unit reviewed listening adjustment.
-    # This is an explicit conversion erratum, not a claim about the public MIDI.
-    listening_gap=1
     totals=[]
     for ch in range(1,5):
         label=f'gbs_hg_poke_mart_Ch{ch}'
@@ -62,6 +58,6 @@ def fix(source,text):
             out.append(line)
             if note:elapsed+=int(note[1])
         assert inserted and elapsed==expected-1,(ch,elapsed)
-        out.append(f'\trest {1+listening_gap}\t@ MIDI boundary plus reviewed silent loop gap\n')
-        totals.append(elapsed+1+listening_gap);text=text[:start]+''.join(out)+text[end:]
-    return text,{'sourceMidi':midi,'midiDivision':division,'midiLoopTick':markers['['],'midiLoopEndTick':markers[']'],'midiBodyUnits':body_units,'bodyRepeats':repeats,'tailPaddingUnits':1,'listeningGapUnits':listening_gap,'introUnits':units,'trackUnits':totals}
+        out.append('\trest 1\t@ complete source MIDI whole-bar loop boundary\n')
+        totals.append(elapsed+1);text=text[:start]+''.join(out)+text[end:]
+    return text,{'sourceMidi':midi,'midiDivision':division,'midiLoopTick':markers['['],'midiLoopEndTick':markers[']'],'midiBodyUnits':body_units,'bodyRepeats':repeats,'tailPaddingUnits':1,'listeningGapUnits':0,'introUnits':units,'trackUnits':totals}

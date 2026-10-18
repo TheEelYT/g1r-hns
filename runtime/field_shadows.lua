@@ -13,42 +13,54 @@ return function(mod,w,game)
   -- restart and cleanup. Both draw in the common outdoor tint pass.
   local loadSheet=old.loadSheet or Fx.loadSheet
   local manifestObject=old.manifestObject or Fx.manifestObject
-  local shortSheet,shortObject
+  local sheets,objects={},{}
+  local function sourceArt(name)
+    if not own()then return end
+    return name=='short_grass'and S.spec.grass.short_grass or S.spec.ground.art[name]
+  end
   Fx.loadSheet=function(name,...)
-    if own()and name=='short_grass'then
-      if not shortSheet then
-        local art=S.spec.grass.short_grass;local quads={}
-        for i=0,art.height/16-1 do quads[i]=love.graphics.newQuad(0,i*16,16,16,art.width,art.height)end
-        shortSheet={image=U.image(art.file,art.width,art.height),quads=quads,fw=16,fh=16,frames=art.height/16}
+    local art=sourceArt(name)
+    if art then
+      if not sheets[name]then
+        local fw,fh=art.fw or 16,art.fh or 16;local quads={}
+        for i=0,art.height/fh-1 do quads[i]=love.graphics.newQuad(0,i*fh,fw,fh,art.width,art.height)end
+        sheets[name]={image=U.image(art.file,art.width,art.height),quads=quads,fw=fw,fh=fh,frames=art.height/fh}
       end
-      return shortSheet
+      return sheets[name]
     end
     return loadSheet(name,...)
   end
   Fx.manifestObject=function(name,...)
-    if own()and name=='short_grass'then
-      if not shortObject then
-        local seq={};for _,p in ipairs(S.spec.grass.short_grass.sequence)do seq[#seq+1]={'frame',p[1],p[2]}end;seq[#seq+1]={'end'}
-        shortObject={anims={seq},fw=16,fh=16,frames=S.spec.grass.short_grass.height/16,paletteTag=S.spec.paletteTag}
+    local art=sourceArt(name)
+    if art then
+      if not objects[name]then
+        local anims=art.anims
+        if not anims then
+          local seq={};for _,p in ipairs(art.sequence)do seq[#seq+1]={'frame',p[1],p[2]}end;seq[#seq+1]={'end'};anims={seq}
+        end
+        objects[name]={anims=anims,fw=art.fw or 16,fh=art.fh or 16,frames=art.height/(art.fh or 16),paletteTag=name=='short_grass'and S.spec.paletteTag or nil}
       end
-      return shortObject
+      return objects[name]
     end
     return manifestObject(name,...)
   end
+  local Ground=assert(load(mod:read('follower_ground.lua')))()(mod,w,game)
   local function grassName(beh)return beh==MB.id('LONG_GRASS')and'long_grass'or beh==MB.id('TALL_GRASS')and'tall_grass'end
-  function S.leaveShort(a)S.short[a]=nil end
-  function S.finish(a,x,y)
+  function S.leaveShort(a)S.short[a]=nil;Ground.leave(a)end
+  local function shortCover(a,x,y)
     if Coll.behavior(x,y)==MB.id('SHORT_GRASS')and a.visible then
       S.short[a]=S.short[a]or{actor=a,timer=0,x=a.px,y=a.py}
     else S.short[a]=nil end
   end
+  function S.finish(a,x,y,jumped)Ground.finish(a,x,y,jumped);shortCover(a,x,y)end
+  function S.appear(a,x,y)Ground.appear(a,x,y);shortCover(a,x,y)end
   function S.step(a,x,y,jump)
     if not own()or not a.visible then return end
+    if not jump then Ground.begin(a,x,y)end
     local beh=Coll.behavior(x,y);local name=grassName(beh)
     if beh==MB.id('SHORT_GRASS')and Coll.behavior(a.cellX,a.cellY)==beh and not jump then S.finish(a,x,y)else S.short[a]=nil end
     if name then S.grass[#S.grass+1]={x=x,y=y,name=name,timer=0,actor=a}
-    elseif jump then Fx.startDust(x,y)
-    elseif beh==MB.id('PUDDLE')then Fx.startRipple(x,y)end
+    elseif jump and not Ground.land(a,x,y)then Fx.startDust(x,y)end
   end
   function S.tick()
     for a,g in pairs(S.short)do
@@ -108,7 +120,9 @@ return function(mod,w,game)
   function S.collect(actors,camX,camY)
     if not own()then return end
     for i=#actors,1,-1 do
-      local a=actors[i];local remove=a.kind=='field_effect_shadow'
+      local a=actors[i];local e=a.fxEntry
+      if e and e.hnsAttached then a.disguiseObject=e.hnsGroundOwner end
+      local remove=a.kind=='field_effect_shadow'
       if a.kind=='field_effect_npc_grass'then for _,g in ipairs(S.grass)do if a.x==g.x*16 and a.y==g.y*16+8 then remove=true;break end end end
       if remove then table.remove(actors,i)end
     end
