@@ -10,7 +10,10 @@ assert(cart.id=='pokemon_heart_soul'and cart.base=='emerald'and cart.seal=='seal
 assert(cart.version==arg[4]);assert(cart.mods[1].version==arg[3]);assert(cart.mods[1].sha256==arg[2])
 assert(cart.mods[1].source=='github'and cart.mods[1].repo=='TheEelYT/g1r-hns')
 assert(M.modEnabled(cart.mods[1]));assert(#cart.mods==1 and cart.load_order[1]=='hns_exploration')
-local label=assert(M.labelArtBytes(cart));assert(#label==770595 and label:sub(1,8)==M.PNG_SIGNATURE)
+local label=assert(M.labelArtBytes(cart));assert(#label<=M.MAX_LABEL_ART and label:sub(1,8)==M.PNG_SIGNATURE)
+local imageFile=assert(io.open(assert(arg[5],'expected source label PNG'),'rb'))
+local expectedLabel=imageFile:read('*a');imageFile:close()
+assert(label==expectedLabel,'cart must embed the exact current source label PNG')
 assert(M.hash(cart)==M.hash(assert(M.decode(M.encode(cart)))))
 local files={};local fs={read=function(p)return files[p]end,write=function(p,b)files[p]=b;return true end,createDirectory=function()return true end,getInfo=function(p)return files[p]and {type='file'}end}
 love.filesystem=fs;Save.resetSlotState()

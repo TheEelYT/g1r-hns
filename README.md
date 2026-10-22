@@ -6,7 +6,9 @@ A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.89. Version 0.7.19 
 
 ## Install
 
-Use Gen1Recomp **v0.3.89**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.19** and the cart version is **1.0.18**. The existing `pokemon_heart_soul` identity, label and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
+Use Gen1Recomp **v0.3.89**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.19** and the cart version is **1.0.18**. The existing `pokemon_heart_soul` identity and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
+
+Future cart packages use [the custom G1R Deluxe Heart & Soul label](release/pokemon-heart-soul.png), preserved exactly as supplied. The new artwork is queued for the next cart release; published downloads keep their original files. Artwork updates preserve the cart ID and existing save slots.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
 
