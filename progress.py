@@ -9,7 +9,6 @@ def generate(mod,engine,luajit):
     abilities=world['abilities'];moves=world['expandedMoves'];settings=world['startup']['settings']
     # Count reviewed bridges, including explicitly partial settings; not all
     # modern-move effects are complete merely because that menu is wired.
-    rows=[r for page in settings['pages'] for r in page['rows']] if 'pages' in settings else []
     implemented=world['startup']['rules']['implemented']
     def countrows(v):
         if isinstance(v,dict):
@@ -23,9 +22,11 @@ def generate(mod,engine,luajit):
              'moves':{'covered':len(moves['moves']),'total':len(moves['moves'])+len(moves['omitted'])},
              'settings':{'covered':len(set(implemented)&ids),'total':len(ids)}}
     assert all(0<=m['covered']<=m['total'] and m['total']>0 for m in metrics.values())
+    assert spec['schema']==1
     seen=set();score=0;categories=[]
     assert sum(c['weight']for c in spec['categories'])==100
     for c in spec['categories']:
+        assert c['weight']>0
         assert c['id']not in seen;seen.add(c['id']);subtotal=0
         assert sum(i['weight']for i in c['items'])==c['weight']
         for i in c['items']:

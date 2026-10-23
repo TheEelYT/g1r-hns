@@ -1,0 +1,14 @@
+{
+  "previous_release": "v0.7.19",
+  "previous_zip_sha256": "c9ac212e9e2eff3b053b7d04eaefd2444434a00490ea65df1e1021f132bc0c60",
+  "non_code_assets_identical": 7711,
+  "missing_previous_files": [],
+  "changed_previous_non_code_assets": [],
+  "world_datasets_unchanged": 28,
+  "changed_world_datasets": [
+    "fieldShadows"
+  ],
+  "maps_preserved": 564,
+  "scripts_preserved": 1789,
+  "result": "pass"
+}

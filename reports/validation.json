@@ -1,8 +1,8 @@
 {
-  "version": "0.7.19",
+  "version": "0.7.20",
   "native_checks": {
-    "default": 127432,
-    "mounted": 127432
+    "default": 127597,
+    "mounted": 127597
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.18",
+  "cart_version": "1.0.19",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -158,10 +158,11 @@
         "source_follower_grass_pixels": 2816,
         "source_follower_grass_sequences": 3,
         "source_follower_ground_sound_effects": 1,
-        "source_follower_ground_art_sheets": 12,
-        "source_follower_ground_pixels": 7680,
-        "source_c_follower_ground_anim_commands": 112,
+        "source_follower_ground_art_sheets": 13,
+        "source_follower_ground_pixels": 11776,
+        "source_c_follower_ground_anim_commands": 121,
         "source_c_follower_track_fade_frames": 57,
+        "source_c_reflection_color_cases": 98304,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -501,9 +502,9 @@
     ],
     "previous_water_suppression": true,
     "player_surf_shore_history": true,
-    "source_ground_art_sheets": 12,
-    "source_ground_art_pixels": 7680,
-    "source_c_ground_anim_commands": 112,
+    "source_ground_art_sheets": 13,
+    "source_ground_art_pixels": 11776,
+    "source_c_ground_anim_commands": 121,
     "source_c_track_fade_frames": 57,
     "source_species_track_types": true,
     "owner_bound_ground_effects": true,
@@ -512,5 +513,134 @@
     "jump_departure_tracks": true,
     "spawn_excludes_step_effects": true,
     "source_ground_sound_effects": 1
+  },
+  "engine": {
+    "version": "v0.3.95",
+    "commit": "2b45436abffc31100d3cb599c6cc09d00c1ddac3"
+  },
+  "installer_compressed": {
+    "assets": 5609,
+    "codec": "actual native CacheBlob encode/decode",
+    "default_checks": 127597,
+    "mounted_checks": 127597,
+    "result": "pass"
+  },
+  "progress": {
+    "version": "0.7.20",
+    "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
+    "complete_percent": 42.11,
+    "remaining_percent": 57.89,
+    "categories": [
+      {
+        "id": "world",
+        "title": "World data and assets",
+        "weight": 12,
+        "complete_percent": 83.33,
+        "earned_points": 10.0
+      },
+      {
+        "id": "presentation",
+        "title": "Menus, presentation and audio",
+        "weight": 12,
+        "complete_percent": 79.17,
+        "earned_points": 9.5
+      },
+      {
+        "id": "field",
+        "title": "Field and followers",
+        "weight": 10,
+        "complete_percent": 50.0,
+        "earned_points": 5.0
+      },
+      {
+        "id": "battle",
+        "title": "Battle and Pok\u00e9mon systems",
+        "weight": 25,
+        "complete_percent": 41.0,
+        "earned_points": 10.2505
+      },
+      {
+        "id": "modes",
+        "title": "Modes and challenges",
+        "weight": 12,
+        "complete_percent": 19.7,
+        "earned_points": 2.3636
+      },
+      {
+        "id": "campaign",
+        "title": "Campaign, services and progression",
+        "weight": 24,
+        "complete_percent": 10.42,
+        "earned_points": 2.5
+      },
+      {
+        "id": "release",
+        "title": "Release and final validation",
+        "weight": 5,
+        "complete_percent": 50.0,
+        "earned_points": 2.5
+      }
+    ],
+    "coverage": {
+      "abilities": {
+        "covered": 81,
+        "total": 311
+      },
+      "moves": {
+        "covered": 168,
+        "total": 580
+      },
+      "settings": {
+        "covered": 24,
+        "total": 88
+      }
+    },
+    "limits": [
+      "Scope weights are editorial and can change when omissions are found.",
+      "Partial milestones default to half credit; measured rows use their actual reviewed counts.",
+      "Settings include partial bridges; expanded moves exclude original native move rows.",
+      "Automated headless checks do not establish Windows GPU/audio/gameplay parity."
+    ]
+  },
+  "preservation": {
+    "previous_release": "v0.7.19",
+    "previous_zip_sha256": "c9ac212e9e2eff3b053b7d04eaefd2444434a00490ea65df1e1021f132bc0c60",
+    "non_code_assets_identical": 7711,
+    "missing_previous_files": [],
+    "changed_previous_non_code_assets": [],
+    "world_datasets_unchanged": 28,
+    "changed_world_datasets": [
+      "fieldShadows"
+    ],
+    "maps_preserved": 564,
+    "scripts_preserved": 1789,
+    "result": "pass"
+  },
+  "reflection_checks": {
+    "source_c_rgb555_cases": 98304,
+    "normal_shiny_palettes": true,
+    "native_projection_recolor_and_clipping": true,
+    "shared_follower_poses": true,
+    "temporary_actor_state_restored_on_error": true,
+    "foreign_map_delegation": true,
+    "ball_transition_affine_blend_complete": false
+  },
+  "seaweed_checks": {
+    "both_source_behaviors": true,
+    "finish_step_only": true,
+    "source_bubble_sheet_and_animation": true,
+    "half_pixel_accumulator_per_tick": true,
+    "detached_recall_lifetime": true,
+    "map_cleanup": true
+  },
+  "cart_label_automation": {
+    "result": "pass",
+    "gimp": "3.2.6",
+    "version_changes_visible": true,
+    "long_version_fits": true,
+    "outside_version_box_unchanged": true,
+    "master_xcf_unchanged": true,
+    "deterministic_png_cart_zip": true,
+    "native_import_save_seal_upgrade": true
   }
 }
