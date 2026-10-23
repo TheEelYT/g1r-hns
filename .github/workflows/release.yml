@@ -42,6 +42,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y luajit gcc g++ binutils
           python3 -m pip install 'Pillow>=12,<13'
+      - name: Install pinned GIMP for automatic cart labels
+        run: |
+          bash tools/setup_gimp.sh
+          echo "HNS_GIMP=$GITHUB_WORKSPACE/.tools/gimp/squashfs-root/AppRun" >> "$GITHUB_ENV"
       - name: Get pinned source checkouts
         run: |
           git clone https://github.com/PokemonHnS-Development/pokehns-expansion.git build/source
@@ -75,6 +79,7 @@ jobs:
           test -z "$(git -C build/engine status --porcelain)"
       - name: Package mod and sealed cart
         run: |
+          python3 tests/test_cart_label.py --engine build/engine --luajit /usr/bin/luajit
           python3 release.py --mod build/hns_exploration --out dist --engine build/engine --luajit /usr/bin/luajit
       - name: Keep validated downloads as workflow artifacts
         uses: actions/upload-artifact@v4

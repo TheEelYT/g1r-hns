@@ -8,7 +8,7 @@ A development port of HnS Release-v2.0.6 for Gen1Recomp v0.3.89. Version 0.7.19 
 
 Use Gen1Recomp **v0.3.89**, with vanilla US Emerald already imported. Import the cart, accept its pinned mod installation and select Pokémon Heart & Soul. The mod version is **0.7.19** and the cart version is **1.0.18**. The existing `pokemon_heart_soul` identity and seal are preserved, including upgrades from the supplied 1.0.0 cart. Restart after updating. Existing HnS party/inventory/map/story/settings namespaces are retained; a New Game is needed to replay the opening.
 
-Future cart packages use [the custom G1R Deluxe Heart & Soul label](release/pokemon-heart-soul.png), preserved exactly as supplied. The new artwork is queued for the next cart release; published downloads keep their original files. Artwork updates preserve the cart ID and existing save slots.
+Future cart packages render [the custom G1R Deluxe Heart & Soul label](release/pokemon-heart-soul.png) from [gbalabels.xcf](release/gbalabels.xcf). Packaging fills the editable `MOD_VERSION_NUMBER` layer inside `heartsoul` with the mod manifest's version, using bundled Cascadia Mono. The version fits its original box and lower-right anchor; the remaining artwork and child visibility are retained. The editable master is never overwritten. This artwork is queued for the next cart release; published downloads keep their original files. Artwork updates preserve the cart ID and existing save slots.
 
 For a manual install, uninstall the prior same-ID mod, import the ZIP and enable it for Emerald. This does not select the custom cart or move vanilla saves into it. Disable the mod, select an Emerald slot and restart for ordinary Emerald. Hot reload is untested.
 
@@ -68,6 +68,12 @@ Run `tests/test_converter.py`; from the engine directory run `tests/test_native.
 ```bash
 python3 release.py --mod /absolute/build/hns_exploration --out /absolute/dist --engine /absolute/hns-gen1recomp --luajit /absolute/path/to/luajit
 ```
+
+Cart packaging also needs GIMP 3. The release workflow installs the official GIMP 3.2.6 AppImage with a pinned SHA-256 and uses its extracted runtime, requiring no FUSE. For the same Linux setup, run `bash tools/setup_gimp.sh` and set `HNS_GIMP` to the absolute path of `.tools/gimp/squashfs-root/AppRun` before packaging. Cascadia Mono and its OFL license are bundled under `release/fonts`; no system font installation is needed. `python3 cart_label.py --out build/label-preview.png` previews the current mod version. Packaging renders a fresh `dist/pokemon-heart-soul.png` and embeds those exact bytes at the cart's top-level `labelArt`; it never reuses a stale preview PNG. The XCF and font are build inputs, excluded from the mod ZIP.
+
+The reviewed `release/cart-label-artwork.png` supplies pixels outside the original version box. Its sidecar records both its hash and the XCF hash: this preserves the exact artwork despite GEGL's occasional one-unit blend rounding differences. Each build replaces the full version box from the fresh XCF render. After deliberately editing the XCF artwork, run `python3 cart_label.py --refresh-art`, review the result and commit the updated artwork reference and sidecar together. Version-only releases need no refresh.
+
+`python3 tests/test_cart_label.py --engine /absolute/hns-gen1recomp --luajit /absolute/path/to/luajit` checks real version changes, longer versions, unchanged artwork outside the version box, reproducible packaging and native cart/save/seal behavior. Its tiny fixture mod exercises packaging without rebuilding game assets. The separate Cart label workflow runs this check without publishing a release.
 
 ## Releases and remaining work
 

@@ -7,6 +7,7 @@ import re
 import subprocess
 import zipfile
 from pathlib import Path
+from cart_label import render_label
 
 ROOT=Path(__file__).resolve().parent
 
@@ -33,7 +34,8 @@ def package(mod,out,engine,luajit):
     assert mod_id+'-'+version+'.zip' in readme,'README ZIP download is stale'
     assert '## Port progress checklist' in readme and '- [x] ~~' in readme and '- [ ] ' in readme,'Keep completed and pending port milestones in README'
     assert (mod/'README.md').read_text()==readme,'Rebuild with the current README before packaging'
-    label_path=ROOT/'release/pokemon-heart-soul.png'
+    label_path=out/'pokemon-heart-soul.png'
+    label_metadata=render_label(version,label_path)
     label=label_path.read_bytes()
     assert label.startswith(b'\x89PNG\r\n\x1a\n')and len(label)<=1024*1024
     out.mkdir(parents=True,exist_ok=True)
@@ -54,7 +56,7 @@ def package(mod,out,engine,luajit):
     subprocess.run([str(luajit),str(ROOT/'tests/test_cart_release.lua'),str(cart_path.resolve()),digest,version,cart_version,str(label_path.resolve())],cwd=engine,check=True)
     records=[{'name':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}for p in (cart_path,zip_path)]
     (out/'SHA256SUMS').write_text(''.join(r['sha256']+'  '+r['name']+'\n'for r in records))
-    (out/'release.json').write_text(json.dumps({'mod_version':version,'cart_version':cart_version,'repo':repo,'files':records},indent=2)+'\n')
+    (out/'release.json').write_text(json.dumps({'mod_version':version,'cart_version':cart_version,'repo':repo,'label':label_metadata,'files':records},indent=2)+'\n')
     notes='Download **`'+cart_path.name+'` (recommended)** and import it with Gen1Recomp’s cart importer. It installs the exact mod release, keeps HnS saves under the custom cart, and ships sealed with mod edits disabled. Use Gen1Recomp v0.3.89 with vanilla US Emerald imported.\n\n`'+zip_path.name+'` is the alternative manual mod download; it does not create the isolated cart by itself.\n\nMod '+version+' / cart '+cart_version+'. Existing `pokemon_heart_soul` cart identity and save slots are preserved. This is a development port; the later campaign and expanded battle effects remain in progress.\n'
     changes=ROOT/'release/changes.md'
     if changes.exists():notes+='\n'+changes.read_text()

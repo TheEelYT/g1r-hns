@@ -1,0 +1,28 @@
+name: Cart label
+
+on:
+  push:
+    paths: [cart_label.py, release.py, 'release/**', tests/test_cart_label.py, tests/test_cart_release.lua, tools/setup_gimp.sh, .github/workflows/cart-label.yml]
+  pull_request:
+    paths: [cart_label.py, release.py, 'release/**', tests/test_cart_label.py, tests/test_cart_release.lua, tools/setup_gimp.sh, .github/workflows/cart-label.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install label and cart test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit
+          python3 -m pip install 'Pillow>=12,<13'
+          bash tools/setup_gimp.sh
+          echo "HNS_GIMP=$GITHUB_WORKSPACE/.tools/gimp/squashfs-root/AppRun" >> "$GITHUB_ENV"
+      - name: Get the pinned native cart importer
+        run: git clone --depth=1 --branch v0.3.89 https://github.com/bryanthaboi/gen1recomp.git build/engine
+      - name: Check version rendering, packaging and saved cart identity
+        run: python3 tests/test_cart_label.py --engine build/engine --luajit /usr/bin/luajit

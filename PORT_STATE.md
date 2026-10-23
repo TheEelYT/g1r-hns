@@ -1,4 +1,17 @@
-# Port state after 0.7.2
+# Port state — 0.7.19 and queued cart-label automation
+
+## Current handoff
+
+- Latest published release: mod `0.7.19`, cart `1.0.18`, G1R `0.3.89` (`6e610fb9919b0233575ba410cd41a94fdf379d7b`). HnS source remains `167aa6d537b109bb229c231ddce4616974c4da71`. Main contains the released work and subsequent label changes; the old work/0.7.19 branch predates the final release commit.
+- 0.7.19 restores the confirmed 0.7.17 GB mart loop, adds species-owned follower tracks and sand/water effects, and keeps 0.7.18 grass/shadow corrections. Use the current README checklist and TESTING.md for completed work and unresolved player checks. Historical sections below describe their original milestones, not the current full feature set.
+- The next cart packages use the latest user-supplied `release/gbalabels.xcf`, group `heartsoul`, text layer `MOD_VERSION_NUMBER`. Cascadia Mono is the accepted open font replacement and is bundled with its OFL license. Preserve all other artwork and child visibility.
+- `release.py` now invokes `cart_label.render_label()` using the built mod manifest version. GIMP 3 renders a fresh PNG into the output directory; the cart embeds those exact bytes. The original XCF stays untouched. Text is measured and fitted within its source box to prevent Cascadia's taller metrics from wrapping the number out of view. Both PNG and cart remain deterministic.
+- The reviewed `release/cart-label-artwork.png` supplies exact pixels outside the version box; each build replaces that entire box from the fresh render. The JSON sidecar guards the XCF and artwork hashes. This avoids GEGL's observed one-unit rounding differences at a few distant blended edges. After editing artwork, use `cart_label.py --refresh-art` and review/commit both reference files. Ordinary version bumps require no refresh. Fontconfig is isolated to the bundled font.
+- `tools/setup_gimp.sh` installs a checksum-pinned official GIMP 3.2.6 AppImage. Set `HNS_GIMP` to the absolute extracted AppRun path. `tests/test_cart_label.py` renders actual labels and packages a tiny fixture mod through G1R's real cart importer/save/seal checks. It does not replace full converter/native/source validation for gameplay changes.
+- No mod/cart version bump or published-release replacement is needed for this build-pipeline change. The new label ships with the next versioned cart. Keep the existing cart ID, isolated save slots and sealed exact ZIP pin.
+- Next gameplay work remains the unfinished source mechanics/field effects and later campaign in README. Missing progression trainers, Cut trees and other travel blockers stay last, followed by the sequence-break audit. Mod 1.0 is reserved for complete parity.
+
+## Historical milestone notes (through 0.7.2)
 
 The user confirmed the earlier field, music and UI work, then reported the Egg handoff cue, post-errand Mom gate and recreated New Game intro regressions. 0.6.6 fixes these and starts the HnS battle bridge. The user clarified that fixed HnS battle rules apply independently of settings: source move parameters/chart/critical odds and Hidden Power/Explosion/Facade are imported, while the source's deliberate Gen 3 multiplier/status behavior stays intact. Nine settings now have real effects. Expanded abilities/moves/learnsets, other fixed rules, remaining challenge settings and later story are still pending. Preserve prior namespaces and terrain. Native/source checks pass; full Windows playback still requires user testing.
 
