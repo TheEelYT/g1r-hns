@@ -55,7 +55,7 @@ static void FieldEffectStop(struct Sprite*s,int effect){stopped=1;}
         # against the source callback, rather than the importer timer fields.
         assert reference==bytes([0]*41+[int(f%2==0)for f in range(42,57)]+[2])
     behavior=(source/'src/metatile_behavior.c').read_text()
-    funcs={'sand':'IsSandOrDeepSand','deep':'IsDeepSand','prints':'IsFootprints','puddle':'IsPuddle','ripple':'HasRipples','flow':'IsShallowFlowingWater','logs':'IsPacifidlogLog','spring':'IsHotSprings'}
+    funcs={'weed':'IsSeaweed','sand':'IsSandOrDeepSand','deep':'IsDeepSand','prints':'IsFootprints','puddle':'IsPuddle','ripple':'HasRipples','flow':'IsShallowFlowingWater','logs':'IsPacifidlogLog','spring':'IsHotSprings'}
     for key,name in funcs.items():
         body=re.search(r'bool8 MetatileBehavior_'+name+r'\([^)]*\)\s*\{(.*?)\n\}',behavior,re.S)[1]
         assert set(spec['behaviors'][key])==set(re.findall(r'== MB_(\w+)',body))

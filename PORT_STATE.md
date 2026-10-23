@@ -1,3 +1,9 @@
+# Current release handoff — 0.7.20
+
+Mod 0.7.20 / cart 1.0.19 / G1R v0.3.95 (`2b45436abffc31100d3cb599c6cc09d00c1ddac3`). HnS remains pinned to `167aa6d537b109bb229c231ddce4616974c4da71`.
+
+Source pond/ice/bridge reflection palettes and shared follower poses, seaweed finish-step bubbles, automatic versioned XCF cart labels and weighted progress tracking. Full reflection transition affine/blend behavior, ash and weather parity remain open. Preserve the confirmed 0.7.17 mart loop and every 0.7.18 shadow correction; no further music edits. See PROGRESS.md for the current scope estimate and TESTING.md for unresolved player checks.
+
 # Port state — 0.7.19 and queued cart-label automation
 
 ## Current handoff

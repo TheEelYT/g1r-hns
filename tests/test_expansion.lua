@@ -164,6 +164,7 @@ return function(T,game,w,maps)
   local Coll=require('src.core.game3.collision');Coll.bindMap(game,s.map,maps[s.map]);T.check(pcall(require('src.core.game3.field_view').draw,game),'actual field draws follower')
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_follower_motion.lua')(T,game,w,s,lead,keep)
   if w.fieldShadows.ground then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_follower_ground.lua')(T,game,w,s,F,keep)end
+  if w.fieldShadows.reflection then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_field_reflections.lua')(T,game,w,s,F)end
   if w.fieldShadows then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_field_shadows.lua')(T,game,w,s,F,keep)end
   F.step(8,8,16);for i=1,16 do F.tick()end
   T.check(F.message(lead):find('MON',1,true)~=nil,'source follower message uses nickname')

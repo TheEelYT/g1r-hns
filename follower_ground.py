@@ -6,7 +6,7 @@ ART = {
  'sand_footprints':'SandFootprints','deep_sand_footprints':'DeepSandFootprints',
  'bug_tracks':'BugTracks','spot_tracks':'SpotTracks','slither_tracks':'SlitherTracks','bike_tire_tracks':'BikeTireTracks',
  'splash':'Splash','ripple':'Ripple','sand_pile':'SandPile','hot_springs_water':'HotSpringsWater',
- 'jump_small_splash':'JumpSmallSplash','jump_big_splash':'JumpBigSplash',
+ 'bubbles':'Bubbles','jump_small_splash':'JumpSmallSplash','jump_big_splash':'JumpBigSplash',
 }
 
 def build(source,stage,palette):
@@ -44,11 +44,11 @@ def build(source,stage,palette):
         file='field/'+name+'.rgba';(stage/file).write_bytes(raw)
         arts[name]={'file':file,'width':fw,'height':len(frames)*fh,'fw':fw,'fh':fh,'source':path,'sourcePalette':palpath,'sourceTemplate':label,'frameOrder':[int(n)for _,n in frames],'anims':seqs}
     behavior=(source/'src/metatile_behavior.c').read_text();pred={}
-    for key,fn in [('sand','IsSandOrDeepSand'),('deep','IsDeepSand'),('prints','IsFootprints'),('puddle','IsPuddle'),('ripple','HasRipples'),('flow','IsShallowFlowingWater'),('logs','IsPacifidlogLog'),('spring','IsHotSprings')]:
+    for key,fn in [('weed','IsSeaweed'),('sand','IsSandOrDeepSand'),('deep','IsDeepSand'),('prints','IsFootprints'),('puddle','IsPuddle'),('ripple','HasRipples'),('flow','IsShallowFlowingWater'),('logs','IsPacifidlogLog'),('spring','IsHotSprings')]:
         body=re.search(r'bool8 MetatileBehavior_'+fn+r'\([^)]*\)\s*\{(.*?)\n\}',behavior,re.S)[1]
         pred[key]=re.findall(r'== MB_(\w+)',body)
     move=(source/'src/event_object_movement.c').read_text()
     transitions=re.search(r'slitherTracks_Transitions\[4\]\[4\]\s*=\s*\{(.*?)\n    \};',move,re.S)[1]
     transitions=[list(map(int,re.findall(r'\d+',row)))for row in re.findall(r'\{([^}]+)\}',transitions)]
     se=int(re.search(r'#define SE_PUDDLE\s+(\d+)',(source/'include/constants/songs.h').read_text())[1])
-    return {'art':arts,'behaviors':pred,'turns':transitions,'puddleSe':se,'trackWaitFrames':40,'trackEndFrame':56,'limits':'Follower source tracks, sand pile, shallow water, puddles, ripples and hot springs. Reflections, seaweed bubbles, ash and further map-specific effects remain pending.'}
+    return {'art':arts,'behaviors':pred,'turns':transitions,'puddleSe':se,'trackWaitFrames':40,'trackEndFrame':56,'limits':'Follower source tracks, sand pile, shallow water, puddles, ripples and hot springs. Seaweed finish-step bubbles are included. Ash and further map-specific effects remain pending.'}

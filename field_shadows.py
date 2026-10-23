@@ -41,6 +41,15 @@ def build(source,stage,palette):
         no_shadow.append(int(re.search(r'#define WEATHER_'+name+r'\s+(\d+)',constants)[1]))
     tag=int(re.search(r'#define FLDEFF_PAL_TAG_GENERAL_1\s+(0x[0-9A-Fa-f]+)',(source/'include/constants/field_effects.h').read_text())[1],16)
     assert tag&0x8000==0  # source palette.h BLEND_IMMUNE_FLAG
+    helper=(source/'src/field_effect_helpers.c').read_text()
+    filters={}
+    for kind,fn in [('pond','ApplyPondFilter'),('ice','ApplyIceFilter')]:
+        body=re.search(r'static void '+fn+r'\([^;]*?\)\n\{.*?\n\}',helper,re.S)[0]
+        delta={c:0 for c in 'rgb'}
+        for c,op,n in re.findall(r'([rgb]) ([+-])= (\d+);',body):delta[c]=int(n)*(1 if op=='+' else -1)
+        filters[kind]=[delta[c] for c in 'rgb']
+    bridge=int(re.search(r'CpuFill16\((0x[0-9A-Fa-f]+), blueData',helper)[1],16)
+    reflection={'filters':filters,'bridgeColor':bridge}
     import follower_ground
     ground=follower_ground.build(source,stage,palette)
-    return {'ground':ground,'paletteTag':tag,'timeBlend':True,'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'elevationSubpriority':elevation('Subpriority'),'elevationPriority':elevation('Priority'),'suppression':{'grass':grasses,'water':waters,'weather':no_shadow},'limits':'Source shadow sizes/masks, ordering and weather/ground suppression; follower grass rustles. Complete non-grass follower ground effects remain unfinished.'}
+    return {'reflection':reflection,'ground':ground,'paletteTag':tag,'timeBlend':True,'intensity':intensity,'none':3,'shadows':shadows,'grass':grass,'elevationSubpriority':elevation('Subpriority'),'elevationPriority':elevation('Priority'),'suppression':{'grass':grasses,'water':waters,'weather':no_shadow},'limits':'Source shadow sizes/masks, ordering and weather/ground suppression; follower grass rustles. Complete non-grass follower ground effects remain unfinished.'}

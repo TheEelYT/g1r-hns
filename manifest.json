@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development mod for G1R 0.3.89: species-owned follower trails, source sand/water ground effects, and restored player-confirmed GB mart loop. Expanded effects and later campaign remain in progress.",
+  "description": "HnS v2.0.6 development mod for G1R 0.3.95: source reflection palettes and follower poses, seaweed bubbles, automatic cart labels and measured parity tracking. Expanded effects and later campaign remain in progress.",
   "github": "TheEelYT/g1r-hns"
 }

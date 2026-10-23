@@ -189,23 +189,21 @@ return function(mod,w,game)
     local normal=at(x,y);if normal then return normal end
     local a=F.refresh();if a and a.visible and not F.transition and(a.moving and a.targetX or a.cellX)==x and(a.moving and a.targetY or a.cellY)==y then return a end
   end
+  function F.pose(a,spr)
+    if not a or F.transition or F.interaction then return end
+    local right=a.facing=='right'and spr and (a.moving and spr.hnsAsymmetric or not a.moving and spr.frameCount==12)
+    local frames
+    if a.moving then frames=right and{9,11}or({down={0,4},up={1,6},left={2,8},right={2,8}})[a.facing]or{0,4}
+    else frames=right and{10,11}or({down={0,4},up={1,6},left={2,8},right={2,8}})[a.facing]or{0,4}end
+    return frames[Motion.frame(a,w.followers.motion)+1],right and'left'or a.facing
+  end
   local owDraw=old.owDraw or Ow.draw
   Ow.draw=function(id,px,py,cx,cy,facing,phase,flip,opts)
     local a=F.actor
-    if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and a.moving and not(F.transition or F.interaction)then
-      local out={};for k,v in pairs(opts or {})do out[k]=v end
-      local spr=Ow.get(id);local right=facing=='right'and spr and spr.hnsAsymmetric
-      local frames=right and {9,11}or({down={0,4},up={1,6},left={2,8},right={2,8}})[facing]or {0,4}
-      out.frame=frames[Motion.frame(a,w.followers.motion)+1]
-      return owDraw(id,px,py,cx,cy,right and'left'or facing,phase,flip,out)
-    end
-    if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and not(a.moving or F.transition or F.interaction)then
-      local out={};for k,v in pairs(opts or {})do out[k]=v end
-      local spr=Ow.get(id);local right=facing=='right'and spr and spr.frameCount==12
-      local base=right and 10 or({down=0,up=1,left=2,right=2})[facing]or 0
-      local second=right and 11 or({down=4,up=6,left=8,right=8})[facing]or 4
-      out.frame=Motion.frame(a,w.followers.motion)==1 and second or base
-      return owDraw(id,px,py,cx,cy,right and'left'or facing,phase,flip,out)
+    if a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and not(F.transition or F.interaction)then
+      local out={};for k,v in pairs(opts or{})do out[k]=v end
+      out.frame,facing=F.pose(a,Ow.get(id))
+      return owDraw(id,px,py,cx,cy,facing,phase,flip,out)
     end
     if not(a and id==a.graphicsId and px==a.px and py==a.py+(a.raiseY or 0)and F.transition)then
       return owDraw(id,px,py,cx,cy,facing,phase,flip,opts)

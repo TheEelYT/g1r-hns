@@ -49,6 +49,19 @@ return function(T,game,w,s,F,keep)
     reset();cur=MB.id(b);old=n;T.eq(G.land(a,3,4),true,'special landing selected on '..b)
     T.eq(R._list[1].name,b=='POND_WATER'and'jump_big_splash'or'jump_small_splash','source water landing sheet '..b)
   end
+  for _,name in ipairs({'SEAWEED','SEAWEED_NO_SURFACING'})do
+    reset();cur=MB.id(name);old=n;G.appear(a,3,4);G.begin(a,3,4)
+    T.eq(R.count('bubbles'),0,'seaweed waits until completed step '..name)
+    G.finish(a,3,4);local bubble=R._list[1]
+    T.check(bubble and bubble.name=='bubbles','seaweed finish emits source bubble '..name)
+    T.eq(bubble.x,56,'bubble begins at source tile center X');T.eq(bubble.y,64,'bubble begins at source tile top Y')
+    T.eq(bubble.layer,'front','source bubble draws above actors');T.eq(bubble.hnsAttached,false,'bubbles detach from follower')
+    local y=bubble.y
+    for tick=1,8 do R.step();T.eq(bubble.y,y-math.floor(.5*tick),'source bubble rises one pixel every two ticks')end
+    G.leave(a);T.eq(R.count('bubbles'),1,'recall preserves detached bubble')
+    for tick=1,100 do R.step()end;T.eq(R.count('bubbles'),0,'source bubble animation expires')
+    G.finish(a,3,4);G.clear();T.eq(R.count('bubbles'),0,'map cleanup clears bubbles')
+  end
   -- Actual follower movement dispatcher must emit a species-owned previous-tile
   -- trail, rather than relying on this helper being called directly.
   reset();old=MB.id('SAND');cur=n;local actor=F.actor;local saved={};for k,v in pairs(actor)do saved[k]=v end

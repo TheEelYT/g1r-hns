@@ -1,0 +1,391 @@
+{
+  "schema": 1,
+  "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
+  "categories": [
+    {
+      "id": "world",
+      "title": "World data and assets",
+      "weight": 12,
+      "items": [
+        {
+          "id": "layouts",
+          "weight": 5,
+          "state": "done",
+          "label": "Layouts, tilesets, connections and warps",
+          "evidence": [
+            "tests/check_world.py"
+          ]
+        },
+        {
+          "id": "sprites",
+          "weight": 3,
+          "state": "done",
+          "label": "Supported overworld sprites and source portraits",
+          "evidence": [
+            "opening.py"
+          ]
+        },
+        {
+          "id": "encounters",
+          "weight": 1,
+          "state": "partial",
+          "label": "Source encounter pools and unsupported species",
+          "evidence": [
+            "world_encounters.py"
+          ]
+        },
+        {
+          "id": "content",
+          "weight": 3,
+          "state": "partial",
+          "label": "Conditional objects and complete species/forms",
+          "evidence": [
+            "field_pokemon.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "presentation",
+      "title": "Menus, presentation and audio",
+      "weight": 12,
+      "items": [
+        {
+          "id": "menus",
+          "weight": 4,
+          "state": "done",
+          "label": "Source menu/boot/bag/Dex/Pok\u00e9gear pages",
+          "evidence": [
+            "tests/check_presentation.py"
+          ]
+        },
+        {
+          "id": "music",
+          "weight": 3,
+          "state": "done",
+          "label": "Normal and GB music, instruments and jingles",
+          "evidence": [
+            "audio.py"
+          ]
+        },
+        {
+          "id": "battle-presentation",
+          "weight": 2,
+          "state": "partial",
+          "label": "Battle entry, frames and source animation orchestration",
+          "evidence": [
+            "battle_assets.py"
+          ]
+        },
+        {
+          "id": "lighting",
+          "weight": 1,
+          "state": "partial",
+          "label": "Outdoor tint and light-bank immunity",
+          "evidence": [
+            "runtime/time_cycle.lua"
+          ]
+        },
+        {
+          "id": "audio-parity",
+          "weight": 1,
+          "state": "partial",
+          "label": "Cries, hardware arbitration and audible parity",
+          "evidence": [
+            "gbs.py"
+          ]
+        },
+        {
+          "id": "remaining-ui",
+          "weight": 1,
+          "state": "partial",
+          "label": "Remaining Dex/contacts pages and details",
+          "evidence": [
+            "runtime/pokedex.lua"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "field",
+      "title": "Field and followers",
+      "weight": 10,
+      "items": [
+        {
+          "id": "movement",
+          "weight": 2,
+          "state": "done",
+          "label": "Walking, hops, doors and seamless following",
+          "evidence": [
+            "tests/test_follower_motion.lua"
+          ]
+        },
+        {
+          "id": "ground",
+          "weight": 2,
+          "state": "done",
+          "label": "Source trails, covers, bubbles and reflection palettes",
+          "evidence": [
+            "runtime/field_reflections.lua"
+          ]
+        },
+        {
+          "id": "interaction",
+          "weight": 2,
+          "state": "partial",
+          "label": "Conditional dialogue, caught-ball/female variants",
+          "evidence": [
+            "runtime/followers.lua"
+          ]
+        },
+        {
+          "id": "weather",
+          "weight": 3,
+          "state": "pending",
+          "label": "Remaining weather, ash and map-specific effects",
+          "evidence": [
+            "runtime/field_shadows.lua"
+          ]
+        },
+        {
+          "id": "reflection-transitions",
+          "weight": 1,
+          "state": "pending",
+          "label": "Reflection affine and blending during ball transitions",
+          "evidence": [
+            "runtime/field_reflections.lua"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "battle",
+      "title": "Battle and Pok\u00e9mon systems",
+      "weight": 25,
+      "items": [
+        {
+          "id": "stats",
+          "weight": 3,
+          "state": "done",
+          "label": "Source stats, move parameters, type chart and EXP rules",
+          "evidence": [
+            "gameplay.py"
+          ]
+        },
+        {
+          "id": "abilities",
+          "weight": 5,
+          "state": "partial",
+          "label": "Supported source ability effects",
+          "evidence": [
+            "abilities.py"
+          ],
+          "metric": "abilities"
+        },
+        {
+          "id": "moves",
+          "weight": 5,
+          "state": "partial",
+          "label": "Reviewed expanded move effects",
+          "evidence": [
+            "expanded_moves.py"
+          ],
+          "metric": "moves"
+        },
+        {
+          "id": "teaching",
+          "weight": 3,
+          "state": "partial",
+          "label": "Machines, tutors, breeding and evolution",
+          "evidence": [
+            "teaching.py"
+          ]
+        },
+        {
+          "id": "items",
+          "weight": 3,
+          "state": "partial",
+          "label": "Held items, acquisition and interactions",
+          "evidence": [
+            "runtime/battle_fields.lua"
+          ]
+        },
+        {
+          "id": "species",
+          "weight": 3,
+          "state": "partial",
+          "label": "Expanded species/forms and transformation systems",
+          "evidence": [
+            "pokedex.py"
+          ]
+        },
+        {
+          "id": "battle-rules",
+          "weight": 3,
+          "state": "pending",
+          "label": "Remaining complex field/turn-state behavior",
+          "evidence": [
+            "runtime/gameplay.lua"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modes",
+      "title": "Modes and challenges",
+      "weight": 12,
+      "items": [
+        {
+          "id": "settings",
+          "weight": 5,
+          "state": "partial",
+          "label": "Reviewed rule/feature setting bridges",
+          "evidence": [
+            "runtime/gameplay.lua"
+          ],
+          "metric": "settings"
+        },
+        {
+          "id": "rtc",
+          "weight": 1,
+          "state": "done",
+          "label": "Saved Fake RTC and time pools",
+          "evidence": [
+            "runtime/time_cycle.lua"
+          ]
+        },
+        {
+          "id": "randomizer",
+          "weight": 3,
+          "state": "pending",
+          "label": "Deterministic saved randomization",
+          "evidence": [
+            "settings.py"
+          ]
+        },
+        {
+          "id": "challenges",
+          "weight": 3,
+          "state": "pending",
+          "label": "Nuzlocke and remaining challenge restrictions",
+          "evidence": [
+            "settings.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "campaign",
+      "title": "Campaign, services and progression",
+      "weight": 24,
+      "items": [
+        {
+          "id": "opening",
+          "weight": 2,
+          "state": "done",
+          "label": "Opening through Violet Gym and Sprout Tower",
+          "evidence": [
+            "campaign.py"
+          ]
+        },
+        {
+          "id": "services",
+          "weight": 1,
+          "state": "partial",
+          "label": "Source marts, healing, phone and services",
+          "evidence": [
+            "service_assets.py"
+          ]
+        },
+        {
+          "id": "johto",
+          "weight": 8,
+          "state": "pending",
+          "label": "Remaining Johto events, puzzles, travel and rewards",
+          "evidence": [
+            "campaign.py"
+          ]
+        },
+        {
+          "id": "kanto",
+          "weight": 5,
+          "state": "pending",
+          "label": "Kanto campaign events and progression",
+          "evidence": [
+            "campaign.py"
+          ]
+        },
+        {
+          "id": "other-regions",
+          "weight": 4,
+          "state": "pending",
+          "label": "Other regions and postgame events",
+          "evidence": [
+            "campaign.py"
+          ]
+        },
+        {
+          "id": "services-rest",
+          "weight": 2,
+          "state": "pending",
+          "label": "Remaining contacts, tutors and service unlocks",
+          "evidence": [
+            "service_assets.py"
+          ]
+        },
+        {
+          "id": "final-blockers",
+          "weight": 2,
+          "state": "pending",
+          "label": "FINAL: missing trainers, Cut trees and route/sequence-break audit",
+          "evidence": [
+            "PORT_STATE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "release",
+      "title": "Release and final validation",
+      "weight": 5,
+      "items": [
+        {
+          "id": "packaging",
+          "weight": 2,
+          "state": "done",
+          "label": "Pinned immutable packages, isolated cart and editable label",
+          "evidence": [
+            "tests/test_cart_label.py"
+          ]
+        },
+        {
+          "id": "regression",
+          "weight": 1,
+          "state": "partial",
+          "label": "Automated native and independent source coverage",
+          "evidence": [
+            "tests/test_native.lua"
+          ]
+        },
+        {
+          "id": "windows",
+          "weight": 1,
+          "state": "pending",
+          "label": "Windows GPU, gameplay and listening validation",
+          "evidence": [
+            "TESTING.md"
+          ]
+        },
+        {
+          "id": "parity-audit",
+          "weight": 1,
+          "state": "pending",
+          "label": "Final full-source parity audit",
+          "evidence": [
+            "PROGRESS.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

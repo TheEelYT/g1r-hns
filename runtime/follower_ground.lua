@@ -81,6 +81,9 @@ return function(mod,w,game)
     if not active(a)then return end
     local cur=C.behavior(x,y);cover(a,cur,cur)
     if is('puddle',cur)and not jumped then splash(a)end
+    if is('weed',cur)then
+      tag(R.spawnAt('bubbles',x,y,8,0,{layer='front',vy=.5}),a,false)
+    end
     if is('ripple',cur)then
       tag(R.spawn('ripple',{x=a.px+8,y=a.py+14,layer='behind'}),a,false)
     end

@@ -51,7 +51,7 @@ jobs:
           git clone https://github.com/PokemonHnS-Development/pokehns-expansion.git build/source
           git -C build/source checkout 167aa6d537b109bb229c231ddce4616974c4da71
           git clone https://github.com/bryanthaboi/gen1recomp.git build/engine
-          git -C build/engine checkout 6e610fb9919b0233575ba410cd41a94fdf379d7b
+          git -C build/engine checkout 2b45436abffc31100d3cb599c6cc09d00c1ddac3
       - name: Build without a ROM
         run: |
           mkdir -p reports
@@ -73,6 +73,8 @@ jobs:
           python3 tests/render_source_ui.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --out build/ui-captures
           test -z "$(git -C build/source status --porcelain)"
           test -z "$(git -C build/engine status --porcelain)"
+      - name: Check weighted progress snapshot
+        run: python3 progress.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --check
       - name: Validate latest G1R installer-compressed assets
         run: |
           python3 tests/test_installed_assets.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit

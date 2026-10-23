@@ -44,6 +44,7 @@ return function(mod,w,game)
     end
     return manifestObject(name,...)
   end
+  assert(load(mod:read('field_reflections.lua')))()(mod,w,game)
   local Ground=assert(load(mod:read('follower_ground.lua')))()(mod,w,game)
   local function grassName(beh)return beh==MB.id('LONG_GRASS')and'long_grass'or beh==MB.id('TALL_GRASS')and'tall_grass'end
   function S.leaveShort(a)S.short[a]=nil;Ground.leave(a)end

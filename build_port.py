@@ -20,7 +20,7 @@ import sys
 import zlib
 
 PIN_HNS = "167aa6d537b109bb229c231ddce4616974c4da71"
-PIN_ENGINE = "6e610fb9919b0233575ba410cd41a94fdf379d7b"
+PIN_ENGINE = "2b45436abffc31100d3cb599c6cc09d00c1ddac3"
 EARLY_PREFIXES = ("NewBarkTown", "Route29", "CherrygroveCity", "Route30")
 OPENING_PREFIXES = EARLY_PREFIXES + (
     "Route31", "VioletCity", "SproutTower", "Route27", "TohjoFalls",
@@ -402,7 +402,8 @@ def build(args):
                    "MAP_TYPE_INDOOR": 8, "MAP_TYPE_SECRET_BASE": 9}
     try:
         shutil.copytree(HERE / "runtime", stage, dirs_exist_ok=True)
-        shutil.copy2(HERE / "README.md", stage / "README.md")
+        for document in ("README.md", "TESTING.md", "PROGRESS.md"):
+            shutil.copy2(HERE / document, stage / document)
         shutil.copy2(source / "CREDITS.md", stage / "HNS_UPSTREAM_CREDITS.md")
         for m in maps:
             mapid = selected[m["id"]]; layout = layouts[m["layout"]]
