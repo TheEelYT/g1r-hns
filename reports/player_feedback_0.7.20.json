@@ -1,0 +1,69 @@
+{
+  "version": "0.7.20",
+  "workflow": "Player normally replies to TESTING.md after each update, and separately reports other bugs.",
+  "location": "Azalea",
+  "confirmed": [
+    {
+      "check": "azalea_short_grass",
+      "subjects": [
+        "player",
+        "follower"
+      ],
+      "result": "correct",
+      "time_of_day_exhaustively_confirmed": false
+    },
+    {
+      "check": "ordinary_landing_dust",
+      "result": "unchanged"
+    },
+    {
+      "check": "tonal_percussion_source_presence",
+      "result": "same tonal note heard in original romhack"
+    }
+  ],
+  "deferred": [
+    {
+      "check": "shiny_reflections",
+      "reason": "No shiny on current save."
+    },
+    {
+      "check": "normal_pond_ice_bridge_reflections",
+      "reason": "No convenient reflective test location established."
+    },
+    {
+      "check": "seaweed_bubbles",
+      "reason": "No known accessible location from current play."
+    },
+    {
+      "check": "sand_tracks",
+      "reason": "Walking/running back to Cherrygrove is impractical."
+    },
+    {
+      "check": "puddles_and_other_ground_overlays",
+      "reason": "Suitable locations unavailable or unknown."
+    },
+    {
+      "check": "fog_shadow_suppression",
+      "reason": "Fog not encountered."
+    },
+    {
+      "check": "terrain_background_restoration",
+      "reason": "Not addressed by this reply."
+    }
+  ],
+  "unresolved": [
+    {
+      "check": "percussion_prominence",
+      "observation": "Tonal percussion is less noticeable in the original romhack.",
+      "hypothesis": "Lower sample rate may contribute.",
+      "cause_confirmed": false
+    }
+  ],
+  "testing_policy": {
+    "no_special_travel_required": true,
+    "no_shiny_hunt_required": true,
+    "active_checks_require_verified_access": true,
+    "quick_test_access_needed": true
+  },
+  "audio_policy": "Preserve confirmed GB mart timing and source percussion. No audio changes made for this feedback."
+}

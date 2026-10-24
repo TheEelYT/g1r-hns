@@ -4,7 +4,13 @@ Mod 0.7.20 / cart 1.0.19 / G1R v0.3.95 (`2b45436abffc31100d3cb599c6cc09d00c1ddac
 
 Source pond/ice/bridge reflection palettes and shared follower poses, seaweed finish-step bubbles, automatic versioned XCF cart labels and weighted progress tracking. Full reflection transition affine/blend behavior, ash and weather parity remain open. Preserve the confirmed 0.7.17 mart loop and every 0.7.18 shadow correction; no further music edits. See PROGRESS.md for the current scope estimate and TESTING.md for unresolved player checks.
 
-# Port state — 0.7.19 and queued cart-label automation
+## Player feedback after 0.7.20
+
+The normal feedback workflow is replies to TESTING.md after releases, plus any separately noticed bugs. Current player location: Azalea. No shiny available. Short grass is confirmed correct for player and follower; ordinary landing dust is unchanged. Shiny reflections, seaweed, sand, puddles/deep sand/shallow water/hot springs and fog remain deferred rather than failed/confirmed. Do not request a walk back to Cherrygrove or a hunt for terrain/weather/shinies. Active checks need a nearby verified location or supplied quick test access; add an opt-in test area/preset/return before distant checks become active. Gen1Recomp's documented developer-console warp is Gen 1-only, so do not recommend it as an Emerald shortcut.
+
+The tonal percussion also exists in the romhack, but is less noticeable there. Source presence is settled; prominence remains an unconfirmed playback-fidelity difference. Lower sample rate is a hypothesis only. Preserve the confirmed mart timing and source percussion. See reports/player_feedback_0.7.20.json for the structured record.
+
+# Historical state — 0.7.19 and queued cart-label automation
 
 ## Current handoff
 
