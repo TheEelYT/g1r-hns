@@ -275,26 +275,17 @@
     "Actual native party-menu immediate and deferred TM learning obeys Infinite TMs, cancellation, unsupported moves, current importance and HM/source-important preservation. Private handler construction preserves live native menu state."
   ],
   "tested_build_content_equivalence": {
-    "files": 7842,
-    "release_readme_matches_repository": true,
-    "all_runtime_files_match_repository": true
+    "result": "pass",
+    "packaged_files_match_staged_bytes": 7849,
+    "preservation_report": "reports/preservation_0.7.21.json"
   },
   "engine_compatibility": {
-    "v0.3.89": {
-      "commit": "6e610fb9919b0233575ba410cd41a94fdf379d7b",
-      "latest_release_verified": "2026-10-18",
-      "raw_native_checks": {
-        "default": 127432,
-        "mounted": 127432
-      },
-      "compressed_native_checks": {
-        "default": 127432,
-        "mounted": 127432
-      },
-      "installer_encoded_assets": 5608,
-      "codec": "actual src.import.CacheBlob encode/decode"
-    },
-    "policy": "Test only latest published G1R; old engine matrix retired at user request."
+    "version": "v0.3.96",
+    "revision": "0e92b587468c2db7c386f055fc272e6505b0f401",
+    "raw_native_checks_per_root": 127759,
+    "installer_compressed_checks_per_root": 127759,
+    "installer_codec_assets": 5609,
+    "strict_modkit": true
   },
   "move_table": {
     "rows": 935,
@@ -312,7 +303,9 @@
     "machine_pickups": 12,
     "port_TM52_to_TM92_IDs": "904..944",
     "stable_Roost_item_move_ID": 901,
-    "tutor_NPC_services_complete": false
+    "tutor_NPC_services_complete": false,
+    "infinite_tms_option": true,
+    "native_party_menu_immediate_and_deferred": true
   },
   "battle_fields": {
     "terrain_moves": 4,
@@ -634,7 +627,11 @@
     "outside_version_box_unchanged": true,
     "master_xcf_unchanged": true,
     "deterministic_png_cart_zip": true,
-    "native_import_save_seal_upgrade": true
+    "native_import_save_seal_upgrade": true,
+    "fixed_point_linear_text_compositing": true,
+    "reviewed_version_box_background": true,
+    "repeat_same_version_renders": 5,
+    "source_xcf_unchanged": true
   },
   "player_feedback": {
     "version": "0.7.20",
@@ -732,5 +729,17 @@
     "source_important_machine_preservation": true,
     "live_menu_state_preserved": true,
     "vanilla_sessions_delegate": true
-  }
+  },
+  "release_artifacts": [
+    {
+      "name": "pokemon_heart_soul-1.0.20.g1rcart",
+      "bytes": 896473,
+      "sha256": "e9029dc2235401c563045d0819a59137f918faacd505f1b00b2fdd12da3e6dc8"
+    },
+    {
+      "name": "hns_exploration-0.7.21.zip",
+      "bytes": 10328035,
+      "sha256": "21b689fa96639ad35065ca9bb75b34fcb214bcd5ed3e04f65565d379837b9bd7"
+    }
+  ]
 }
