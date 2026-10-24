@@ -236,6 +236,8 @@ def check(source,engine,mod,luajit):
     count['source_machine_pickups']=len(world['teaching']['pickups'])
     from check_fields import check as check_fields
     count.update(check_fields(source,engine,mod,luajit,world))
+    from check_practice import check as check_practice
+    count.update(check_practice(source,mod,world))
     return {'result':'pass','counts':count,'limits':['Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pokéblock bonuses remain pending.','Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
 
 if __name__=='__main__':

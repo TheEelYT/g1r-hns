@@ -1,7 +1,7 @@
 {
   "id": "hns_exploration",
   "name": "Pok\u00e9mon Heart & Soul \u2014 Exploration Prototype",
-  "version": "0.7.21",
+  "version": "0.7.22",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -17,6 +17,6 @@
   "dependencies": [],
   "optional_dependencies": [],
   "conflicts": [],
-  "description": "HnS v2.0.6 development mod for G1R 0.3.96: source Synchronize and Cute Charm encounters, configurable reusable TMs, and retained field/cart fixes. Expanded effects and later campaign remain in progress.",
+  "description": "HnS v2.0.6 development mod for G1R 0.3.96: isolated practice saves, repeatable TM supplies, normal/shiny test followers and verified terrain shortcuts. Expanded mechanics and campaign remain in progress.",
   "github": "TheEelYT/g1r-hns"
 }

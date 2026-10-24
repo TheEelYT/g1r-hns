@@ -531,7 +531,9 @@ def build(args):
         imported_objects={(mid,o["localId"]-1) for mid,m in packed_maps.items() for o in m["objects"]}
         events_data["omittedObjects"]=[o for o in events_data["omittedObjects"] if (o["map"],o["sourceIndex"]) not in imported_objects]
         events_data["spriteCount"]=len(opening_data["sprites"])
-        data = {"format":1,"scope":args.scope,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
+        import practice
+        practice_data=practice.build(packed_maps,raw_maps,pairs)
+        data = {"format":1,"scope":args.scope,"practice":practice_data,"maps":packed_maps,"pairs":pair_defs,"text":text,"scripts":scripts,"opening":opening_data,"worldEvents":events_data,
                 "encounters":encounter_data,"trainers":trainer_data,"quest":quest_data,"pokedex":dex_data,"audio":audio_data,"campaign":campaign_data,"fieldPokemon":field_mon_data,"presentation":presentation_data,"startup":startup_data,
                 "fieldShadows":shadow_data,"abilities":ability_data,"battleFields":field_data,"teaching":teaching_data,"moveTable":move_data,"expandedMoves":expanded_data,"battleVisuals":battle_data,"bootPresentation":boot_data,"followers":follower_data,"animations":animation_data,"services":services,"start":{"map":"EM_HNS_NEW_BARK_TOWN_HNS","x":20,"y":12,"facing":"down"}}
         # LuaJIT limits one function to 65,536 constants. Compile independent

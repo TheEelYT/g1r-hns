@@ -293,6 +293,18 @@ for _,id in ipairs({'speed','video','graphics','audio'})do
   snap('options_native_'..id,O.draw);table.remove(O.enginePages)
 end
 O.close(false)
+collection._hnsExpandedMoves=collection._hnsExpandedMoves or {moves={}}
+assert(load(mod:read('practice.lua')))()(mod,w,collection)
+local Lab=collection._hnsPractice.lab;local practiceImage=Lab.ui.image
+Lab.ui.image=function(file,x,y)local im=practiceImage(file,x,y);im.file=file;return im end
+Lab.show({session=session});snap('practice_create',Lab.draw)
+Lab.confirm=true;Lab.yes=false;snap('practice_confirm_no',Lab.draw)
+Lab.yes=true;snap('practice_confirm_yes',Lab.draw);Lab.confirm=nil
+Lab.message='Created HnS PRACTICE.\nExit to the launcher, choose that\nsave slot, then Continue.\nYour regular slot stays selected.'
+snap('practice_created',Lab.draw);Lab.message=nil
+local practice={map=session.map,meta={hnsPractice={schema=1}}}
+Lab.show({session=practice});snap('practice_tools',Lab.draw)
+Lab.page='terrain';Lab.cursor=1;snap('practice_terrain',Lab.draw);Lab.close()
 session.flags[w.startup.clockFlag]=true
 require('src.core.game3.scripting.space').store=nil
 Start.open=true;Start._session=session;snap('pause_clock',Start.draw)

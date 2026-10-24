@@ -645,5 +645,6 @@ dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_tile_animation.lua')(T,game,w
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_field_services.lua')(T,game,world,maps)
 dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_engine_options.lua')(T,game,world)
 if world.battleVisuals then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_expansion.lua')(T,game,world,maps)end
+if world.practice then dofile((arg[0]:match('^(.*)[/\\]') or '.')..'/test_practice.lua')(T,game,world)end
 run.release()
 T.finish("HnS native exploration integration")
