@@ -1,11 +1,11 @@
-## Pokémon Heart & Soul — Mod 0.7.20
+## Pokémon Heart & Soul — Mod 0.7.21
 
-Use the `.g1rcart` download for isolated saves and disabled mod edits. Cart version is 1.0.19. Requires Gen1Recomp v0.3.95 with vanilla US Emerald imported. Mod 1.0 remains reserved for complete romhack parity.
+Use the `.g1rcart` download for isolated saves and disabled mod edits. Cart version is 1.0.20. Requires Gen1Recomp v0.3.96 with vanilla US Emerald imported. Mod 1.0 remains reserved for complete romhack parity.
 
-- Connect HnS source pond, ice and bridge reflection palettes, including normal/shiny overworld Pokémon. Share source walking/idle poses with follower reflections and retain native clipping, distortion and bridge offsets.
-- Add source seaweed bubbles after completed follower steps. Bubbles rise and expire independently; map changes clear them.
-- Generate the custom versioned cart label from the editable XCF included in the repository. Preserve cart identity and saves.
-- Add a weighted feature-parity inventory and progress report: approximately 42% complete, 58% remaining. This is a scope estimate, not binary matching or a prediction of engineering hours.
-- Target G1R v0.3.95. Retain the confirmed 0.7.17 GB mart loop and all 0.7.18 shadow fixes.
+- Connect the source Synchronize setting: classic half-chance or modern guaranteed nature matching for wild/static encounters. Use the actual first party slot, including a fainted lead; eggs do not activate it.
+- Connect Cute Charm's source two-in-three opposite-gender attempt, with fixed-gender/genderless guards. Generate the personality before native stats/ability/capture handling; keep gifts, roamers, fixed personalities and special encounters on their existing paths.
+- Connect Infinite TMs to source item importance and successful-learning consumption. Preserve HMs, source-important machines, failed learning and cancelled replacements. Delayed move replacement uses the native workflow.
+- Validate against G1R v0.3.96 and retain existing map/script/assets, short grass, reflections, mart timing and source percussion.
+- Record player confirmations for normal follower pond reflections and the versioned cart label. Distant terrain/shiny/weather checks remain deferred; no backtracking or rare-item testing requested.
 
-Full ball-transition reflection affine/blend effects, ash/weather parity, expanded battle effects and later campaign remain pending. Native/source checks cover the new behavior; Windows gameplay, GPU rendering and listening remain player checks. Missing progression trainers, Cut trees and other travel blockers remain the final campaign pass.
+Windows/GPU/audio checks and the remaining expanded battle/campaign work are still pending. Missing progression trainers, Cut trees and other travel blockers stay last. Progress figures are weighted feature-parity estimates, not engineering-hour predictions.

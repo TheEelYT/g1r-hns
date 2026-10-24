@@ -17,13 +17,17 @@ return function(mod,w,game)
     for _,n in ipairs(w.pokedex.teachables[row.teachableRef]or {})do if n==name then return true end end
     return false
   end
+  function T.reusable(session,id)
+    local r=T.machine(id)
+    return r and H.own(session)and(r.kind=='HM'or r.importance~=0 or H.value('ITEM_MODE_INFINITE_TMS',session)==1)or false
+  end
   local function wrap(table,key,fn)
     local base=old[key]or table[key];old[key]=base;table[key]=function(...)return fn(base,...)end
   end
   wrap(Items,'toNumericId',function(base,id)local r=H.battle()and T.machine(id);if r then return r.itemId end;return base(id)end)
   wrap(Items,'info',function(base,id)
     local r=H.battle()and T.machine(id);if not r then return base(id)end
-    return {id=r.itemId,name=r.name,pocket='TM_CASE',fieldUse='tm',price=r.price,importance=r.importance,description=r.description,battleUsage=0,registrability=0}
+    return {id=r.itemId,name=r.name,pocket='TM_CASE',fieldUse='tm',price=r.price,importance=T.reusable(require('src.core.game3.runtime').getSession(),id)and 1 or r.importance,description=r.description,battleUsage=0,registrability=0}
   end)
   wrap(Items,'isTm',function(base,id)local r=H.battle()and T.machine(id);if r then return true end;return base(id)end)
   wrap(Items,'isHm',function(base,id)local r=H.battle()and T.machine(id);if r then return r.kind=='HM'end;return base(id)end)
@@ -40,6 +44,19 @@ return function(mod,w,game)
     if r and mon and P.isEgg(mon)then return 'incompatible','An Egg cannot learn a move.'end
     return base(mon,id)
   end)
+  local teach=assert(load(mod:read('hns_use_tm.lua'),'@hns/use_tm.lua'))()(Use,T)
+  wrap(Use,'useTm',function(base,session,bag,id,index)
+    if H.own(session)and T.machine(id)then return teach(session,bag,id,index)end
+    return base(session,bag,id,index)
+  end)
+  local Menu=require('src.ui.game3.party_menu');local input=old.partyInput or Menu.handleInput
+  local partyTeach=assert(load(mod:read('hns_party_tm.lua'),'@hns/party_tm.lua'))()(Menu,T)
+  Menu.handleInput=function(keys)
+    local session=Menu._session or require('src.core.game3.runtime').getSession()
+    if H.own(session)and Menu.mode=='use'and T.machine(Menu._item)then return partyTeach(keys)end
+    return input(keys)
+  end
+  old.partyInput=input
   wrap(Learn,'relearnableMoves',function(base,mon)
     if not H.battle()then return base(mon)end
     if not mon or P.isEgg(mon)then return {}end

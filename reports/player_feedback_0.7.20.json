@@ -19,16 +19,20 @@
     {
       "check": "tonal_percussion_source_presence",
       "result": "same tonal note heard in original romhack"
+    },
+    {
+      "check": "normal_follower_pond_reflections",
+      "result": "work as intended"
+    },
+    {
+      "check": "versioned_cart_label",
+      "result": "new label displays correctly with mod version"
     }
   ],
   "deferred": [
     {
       "check": "shiny_reflections",
       "reason": "No shiny on current save."
-    },
-    {
-      "check": "normal_pond_ice_bridge_reflections",
-      "reason": "No convenient reflective test location established."
     },
     {
       "check": "seaweed_bubbles",
@@ -49,6 +53,10 @@
     {
       "check": "terrain_background_restoration",
       "reason": "Not addressed by this reply."
+    },
+    {
+      "check": "ice_and_bridge_reflections",
+      "reason": "Only normal follower pond reflections were confirmed."
     }
   ],
   "unresolved": [

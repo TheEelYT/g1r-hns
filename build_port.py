@@ -20,7 +20,7 @@ import sys
 import zlib
 
 PIN_HNS = "167aa6d537b109bb229c231ddce4616974c4da71"
-PIN_ENGINE = "2b45436abffc31100d3cb599c6cc09d00c1ddac3"
+PIN_ENGINE = "0e92b587468c2db7c386f055fc272e6505b0f401"
 EARLY_PREFIXES = ("NewBarkTown", "Route29", "CherrygroveCity", "Route30")
 OPENING_PREFIXES = EARLY_PREFIXES + (
     "Route31", "VioletCity", "SproutTower", "Route27", "TohjoFalls",
@@ -510,6 +510,7 @@ def build(args):
         import service_assets
         import teaching
         teaching_data=teaching.build(source,dex_data,quest_data)
+        teaching.derivatives(engine,stage)
         import battle_fields
         field_data=battle_fields.build(source,quest_data)
         teaching.pickups(teaching_data,source,stage,packed_maps,source_maps,labels,text,scripts,opening_data,parse_palette)

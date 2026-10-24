@@ -9,6 +9,7 @@ from check_follower_bob import check as check_bob
 from check_field_shadows import check as check_shadows
 from check_follower_ground import check as check_ground
 from check_field_reflections import check as check_reflections
+from check_lead_encounters import check as check_lead
 
 
 def colors(path):
@@ -159,6 +160,7 @@ def check(source,engine,mod,luajit):
     count.update(check_shadows(source,mod,world))
     count.update(check_ground(source,engine,mod,world,luajit))
     count.update(check_reflections(source,engine,mod,luajit,world))
+    count.update(check_lead(source,engine,mod,luajit,world))
     count['follower_species_and_forms']=413;count['follower_normal_shiny_sheets']=826
     art=world['followers']['emotes'];im=Image.open(source/'graphics/misc/emotes.png');pal=colors(source/'graphics/misc/emotes.pal')
     raw=bytes(v for n in im.tobytes()for v in pal[n]+(255 if n else 0,))
@@ -234,7 +236,7 @@ def check(source,engine,mod,luajit):
     count['source_machine_pickups']=len(world['teaching']['pickups'])
     from check_fields import check as check_fields
     count.update(check_fields(source,engine,mod,luajit,world))
-    return {'result':'pass','counts':count,'limits':['Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
+    return {'result':'pass','counts':count,'limits':['Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pokéblock bonuses remain pending.','Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.','Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished.']}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)

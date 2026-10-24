@@ -1,8 +1,8 @@
 {
-  "version": "0.7.20",
+  "version": "0.7.21",
   "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
-  "complete_percent": 42.11,
-  "remaining_percent": 57.89,
+  "complete_percent": 42.23,
+  "remaining_percent": 57.77,
   "categories": [
     {
       "id": "world",
@@ -36,8 +36,8 @@
       "id": "modes",
       "title": "Modes and challenges",
       "weight": 12,
-      "complete_percent": 19.7,
-      "earned_points": 2.3636
+      "complete_percent": 20.64,
+      "earned_points": 2.4773
     },
     {
       "id": "campaign",
@@ -64,7 +64,7 @@
       "total": 580
     },
     "settings": {
-      "covered": 24,
+      "covered": 26,
       "total": 88
     }
   },

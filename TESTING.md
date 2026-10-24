@@ -1,8 +1,10 @@
-# Player testing notes — 0.7.20
+# Player testing notes — 0.7.21
 
-Use G1R 0.3.95. These notes are the normal place to reply after an update; report any other bug you notice too. Checks must fit the player's current location and available Pokémon. An inaccessible check is deferred, not a failure and not a confirmation.
+Use G1R 0.3.96. These notes are the normal place to reply after an update; report any other bug you notice too. Checks must fit the player's current location and available Pokémon. An inaccessible check is deferred, not a failure and not a confirmation.
 
 ## Current player checks
+
+Synchronize/Cute Charm encounters and Infinite TMs are covered by automated checks in this update. If you use these naturally, report a mismatch; no bulk encounter sampling or spending rare TMs is requested.
 
 No special testing trip is requested from the current Azalea save. Continue normal play and report anything that looks or sounds wrong. There is no need to obtain a shiny, hunt for a terrain/weather effect, walk back to Cherrygrove, or test every move or ability.
 
@@ -11,6 +13,8 @@ Future active checks should name a nearby, verified location or provide a quick,
 ## Feedback received for 0.7.20
 
 - **Azalea short grass: confirmed correct for both player and follower.** Remove this from active checks. The reply did not separately establish every time-of-day case.
+- **Normal follower pond reflections: confirmed working as intended.** Ice/bridge and shiny reflection checks remain deferred.
+- **New cart label: confirmed correct, including the mod version.**
 - **Ordinary ground landing dust: reported unchanged.** No new dust retest is requested.
 - **GB tonal percussion: the same tonal hit is audible in the original romhack, but less prominent.** Its presence is confirmed as source behavior; the difference in prominence remains an audio-fidelity observation. The cause is unconfirmed. Do not remove/change the source percussion or repeat the source-presence comparison.
 - The player is currently in **Azalea** and has no shiny available for testing.
@@ -23,7 +27,7 @@ These remain unverified in live player testing. Automated evidence is retained s
 
 | Check | Why deferred | Prerequisite before requesting it |
 |---|---|---|
-| Normal follower pond/ice/bridge reflections, including idle/walking and asymmetric right-facing poses | No convenient reflective test location established near the current save | Verified nearby location or quick test access |
+| Ice and bridge follower reflections | Normal pond reflections are confirmed; ice/bridge cases have not been confirmed | Verified nearby location or quick test access |
 | Shiny reflection palette | No shiny on the current save | A supplied test preset/save or a naturally obtained shiny; no shiny hunt requested |
 | Seaweed finish-step bubbles, rising/expiry and cleanup | No known accessible seaweed location from current Azalea play | Verified location and quick access |
 | Species-owned sand/footprint trails, turning, hold/flicker/expiry | Cherrygrove backtracking is impractical | Quick access or a nearby verified patch; no walk back requested |

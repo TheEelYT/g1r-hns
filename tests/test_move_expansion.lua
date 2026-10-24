@@ -87,6 +87,9 @@ return function(T,game,w,s,mon,keep)
   T.eq(P.canLearnTmItem(158,'TM60'),false,'Totodile uses source Drain Punch incompatibility')
   T.eq(P.canLearnTmItem(62,'TM60'),true,'Poliwrath uses HnS Drain Punch compatibility')
   T.eq(P.canLearnTmItem(158,'TM85'),false,'Totodile cannot learn Dream Eater')
+  local H=game._hnsRules.rules;local Flags=require('src.core.game3.scripting.flags');local Space=require('src.core.game3.scripting.space')
+  local modeRow;for _,page in ipairs(w.startup.settings.pages)do for _,r in ipairs(page.rows)do if r.id=='ITEM_MODE_INFINITE_TMS'then modeRow=r end end end
+  local oldMode=H.value('ITEM_MODE_INFINITE_TMS',s);Flags.setVar(Space.store,nil,modeRow.var,0)
   local learner=mon(62);learner.moves={};learner.pp={};s.party={learner}
   T.eq(Use.checkTmPreflight(learner,'TM60'),'ok','source expanded machine preflight')
   Bag.add(s.bag,912,2);T.eq(Use.useTm(s,s.bag,912,1),true,'native item-use teaches expanded Drain Punch')
@@ -125,5 +128,6 @@ return function(T,game,w,s,mon,keep)
     end
   end
   T.eq(extended,true,'native species fixture covers over twenty distinct source level-up moves')
+  Flags.setVar(Space.store,nil,modeRow.var,oldMode)
   print('Move expansion: exact absorb/recoil, substitute/faint/ability behavior, ordered setup stages, 100 source machines, native teaching and tutor compatibility')
 end

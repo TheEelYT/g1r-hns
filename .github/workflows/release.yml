@@ -51,7 +51,7 @@ jobs:
           git clone https://github.com/PokemonHnS-Development/pokehns-expansion.git build/source
           git -C build/source checkout 167aa6d537b109bb229c231ddce4616974c4da71
           git clone https://github.com/bryanthaboi/gen1recomp.git build/engine
-          git -C build/engine checkout 2b45436abffc31100d3cb599c6cc09d00c1ddac3
+          git -C build/engine checkout 0e92b587468c2db7c386f055fc272e6505b0f401
       - name: Build without a ROM
         run: |
           mkdir -p reports

@@ -56,3 +56,35 @@ def pickups(data,source,stage,maps,source_maps,labels,text,scripts,opening,palet
             add_object(source,stage,maps,mid,obj,i,key,opening,palette_parser,flag=flag)
             result.append({'map':mid,'localId':i+1,'flag':flag,'sourceFlag':obj['flag'],'itemId':record['itemId'],'sourceItem':match[1],'script':key})
     data['pickups']=result
+
+
+def derivatives(engine,stage):
+    src=(engine/'src/core/game3/item_use.lua').read_text()
+    def fn(name):
+        pattern=(r'local function '+name if name in ('mon_text','no_pokemon_text') else r'function ItemUse\.'+name)+r'\([^\n]*\).*?\nend'
+        return re.search(pattern,src,re.S)[0]
+    body=fn('useTm');needle='if learned and not isHm and not consumed then'
+    assert body.count(needle)==1
+    body=body.replace(needle,'if learned and not isHm and not consumed and not HNS.reusable(session,id) then')
+    header='local ItemsData=require("src.core.game3.items_data");local Bag=require("src.core.game3.bag");local Pokemon=require("src.core.game3.pokemon");local RomText=require("src.core.game3.rom_text")\n'
+    (stage/'hns_use_tm.lua').write_text('-- Derived from pinned native ItemUse.useTm; source reuse predicate only. See GEN1RECOMP_LICENSE.md.\nreturn function(ItemUse,HNS)\n'+header+fn('mon_text')+'\n'+fn('no_pokemon_text')+'\n'+body.replace('function ItemUse.useTm','local function useTm',1)+'\nreturn useTm\nend\n')
+    # The graphical party menu has its own immediate and delayed TM paths.
+    # A private method table shares all live state with the real menu, while
+    # leaving native methods and vanilla sessions untouched.
+    menu=(engine/'src/ui/game3/party_menu.lua').read_text()
+    needle='local PartyMenu = { isMenu = true }';assert menu.count(needle)==1
+    proxy='''local constructing=true
+local PartyMenu=setmetatable({}, {__index=NativeMenu,__newindex=function(t,k,v)
+  if constructing or type(v)=="function"then rawset(t,k,v)else NativeMenu[k]=v end
+end})'''
+    menu=menu.replace(needle,proxy)
+    needle='if not isHm then';assert menu.count(needle)==2
+    menu=menu.replace(needle,'if not isHm and not HNS.reusable(PartyMenu._session,PartyMenu._item) then')
+    needle='status == "knows" or status == "incompatible" or status == "invalid"';assert menu.count(needle)==1
+    menu=menu.replace(needle,needle+' or status == "unsupported"')
+    assert menu.endswith('return PartyMenu\n')
+    menu=menu[:-len('return PartyMenu\n')]+'''constructing=false
+for k,v in pairs(PartyMenu)do if type(v)~="function"then rawset(PartyMenu,k,nil)end end
+return PartyMenu.handleInput
+'''
+    (stage/'hns_party_tm.lua').write_text('-- Derived native party_menu.lua for HnS TM learning only; shared native state. See GEN1RECOMP_LICENSE.md.\nreturn function(NativeMenu,HNS)\n'+menu+'\nend\n')

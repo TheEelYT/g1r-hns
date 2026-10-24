@@ -23,6 +23,6 @@ jobs:
           bash tools/setup_gimp.sh
           echo "HNS_GIMP=$GITHUB_WORKSPACE/.tools/gimp/squashfs-root/AppRun" >> "$GITHUB_ENV"
       - name: Get the pinned native cart importer
-        run: git clone --depth=1 --branch v0.3.95 https://github.com/bryanthaboi/gen1recomp.git build/engine
+        run: git clone --depth=1 --branch v0.3.96 https://github.com/bryanthaboi/gen1recomp.git build/engine
       - name: Check version rendering, packaging and saved cart identity
         run: python3 tests/test_cart_label.py --engine build/engine --luajit /usr/bin/luajit

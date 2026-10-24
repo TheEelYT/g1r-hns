@@ -77,7 +77,9 @@ return function(T,game,w,maps)
     ad.roll=function()return 9 end;Secondary.withChance(M,'HNS_ADDITIONAL_LIST');T.eq(st.enemy.mon.status,'FRZ','source Ice Fang freeze chance includes roll 9');T.eq(st.enemy.flinched,true,'source Ice Fang rolls flinch independently')
     ad.roll=roll
   end
+  if w.abilities.fieldLead then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_lead_encounters.lua')(T,game,w,s,mon,setting)end
   if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_move_expansion.lua')(T,game,w,s,mon,keep)end
+  if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_tm_reuse.lua')(T,game,w,s,mon,setting)end
   if w.battleFields then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_battle_fields.lua')(T,game,w,s,mon,keep)end
   if w.audio.gbSounds then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_gb_sounds.lua')(T,game,w,s,keep)end
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_capture_audio.lua')(T,game,w,s,keep)

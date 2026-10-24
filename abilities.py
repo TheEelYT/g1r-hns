@@ -29,5 +29,7 @@ def build(source,engine,dex):
     pokemon=(source/'src/pokemon.c').read_text()
     legendary=dict(re.findall(r'\{ SPECIES_(\w+),\s*ABILITY_(\w+)',pokemon.split('sLegendaryCustomAbilities[] = {')[1].split('};',1)[0]))
     assert len(legendary)==9
-    return {'records':records,'species':species,'legendary':legendary,'normalSlots':2,'hiddenSlots':1,'surges':SURGES,'counts':{k:sum(r['support']==k for r in records.values())for k in ('native','reviewed','pending')},
+    config=subprocess.check_output(['cpp','-P','-I'+str(source/'include'),'-'],input='#include "config/general.h"\n#include "config/overworld.h"\nOW_SYNCHRONIZE_NATURE\n',text=True)
+    synchronize_generation=int(config.strip().splitlines()[-1])+1  # source GEN_1..GEN_9 are zero-based
+    return {'fieldLead':{'synchronizeGeneration':synchronize_generation},'records':records,'species':species,'legendary':legendary,'normalSlots':2,'hiddenSlots':1,'surges':SURGES,'counts':{k:sum(r['support']==k for r in records.values())for k in ('native','reviewed','pending')},
             'limits':'Complete source ability identities/descriptions/fields, native bridges and four reviewed Surge entry effects. Normal/hidden source slot identities and legendary setting are connected; hidden acquisition, randomizer and remaining expanded effects, suppression/transfer differences and source ability popups remain pending.'}

@@ -1,4 +1,4 @@
-# Port progress — 0.7.20
+# Port progress — 0.7.21
 
 **Approximately 42% complete / 58% remaining.**
 
@@ -12,7 +12,7 @@ Weights describe total feature scope. Map imports and small fixes do not count e
 | Menus, presentation and audio | 12% | 79.2% |
 | Field and followers | 10% | 50.0% |
 | Battle and Pokémon systems | 25% | 41.0% |
-| Modes and challenges | 12% | 19.7% |
+| Modes and challenges | 12% | 20.6% |
 | Campaign, services and progression | 24% | 10.4% |
 | Release and final validation | 5% | 50.0% |
 
@@ -20,7 +20,7 @@ Measured bridge coverage (not a claim of complete behavior):
 
 - Abilities: 81/311 (26.0%).
 - Moves: 168/580 (29.0%).
-- Settings: 24/88 (27.3%).
+- Settings: 26/88 (29.5%).
 
 The source scope inventory and evidence paths are in [progress.json](progress.json). `done` earns full credit, `pending` zero and `partial` half unless a coverage counter is specified. Each item has an explicit share of its category. Settings include partial Modern Moves coverage; expanded moves exclude the original native rows.
 
