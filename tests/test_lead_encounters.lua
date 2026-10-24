@@ -62,6 +62,9 @@ return function(T,game,w,s,mon,setting)
   Rng.Random=originalRandom;lead.personality=0;Rng.SeedRng(43)
   local gender=S.gender('wild',19,s);T.check(gender==nil or gender=='M','female Cute Charm lead requests opposite gender')
   lead.isEgg=true;T.eq(S.gender('wild',19,s),nil,'egg cannot activate Cute Charm');lead.isEgg=nil
+  local cute=lead;local genderless=mon(81);A.assign(genderless,'CUTE_CHARM');s.party={genderless,cute}
+  Rng.Random=function()return 1 end;T.eq(S.gender('wild',19,s),nil,'genderless Cute Charm lead cannot request impossible gender')
+  s.party={cute,mon(158)};Rng.Random=originalRandom
   for _,seed in ipairs({1,7,23,56,120})do
     Rng.SeedRng(seed);local opts={session=s,wild=true,headless=true,autoFight=false,cache=cache,playerParty=s.party,foe={species=19,level=8,moves={33}}}
     T.eq(B.start(opts),true,'native Cute Charm encounter starts')

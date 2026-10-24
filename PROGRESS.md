@@ -22,7 +22,7 @@ Measured bridge coverage (not a claim of complete behavior):
 - Moves: 168/580 (29.0%).
 - Settings: 26/88 (29.5%).
 
-The source scope inventory and evidence paths are in [progress.json](progress.json). `done` earns full credit, `pending` zero and `partial` half unless a coverage counter is specified. Each item has an explicit share of its category. Settings include partial Modern Moves coverage; expanded moves exclude the original native rows.
+The source scope inventory and evidence paths are in [progress.json](progress.json). `done` earns full credit, `pending` zero and `partial` half unless a coverage counter is specified. Each item has an explicit share of its category. Settings include partial Modern Moves and Synchronize coverage; expanded moves exclude the original native rows.
 
 ## Inventory
 

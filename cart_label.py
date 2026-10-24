@@ -1,5 +1,9 @@
 """Render the heartsoul XCF label with the installed mod's version (GIMP 3)."""
 import argparse
+import base64
+from bisect import bisect_right
+from decimal import Decimal, ROUND_HALF_UP, localcontext
+from functools import lru_cache
 import hashlib
 import json
 import os
@@ -8,10 +12,43 @@ import re
 import shutil
 import subprocess
 import tempfile
+import zlib
 
 ROOT = Path(__file__).resolve().parent
 FONT_NAME = 'Cascadia Mono Roman'
 MAX_BYTES = 1024 * 1024
+
+
+@lru_cache(maxsize=1)
+def linear_tables():
+    """Fixed-point sRGB tables, independent of GEGL's floating blend rounding."""
+    with localcontext() as context:
+        context.prec = 50
+        def linear(value):
+            value /= Decimal(255)
+            result = value / Decimal('12.92') if value <= Decimal('.04045') else ((value + Decimal('.055')) / Decimal('1.055')) ** (Decimal(12) / 5)
+            return int((result * 0xFFFFFF).to_integral_value(rounding=ROUND_HALF_UP))
+        return [linear(Decimal(n)) for n in range(256)], [linear(Decimal(n) + Decimal('.5')) for n in range(255)]
+
+
+def composite_version_text(backing, text, offset):
+    """Match the authored linear-light text blend with deterministic integers."""
+    levels, thresholds = linear_tables()
+    target = backing.load()
+    for y in range(text.height):
+        for x in range(text.width):
+            foreground = text.getpixel((x, y))
+            alpha = foreground[3]
+            if not alpha:
+                continue
+            px, py = x + offset[0], y + offset[1]
+            background = target[px, py]
+            combined = alpha * 255 + background[3] * (255-alpha)
+            channels = []
+            for front, back in zip(foreground[:3], background[:3]):
+                value = (levels[front] * alpha * 255 + levels[back] * background[3] * (255-alpha) + combined//2) // combined
+                channels.append(bisect_right(thresholds, value))
+            target[px, py] = (*channels, (combined+127)//255)
 
 
 def render_in_gimp(request_path):
@@ -112,20 +149,40 @@ def render_in_gimp(request_path):
         while parent is not None:
             parent.set_visible(True)
             parent = parent.get_parent()
-        procedure = Gimp.get_pdb().lookup_procedure('file-png-export')
-        config = procedure.create_config()
-        for key, value in {
-            'run-mode': Gimp.RunMode.NONINTERACTIVE, 'image': image,
-            'file': Gio.File.new_for_path(request['output']), 'compression': 9,
-            'time': False, 'phys': False, 'bkgd': False,
-            'include-color-profile': False, 'include-thumbnail': False,
-            'include-exif': False, 'include-iptc': False, 'include-xmp': False,
-            'include-comment': False,
-        }.items():
-            config.set_property(key, value)
-        result = procedure.run(config)
-        if result.index(0) != Gimp.PDBStatusType.SUCCESS:
-            raise RuntimeError('PNG export failed: ' + str(result.index(0)))
+        def export(canvas, path):
+            procedure = Gimp.get_pdb().lookup_procedure('file-png-export')
+            config = procedure.create_config()
+            for key, value in {
+                'run-mode': Gimp.RunMode.NONINTERACTIVE, 'image': canvas,
+                'file': Gio.File.new_for_path(path), 'compression': 9,
+                'time': False, 'phys': False, 'bkgd': False,
+                'include-color-profile': False, 'include-thumbnail': False,
+                'include-exif': False, 'include-iptc': False, 'include-xmp': False,
+                'include-comment': False,
+            }.items():
+                config.set_property(key, value)
+            result = procedure.run(config)
+            if result.index(0) != Gimp.PDBStatusType.SUCCESS:
+                raise RuntimeError('PNG export failed: ' + str(result.index(0)))
+        export(image, request['output'])
+        # Export fresh glyph coverage separately. GEGL can round a composited
+        # text-edge channel differently by one unit between identical runs.
+        text_image = Gimp.Image.new_with_precision(layer.get_width(), layer.get_height(), Gimp.ImageBaseType.RGB, image.get_precision())
+        try:
+            profile = image.get_color_profile()
+            if profile is not None:
+                text_image.set_color_profile(profile)
+            text_layer = Gimp.Layer.new_from_drawable(layer, text_image)
+            text_image.insert_layer(text_layer, None, 0)
+            text_layer.set_offsets(0, 0)
+            text_layer.set_visible(True)
+            export(text_image, request['text_output'])
+        finally:
+            text_image.delete()
+        if request.get('background_output'):
+            layer.set_visible(False)
+            export(image, request['background_output'])
+            layer.set_visible(True)
         Path(request['report']).write_text(json.dumps({
             'version': request['version'], 'font': font.get_name(),
             'text': ''.join(ET.fromstring(layer.get_markup()).itertext()) if layer.get_markup() else layer.get_text(),
@@ -137,7 +194,7 @@ def render_in_gimp(request_path):
         image.delete()
 
 
-def render_label(version, output, *, source=None, gimp=None, refresh_art=False):
+def render_label(version, output, *, source=None, gimp=None, refresh_art=False, refresh_background=False):
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('Expected a mod version such as 0.7.19')
     source = Path(source or ROOT / 'release/gbalabels.xcf').resolve()
@@ -163,7 +220,11 @@ def render_label(version, output, *, source=None, gimp=None, refresh_art=False):
         request = temp / 'request.json'
         report = temp / 'report.json'
         rendered = temp / 'label.png'
+        glyphs = temp / 'text.png'
+        background = temp / 'background.png'
         request.write_text(json.dumps({'source': str(source), 'output': str(rendered),
+                                       'text_output': str(glyphs),
+                                       'background_output': str(background) if refresh_art or refresh_background else None,
                                        'version': version, 'report': str(report)}))
         gimprc = temp / 'gimprc'
         gimprc.write_text('(font-path ' + json.dumps(str(ROOT / 'release/fonts')) + ')\n(check-updates no)\n')
@@ -185,6 +246,30 @@ def render_label(version, output, *, source=None, gimp=None, refresh_art=False):
         from PIL import Image
         with Image.open(rendered) as image:
             rgba = image.convert('RGBA')
+            if refresh_art or refresh_background:
+                box = tuple(metadata['source_text_bounds'])
+                with Image.open(background) as blank:
+                    pixels = blank.convert('RGBA').crop(box).tobytes()
+                version_background = {
+                    'encoding': 'zlib+base64-rgba8', 'box': list(box),
+                    'sha256': hashlib.sha256(pixels).hexdigest(),
+                    'data': base64.b64encode(zlib.compress(pixels, 9)).decode('ascii'),
+                }
+            else:
+                version_background = artwork_info['version_background']
+            box = tuple(metadata['source_text_bounds'])
+            if version_background['box'] != list(box):
+                raise ValueError('Version background escaped its source box')
+            pixels = zlib.decompress(base64.b64decode(version_background['data']))
+            if hashlib.sha256(pixels).hexdigest() != version_background['sha256']:
+                raise ValueError('Reviewed version background does not match its hash')
+            backing = Image.frombytes('RGBA', (box[2]-box[0], box[3]-box[1]), pixels)
+            with Image.open(glyphs) as fresh_text:
+                text = fresh_text.convert('RGBA')
+            bounds = metadata['text_bounds']
+            if text.size != (bounds[2]-bounds[0], bounds[3]-bounds[1]):
+                raise ValueError('Fresh version glyphs do not match their measured size')
+            composite_version_text(backing, text, (bounds[0]-box[0], bounds[1]-box[1]))
             if not refresh_art:
                 # GEGL's live blend filters can vary by one RGB unit at a few
                 # distant edge pixels. Keep the reviewed artwork exact and use
@@ -198,8 +283,10 @@ def render_label(version, output, *, source=None, gimp=None, refresh_art=False):
                 bounds = metadata['text_bounds']
                 if bounds[0] < box[0] or bounds[1] < box[1] or bounds[2] > box[2] or bounds[3] > box[3]:
                     raise ValueError('Version text escaped its reviewed artwork box')
-                composite.paste(rgba.crop(box), box)
+                composite.paste(backing, box)
                 rgba = composite
+            else:
+                rgba.paste(backing, box)
             rgba.save(rendered, format='PNG', optimize=True, compress_level=9)
         label = rendered.read_bytes()
         if not label.startswith(b'\x89PNG\r\n\x1a\n') or len(label) > MAX_BYTES:
@@ -211,7 +298,11 @@ def render_label(version, output, *, source=None, gimp=None, refresh_art=False):
             artwork_record.write_text(json.dumps({
                 'source_sha256': original_hash, 'png_sha256': hashlib.sha256(label).hexdigest(),
                 'version_box': metadata['source_text_bounds'],
+                'version_background': version_background,
             }, indent=2) + '\n')
+        elif refresh_background:
+            artwork_info['version_background'] = version_background
+            artwork_record.write_text(json.dumps(artwork_info, indent=2) + '\n')
         output.write_bytes(label)
     return {**metadata, 'source_sha256': original_hash,
             'png_sha256': hashlib.sha256(label).hexdigest(), 'bytes': len(label)}
@@ -224,5 +315,6 @@ if __name__ == '__main__':
     parser.add_argument('--source', type=Path)
     parser.add_argument('--gimp')
     parser.add_argument('--refresh-art', action='store_true', help='Refresh the reviewed artwork reference after editing the XCF')
+    parser.add_argument('--refresh-background', action='store_true', help='Refresh only the source version-box backing; preserve reviewed artwork')
     args = parser.parse_args()
-    print(json.dumps(render_label(args.version, args.out, source=args.source, gimp=args.gimp, refresh_art=args.refresh_art), indent=2))
+    print(json.dumps(render_label(args.version, args.out, source=args.source, gimp=args.gimp, refresh_art=args.refresh_art, refresh_background=args.refresh_background), indent=2))

@@ -1,4 +1,16 @@
-# Current release handoff — 0.7.20
+# Current release handoff — 0.7.21
+
+Mod 0.7.21 / cart 1.0.20 / G1R v0.3.96 (`0e92b587468c2db7c386f055fc272e6505b0f401`). HnS source remains pinned to `167aa6d537b109bb229c231ddce4616974c4da71`.
+
+Source Synchronize/Cute Charm lead effects now prepare ordinary wild/static encounter personalities before native construction. Lead means party slot zero, even fainted; eggs do not activate either ability. Classic Synchronize is half-chance; modern is source GEN_9 guaranteed. Gifts/roamers/preset personalities/special modes delegate. Safari/Pokéblock interactions are pending and Synchronize retains a partial notice. Native RNG remains; selectors/rejection are compared with actual source C on common inputs, not source SFC32 save-state matching.
+
+Infinite TMs controls source importance and successful-learning consumption in both the native item API and actual graphical party menu (immediate/deferred branches). Generated private native derivatives share the real menu state; never edit engine files. HMs/source-important machines remain reusable; failed/cancelled learning consumes nothing. Tutor acquisition is still pending. See reports and PROGRESS.md for current validation and weighted scope.
+
+0.7.20 player confirmations: Azalea short grass for both player/follower, normal follower pond reflections, and new cart label with correct mod version. Ordinary landing dust unchanged. Shiny, ice/bridge, seaweed, sand, puddles and fog remain deferred; do not request backtracking, shiny hunts or rare TM consumption. Quick test access remains a prerequisite before distant visual checks return. Replies to TESTING.md are the normal feedback workflow.
+
+Preserve the confirmed 0.7.17 mart timing and source percussion. Missing progression trainers, Cut trees and other blockers remain LAST, with the route-order/sequence-break audit; testing travel stays open.
+
+# Historical handoff — 0.7.20
 
 Mod 0.7.20 / cart 1.0.19 / G1R v0.3.95 (`2b45436abffc31100d3cb599c6cc09d00c1ddac3`). HnS remains pinned to `167aa6d537b109bb229c231ddce4616974c4da71`.
 

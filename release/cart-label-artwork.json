@@ -6,5 +6,16 @@
     775,
     1714,
     831
-  ]
+  ],
+  "version_background": {
+    "encoding": "zlib+base64-rgba8",
+    "box": [
+      1384,
+      775,
+      1714,
+      831
+    ],
+    "sha256": "7f2a80fd49784403acd965ea2c022c27d380f2e50ac815617e708f5e5e787903",
+    "data": "eNrt1D1qQkEUhuE93DIR0gSS4gr5AbHJeAutDLEIKGnEDVjY2+jGdQWeYkAj5z7F034wM8zbPLSnJoHHl6+LmiRnBIha91+8C6CTOgnopE4COqmTgE7qJIBOAugkkKlNfWqhxgI6qZOATuokoJM6CeikTgI6qZOATuqkToJO6qROgk6isfjnoJPoJOgk6CQ6CTqJToJOgk6ik6CT6CRoLBp6L97Ksop26CTopE6ik+ikTqKT6KROopPopE6ik+ikTqKT6KROopPopE5C37vdp3vM1sFr7PrH6KRO6qROopM6qZM6iU7qpE7qJDqpkzqpk+ikTuqkTqKTOqmTOgmgkwA6CaCTOgnopE4COqmTgE7qJIBOAty2o1oI6KROAty6k4PXApDG+2RVJd6dAKTx0f1ViTaf2ilAGqPZpkq0+fz5A5BGWWyrRJvDsgZI43tzrBJtjuc7AALldw9AoFsdAAicAdAmupI="
+  }
 }

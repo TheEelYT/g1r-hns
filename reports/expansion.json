@@ -63,6 +63,7 @@
     "source_special_move_rows_pending": 87
   },
   "limits": [
+    "Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pok\u00e9block bonuses remain pending.",
     "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
     "Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished."
   ]

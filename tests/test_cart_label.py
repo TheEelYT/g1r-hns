@@ -30,6 +30,10 @@ def main():
         stage = Path(temporary)
         first, second, longer = [stage / name for name in ('first.png', 'second.png', 'longer.png')]
         a = render_label(version, first)
+        for repeat in range(2):
+            repeated = stage / ('repeat-' + str(repeat) + '.png')
+            assert render_label(version, repeated) == a, 'Identical version glyphs must render deterministically'
+            assert repeated.read_bytes() == first.read_bytes()
         b = render_label(next_version, second)
         c = render_label('123.456.789', longer)
         for info in (a, b, c):

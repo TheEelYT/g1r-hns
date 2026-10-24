@@ -12,6 +12,13 @@ return function(T,game,w,s,mon,setting)
     Menu._layout='single';Menu._hpAnim=nil;Menu._onSelect=nil;Menu._pokedude=nil;Menu._multi=nil;Menu._battle=nil
     return learner
   end
+  Menu.cursor=5;Menu.mode='summary';Menu._onClose=function()end
+  local callback=Menu._onClose
+  local factory=assert(load(T.readAsset('hns_party_tm.lua')))();factory(Menu,Teaching)
+  T.eq(Menu.cursor,5,'constructing private TM handler preserves native cursor')
+  T.eq(Menu.mode,'summary','constructing private TM handler preserves native mode')
+  T.eq(Menu._onClose,callback,'constructing private TM handler preserves native continuation')
+  Menu._onClose=nil
   for _,mode in ipairs({0,1})do
     setting('ITEM_MODE_INFINITE_TMS',mode);local learner=setup(false)
     T.eq(Items.info(912).importance,mode,'source TM importance follows saved option')

@@ -1,8 +1,8 @@
 {
-  "version": "0.7.20",
+  "version": "0.7.21",
   "native_checks": {
-    "default": 127597,
-    "mounted": 127597
+    "default": 127759,
+    "mounted": 127759
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 121,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.19",
+  "cart_version": "1.0.20",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -87,7 +87,7 @@
         "source_display_move_rows": 934,
         "source_critical_stages": 5,
         "source_fairy_species": 18,
-        "implemented_settings": 24,
+        "implemented_settings": 26,
         "egg_handoff_paths": 2
       }
     },
@@ -163,6 +163,10 @@
         "source_c_follower_ground_anim_commands": 121,
         "source_c_follower_track_fade_frames": 57,
         "source_c_reflection_color_cases": 98304,
+        "source_c_lead_ability_selector_cases": 25920,
+        "source_c_constrained_personality_cases": 936,
+        "native_tm_learning_body_preserved": true,
+        "native_rng_preserved": true,
         "follower_species_and_forms": 413,
         "follower_normal_shiny_sheets": 826,
         "source_follower_emote_frames": 22,
@@ -191,6 +195,7 @@
         "source_special_move_rows_pending": 87
       },
       "limits": [
+        "Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pok\u00e9block bonuses remain pending.",
         "Tint oracle covers ordinary 5-bit colors; source palette-bank light immunity and alternate-light high bits remain pending.",
         "Modern entry maps/scroll registers match source; battler/sprite orchestration and blend effects retain native integration. Distinct expanded move animations and full expanded effects/abilities are unfinished."
       ]
@@ -202,7 +207,8 @@
     "Modern entry layers/scroll registers match source; battler/sprite entry orchestration, blend effects and distinct attack choreography remain integrated with the native engine. Full conditional follower scripts, caught-ball variants and female-specific sprites remain pending.",
     "ROM data, GPU uploads and graphical effect handoffs use controlled fixtures. No live Windows game/GPU/audio listening verification was available.",
     "GB music/fanfares run source bytecode through native PSG synthesis; GB cry remaps, hardware SFX channel arbitration and audible/analog fidelity remain pending.",
-    "Field shadows use source masks, size/offset, opacity, owner-relative ordering and source fog/current-previous water suppression. Source follower tracks/sand/water effects are connected; reflections, seaweed bubbles, ash, further map-specific ground effects and full weather parity remain pending."
+    "Field shadows use source masks, size/offset, opacity, owner-relative ordering and source fog/current-previous water suppression. Source follower tracks/sand/water effects are connected; reflection transition affine/blend behavior, ash, further map-specific ground effects and full weather parity remain pending.",
+    "Synchronize/Cute Charm selectors and personality rejection match source C on common inputs. Native RNG remains; HnS SFC32 save-state matching and Safari/Pok\u00e9block interactions are not implemented."
   ],
   "targeted_regressions": [
     "Real native grass-step rolls in Morning/Day/Evening/Night",
@@ -264,30 +270,14 @@
     "Independently compiled source shadow predicates cover 243 behavior rows; diagonal-fog/bubbles suppression and current/previous water, including actual player Surf-to-shore, are exercised.",
     "Confirmed 0.7.17 mart assembly matches byte-for-byte; 0.7.18 extra rest removed. Current repeats are 6091/11971/17851, with seven silent frames per seam and fractional carry unchanged.",
     "Twelve source follower ground sheets compare 7680 palette pixels and 112 C-compiled animation commands; source footprint-fade callbacks produce 57 reference ticks. Native RSE entries check every hold/flicker/expiry frame.",
-    "Actual follower steps and recall trigger species-owned footprints/turning slither/spot/bug trails, sand cover, puddle/ripple/flow/hot-spring effects and water landing splashes, without changing completed motion/hop/border tests. Spawn and jump covering rules are distinct."
+    "Actual follower steps and recall trigger species-owned footprints/turning slither/spot/bug trails, sand cover, puddle/ripple/flow/hot-spring effects and water landing splashes, without changing completed motion/hop/border tests. Spawn and jump covering rules are distinct.",
+    "Source lead selectors on 25,920 cases and rejection filtering on 936 common-input RNG cases; native wild creation/capture preserves final PID, gender, nature and stats.",
+    "Actual native party-menu immediate and deferred TM learning obeys Infinite TMs, cancellation, unsupported moves, current importance and HM/source-important preservation. Private handler construction preserves live native menu state."
   ],
   "tested_build_content_equivalence": {
     "files": 7842,
     "release_readme_matches_repository": true,
     "all_runtime_files_match_repository": true
-  },
-  "release_artifacts": {
-    "mod_version": "0.7.19",
-    "cart_version": "1.0.18",
-    "repo": "TheEelYT/g1r-hns",
-    "files": [
-      {
-        "name": "pokemon_heart_soul-1.0.18.g1rcart",
-        "bytes": 1028181,
-        "sha256": "e1fce7c51c2a9350a2df448ea1ef27616b66f4ee002c460178e32bdf4596f249"
-      },
-      {
-        "name": "hns_exploration-0.7.19.zip",
-        "bytes": 10289785,
-        "sha256": "c9ac212e9e2eff3b053b7d04eaefd2444434a00490ea65df1e1021f132bc0c60"
-      }
-    ],
-    "result": "pass"
   },
   "engine_compatibility": {
     "v0.3.89": {
@@ -515,21 +505,21 @@
     "source_ground_sound_effects": 1
   },
   "engine": {
-    "version": "v0.3.95",
-    "commit": "2b45436abffc31100d3cb599c6cc09d00c1ddac3"
+    "version": "v0.3.96",
+    "commit": "0e92b587468c2db7c386f055fc272e6505b0f401"
   },
   "installer_compressed": {
     "assets": 5609,
     "codec": "actual native CacheBlob encode/decode",
-    "default_checks": 127597,
-    "mounted_checks": 127597,
+    "default_checks": 127759,
+    "mounted_checks": 127759,
     "result": "pass"
   },
   "progress": {
-    "version": "0.7.20",
+    "version": "0.7.21",
     "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
-    "complete_percent": 42.11,
-    "remaining_percent": 57.89,
+    "complete_percent": 42.23,
+    "remaining_percent": 57.77,
     "categories": [
       {
         "id": "world",
@@ -563,8 +553,8 @@
         "id": "modes",
         "title": "Modes and challenges",
         "weight": 12,
-        "complete_percent": 19.7,
-        "earned_points": 2.3636
+        "complete_percent": 20.64,
+        "earned_points": 2.4773
       },
       {
         "id": "campaign",
@@ -591,7 +581,7 @@
         "total": 580
       },
       "settings": {
-        "covered": 24,
+        "covered": 26,
         "total": 88
       }
     },
@@ -603,18 +593,21 @@
     ]
   },
   "preservation": {
-    "previous_release": "v0.7.19",
-    "previous_zip_sha256": "c9ac212e9e2eff3b053b7d04eaefd2444434a00490ea65df1e1021f132bc0c60",
-    "non_code_assets_identical": 7711,
+    "result": "pass",
+    "previous_release": "v0.7.20",
+    "previous_zip_sha256": "6a976ae8f2dbe4bb9522eeb8dd5258bb823e5c80f175ca7a9132efcbbe77e26c",
+    "previous_non_code_assets_identical": 7712,
     "missing_previous_files": [],
     "changed_previous_non_code_assets": [],
-    "world_datasets_unchanged": 28,
+    "world_datasets_unchanged": 26,
     "changed_world_datasets": [
-      "fieldShadows"
+      "abilities",
+      "audio",
+      "startup"
     ],
+    "audio_metadata_only_change": "sourceFingerprint incorporates the pinned engine extractor/LuaWriter; all audio payloads and other audio metadata are byte-identical.",
     "maps_preserved": 564,
-    "scripts_preserved": 1789,
-    "result": "pass"
+    "scripts_preserved": 1789
   },
   "reflection_checks": {
     "source_c_rgb555_cases": 98304,
@@ -642,5 +635,102 @@
     "master_xcf_unchanged": true,
     "deterministic_png_cart_zip": true,
     "native_import_save_seal_upgrade": true
+  },
+  "player_feedback": {
+    "version": "0.7.20",
+    "workflow": "Player normally replies to TESTING.md after each update, and separately reports other bugs.",
+    "location": "Azalea",
+    "confirmed": [
+      {
+        "check": "azalea_short_grass",
+        "subjects": [
+          "player",
+          "follower"
+        ],
+        "result": "correct",
+        "time_of_day_exhaustively_confirmed": false
+      },
+      {
+        "check": "ordinary_landing_dust",
+        "result": "unchanged"
+      },
+      {
+        "check": "tonal_percussion_source_presence",
+        "result": "same tonal note heard in original romhack"
+      },
+      {
+        "check": "normal_follower_pond_reflections",
+        "result": "work as intended"
+      },
+      {
+        "check": "versioned_cart_label",
+        "result": "new label displays correctly with mod version"
+      }
+    ],
+    "deferred": [
+      {
+        "check": "shiny_reflections",
+        "reason": "No shiny on current save."
+      },
+      {
+        "check": "seaweed_bubbles",
+        "reason": "No known accessible location from current play."
+      },
+      {
+        "check": "sand_tracks",
+        "reason": "Walking/running back to Cherrygrove is impractical."
+      },
+      {
+        "check": "puddles_and_other_ground_overlays",
+        "reason": "Suitable locations unavailable or unknown."
+      },
+      {
+        "check": "fog_shadow_suppression",
+        "reason": "Fog not encountered."
+      },
+      {
+        "check": "terrain_background_restoration",
+        "reason": "Not addressed by this reply."
+      },
+      {
+        "check": "ice_and_bridge_reflections",
+        "reason": "Only normal follower pond reflections were confirmed."
+      }
+    ],
+    "unresolved": [
+      {
+        "check": "percussion_prominence",
+        "observation": "Tonal percussion is less noticeable in the original romhack.",
+        "hypothesis": "Lower sample rate may contribute.",
+        "cause_confirmed": false
+      }
+    ],
+    "testing_policy": {
+      "no_special_travel_required": true,
+      "no_shiny_hunt_required": true,
+      "active_checks_require_verified_access": true,
+      "quick_test_access_needed": true
+    },
+    "audio_policy": "Preserve confirmed GB mart timing and source percussion. No audio changes made for this feedback."
+  },
+  "lead_encounters": {
+    "source_c_selector_cases": 25920,
+    "source_c_personality_cases": 936,
+    "native_wild_construction_capture_serialization": true,
+    "fainted_first_slot_and_egg_guards": true,
+    "cute_charm_fixed_gender_guards": true,
+    "excluded_paths_consume_no_rng": true,
+    "native_rng_preserved": true,
+    "source_sfc32_rng_state_parity": false,
+    "safari_pokeblock_complete": false
+  },
+  "infinite_tms": {
+    "native_direct_use": true,
+    "native_party_menu_immediate": true,
+    "native_party_menu_deferred": true,
+    "cancel_and_failure_preservation": true,
+    "source_important_machine_preservation": true,
+    "live_menu_state_preserved": true,
+    "vanilla_sessions_delegate": true
   }
 }

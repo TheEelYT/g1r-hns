@@ -78,6 +78,9 @@ local PartyMenu=setmetatable({}, {__index=NativeMenu,__newindex=function(t,k,v)
   if constructing or type(v)=="function"then rawset(t,k,v)else NativeMenu[k]=v end
 end})'''
     menu=menu.replace(needle,proxy)
+    first=menu.index('local HOLD_ICONS_SUB =')
+    last=menu.index('-- pokefirered/src/party_menu.c:2763',first)
+    menu=menu[:first]+'-- NativeMenu.heldItemSheet retains ownership of renderer cache assets.\n\n'+menu[last:]
     needle='if not isHm then';assert menu.count(needle)==2
     menu=menu.replace(needle,'if not isHm and not HNS.reusable(PartyMenu._session,PartyMenu._item) then')
     needle='status == "knows" or status == "incompatible" or status == "invalid"';assert menu.count(needle)==1

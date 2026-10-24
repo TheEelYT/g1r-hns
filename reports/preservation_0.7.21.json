@@ -1,0 +1,17 @@
+{
+  "result": "pass",
+  "previous_release": "v0.7.20",
+  "previous_zip_sha256": "6a976ae8f2dbe4bb9522eeb8dd5258bb823e5c80f175ca7a9132efcbbe77e26c",
+  "previous_non_code_assets_identical": 7712,
+  "missing_previous_files": [],
+  "changed_previous_non_code_assets": [],
+  "world_datasets_unchanged": 26,
+  "changed_world_datasets": [
+    "abilities",
+    "audio",
+    "startup"
+  ],
+  "audio_metadata_only_change": "sourceFingerprint incorporates the pinned engine extractor/LuaWriter; all audio payloads and other audio metadata are byte-identical.",
+  "maps_preserved": 564,
+  "scripts_preserved": 1789
+}

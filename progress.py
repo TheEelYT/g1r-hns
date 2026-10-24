@@ -46,7 +46,7 @@ def generate(mod,engine,luajit):
     for c in categories:lines.append(f"| {c['title']} | {c['weight']}% | {c['complete_percent']:.1f}% |")
     lines+=['','Measured bridge coverage (not a claim of complete behavior):','']
     for name,m in metrics.items():lines.append(f"- {name.title()}: {m['covered']}/{m['total']} ({100*m['covered']/m['total']:.1f}%).")
-    lines+=['','The source scope inventory and evidence paths are in [progress.json](progress.json). `done` earns full credit, `pending` zero and `partial` half unless a coverage counter is specified. Each item has an explicit share of its category. Settings include partial Modern Moves coverage; expanded moves exclude the original native rows.','', '## Inventory','']
+    lines+=['','The source scope inventory and evidence paths are in [progress.json](progress.json). `done` earns full credit, `pending` zero and `partial` half unless a coverage counter is specified. Each item has an explicit share of its category. Settings include partial Modern Moves and Synchronize coverage; expanded moves exclude the original native rows.','', '## Inventory','']
     for c in spec['categories']:
         lines+=['### '+c['title'],'','| Milestone | Weight | State | Evidence |','|---|---:|---|---|']
         for i in c['items']:lines.append(f"| {i['label']} | {i['weight']} | {i['state']} | "+', '.join(f'[{p}]({p})'for p in i['evidence'])+' |')
