@@ -8,6 +8,8 @@ Player confirmed Infinite TMs and sand, short-grass/shallow-water footsteps. Fou
 
 Progress remains 42.23% complete / 57.77% remaining. Missing progression trainers, Cut trees and other blockers remain LAST.
 
+Published v0.7.23 from `d790d4c6b0b247d30d270a212e8993b75b39e839`. Release workflow `40158122145` and Cart label workflow `40158122153` passed. Native integration: 128,316 checks per raw/compressed cache root; strict Modkit, seven source audits and 127 UI captures pass. All 7,713 prior non-code assets and 30 prior world datasets are preserved. Uploaded ZIP/cart hashes, runtime/derivative bytes and source XCF are verified in reports/validation.json.
+
 # Historical handoff — 0.7.22
 
 Mod 0.7.22 / cart 1.0.21 / G1R v0.3.96 (`0e92b587468c2db7c386f055fc272e6505b0f401`). HnS source pin unchanged.

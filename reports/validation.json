@@ -281,7 +281,11 @@
     "Native Ice Path forced controller retains the same visible follower, holds its sliding pose, queues trailing steps and stops at the actual wall without a ball recall."
   ],
   "tested_build_content_equivalence": {
-    "result": "local runtime/probe pass; clean source rebuild and packaging run in publication workflow",
+    "result": "pass",
+    "packaged_files": 7850,
+    "all_runtime_files_match_repository": true,
+    "native_TM_derivatives_match_validated_probe": true,
+    "release_readme_testing_progress_match_repository": true,
     "preservation_report": "reports/preservation_0.7.23.json"
   },
   "engine_compatibility": {
@@ -633,7 +637,8 @@
     "reviewed_version_box_background": true,
     "repeat_same_version_renders": 5,
     "source_xcf_unchanged": true,
-    "png_sha256": "d81011245bb335d3d5b7bdc39cdb99b94db88dff1ef5e1be0c05256f9f872b83"
+    "png_sha256": "6f0a87767ab6aa5e3173cb663cff3c6ee90b23565961360b4f0363bf283f27e0",
+    "version": "0.7.23"
   },
   "player_feedback": {
     "version": "0.7.20",
@@ -773,10 +778,10 @@
     "response_in_0.7.22": "Opt-in separate practice slot with repeatable TM supplies, normal/shiny followers and audited terrain shortcuts/return. Does not infer player confirmation of 0.7.21 mechanics."
   },
   "validation_provenance": {
-    "local_runtime_and_compressed_tests": "pass",
-    "current_publication_workflow": "pending",
-    "source_assets_and_datasets": "byte-identical to v0.7.22; full source audits rerun before publication",
-    "previous_full_ci": "https://github.com/TheEelYT/g1r-hns/actions/runs/40151164646"
+    "workflow_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40158122145",
+    "commit": "d790d4c6b0b247d30d270a212e8993b75b39e839",
+    "result": "success",
+    "published_assets_downloaded_and_verified": true
   },
   "latest_player_feedback": {
     "version": "0.7.22",
@@ -827,5 +832,17 @@
     "final_queued_step_at_native_wall": true,
     "other_forced_modes_remain_excluded": true,
     "live_player_confirmation": false
-  }
+  },
+  "release_artifacts": [
+    {
+      "name": "pokemon_heart_soul-1.0.22.g1rcart",
+      "bytes": 897629,
+      "sha256": "05cb041cc26b1da2dd21198717b475da3f3790b6cf1b896c63e7d264f361a136"
+    },
+    {
+      "name": "hns_exploration-0.7.23.zip",
+      "bytes": 10334773,
+      "sha256": "e549a578a5fbfed6400b01f9d9c015c9843ff924211eb9fd630e583c49b0b3e6"
+    }
+  ]
 }
