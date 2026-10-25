@@ -75,7 +75,7 @@ def derivatives(engine,stage):
     needle='local PartyMenu = { isMenu = true }';assert menu.count(needle)==1
     proxy='''local constructing=true
 local PartyMenu=setmetatable({}, {__index=NativeMenu,__newindex=function(t,k,v)
-  if constructing or type(v)=="function"then rawset(t,k,v)else NativeMenu[k]=v end
+  if constructing then rawset(t,k,v)else NativeMenu[k]=v end
 end})'''
     menu=menu.replace(needle,proxy)
     first=menu.index('local HOLD_ICONS_SUB =')

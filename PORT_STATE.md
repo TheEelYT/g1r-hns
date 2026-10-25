@@ -1,4 +1,14 @@
-# Current release handoff — 0.7.22
+# Current release handoff — 0.7.23
+
+Mod 0.7.23 / cart 1.0.22 / G1R v0.3.96; HnS and engine pins unchanged. Four-move TM teaching now shares function-valued message/choice continuations with the genuine native menu, rather than hiding those callbacks in its private method table. All writes after derivative construction go to NativeMenu. Tests drive real A/B messages, native delete/stop choices and actual summary/HM/cancellation/replacement behavior.
+
+Follower collection forwards camera X/Y through the entire effects chain; the old outer wrapper dropped them and broke otherwise-correct shadow subpriority at nonzero camera positions. Ice uses native forcedStep rather than tryMove; a scoped bridge now retains the same follower actor, queues old player cells and holds sliding poses. Other forced modes retain the previous exclusion policy. No engine checkout edits.
+
+Player confirmed Infinite TMs and sand, short-grass/shallow-water footsteps. Four-move TM prompt, shadow overlay and ice recall are reported bugs, pending new player confirmation after repair. Do not infer successful replacement, OFF TM consumption or shiny ice reflection confirmation. Keep settled music/grass/pond/cart checks settled; deferred terrain/weather/bridge checks stay deferred. See reports/player_feedback_0.7.22.json and TESTING.md.
+
+Progress remains 42.23% complete / 57.77% remaining. Missing progression trainers, Cut trees and other blockers remain LAST.
+
+# Historical handoff — 0.7.22
 
 Mod 0.7.22 / cart 1.0.21 / G1R v0.3.96 (`0e92b587468c2db7c386f055fc272e6505b0f401`). HnS source pin unchanged.
 

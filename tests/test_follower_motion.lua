@@ -89,5 +89,6 @@ return function(T,game,w,s,lead,keep)
     T.eq(F.refresh(),held,'seamless '..dir..' preserves follower actor');T.eq(held.visible,true,'seamless '..dir..' stays visible');T.eq(F.transition,nil,'seamless '..dir..' has no ball animation')
     T.eq(held.cellX,51-d[1],'seamless '..dir..' rebases follower X');T.eq(held.cellY,8-d[2],'seamless '..dir..' rebases follower Y')
   end
+  dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_ice_follower.lua')(T,game,w,s,F,keep)
   s.map=before;P.reset(9,8,'left');F.actor=nil;F.refresh();O.loadMap(game,before,game.data.maps[before]);Coll.bindMap(game,before,game.data.maps[before])
 end

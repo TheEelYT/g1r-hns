@@ -80,6 +80,7 @@ return function(T,game,w,maps)
   if w.abilities.fieldLead then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_lead_encounters.lua')(T,game,w,s,mon,setting)end
   if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_move_expansion.lua')(T,game,w,s,mon,keep)end
   if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_tm_reuse.lua')(T,game,w,s,mon,setting)end
+  if w.teaching then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_tm_replacement.lua')(T,game,w,s,mon,setting)end
   if w.battleFields then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_battle_fields.lua')(T,game,w,s,mon,keep)end
   if w.audio.gbSounds then dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_gb_sounds.lua')(T,game,w,s,keep)end
   dofile((arg[0]:match('^(.*)[/\\]')or'.')..'/test_capture_audio.lua')(T,game,w,s,keep)

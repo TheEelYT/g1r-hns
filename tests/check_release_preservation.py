@@ -1,4 +1,4 @@
-"""Guard the testing-tools release against unintended changes to source content."""
+"""Guard the repair release against unintended changes to source content."""
 import argparse
 import hashlib
 import io
@@ -9,8 +9,8 @@ import tempfile
 from urllib.request import urlopen
 import zipfile
 
-BASELINE = 'https://github.com/TheEelYT/g1r-hns/releases/download/v0.7.21/hns_exploration-0.7.21.zip'
-BASELINE_SHA256 = '21b689fa96639ad35065ca9bb75b34fcb214bcd5ed3e04f65565d379837b9bd7'
+BASELINE = 'https://github.com/TheEelYT/g1r-hns/releases/download/v0.7.22/hns_exploration-0.7.22.zip'
+BASELINE_SHA256 = '5d93024a9cd1874fa6a6f9b30c3511bf16c091316bc0e8772bb1c1eb0b779427'
 
 
 def check(mod, engine, luajit):
@@ -40,11 +40,11 @@ def check(mod, engine, luajit):
         before, after = read_world(old_world), read_world(mod / 'world.lua')
     changes = [key for key in before if before[key] != after.get(key)]
     assert not changes, changes
-    assert set(after) - set(before) == {'practice'}
-    return {'result': 'pass', 'previous_release': 'v0.7.21', 'previous_zip_sha256': BASELINE_SHA256,
+    assert set(after) == set(before)
+    return {'result': 'pass', 'previous_release': 'v0.7.22', 'previous_zip_sha256': BASELINE_SHA256,
             'previous_non_code_assets_identical': identical, 'missing_previous_files': missing,
             'changed_previous_non_code_assets': changed, 'world_datasets_unchanged': len(before),
-            'changed_world_datasets': changes, 'added_world_datasets': ['practice'],
+            'changed_world_datasets': changes, 'added_world_datasets': [],
             'maps_preserved': len(before['maps']), 'scripts_preserved': len(before['scripts'])}
 
 

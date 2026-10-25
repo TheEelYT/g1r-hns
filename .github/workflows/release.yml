@@ -73,9 +73,9 @@ jobs:
           python3 tests/render_source_ui.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --out build/ui-captures
           test -z "$(git -C build/source status --porcelain)"
           test -z "$(git -C build/engine status --porcelain)"
-      - name: Preserve published 0.7.21 assets and world data
+      - name: Preserve published 0.7.22 assets and world data
         run: |
-          python3 tests/check_release_preservation.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --report reports/preservation_0.7.22.json
+          python3 tests/check_release_preservation.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --report reports/preservation_0.7.23.json
       - name: Check weighted progress snapshot
         run: python3 progress.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --check
       - name: Validate latest G1R installer-compressed assets

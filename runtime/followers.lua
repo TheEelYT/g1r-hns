@@ -10,6 +10,7 @@ return function(mod,w,game)
   local Ow=require('src.core.game3.ow_sprites');local Fx=require('src.core.game3.field_effects')
   local U=assert(load(mod:read('source_ui.lua')))()(mod,w.startup.ui)
   local Motion=assert(load(mod:read('follower_motion.lua')))()
+  local MB=require('src.core.game3.mb')
   local rows={};for name,r in pairs(w.followers.species)do rows[C:require('species','SPECIES_'..name)]=r end
   function F.lead(s)
     for _,mon in ipairs(s and s.party or {})do
@@ -28,7 +29,9 @@ return function(mod,w,game)
     if Space.store and Flags.getFlag(Space.store,nil,w.followers.disabledFlag)then return false end
     if P.surfing or P.underwater or P.biking then return false end
     local Forced=require('src.core.game3.forced_movement')
-    if Forced.isForced and Forced.isForced()then return false end
+    if Forced.isForced and Forced.isForced()then
+      if not F.iceStep then return false end
+    else F.iceStep=nil end
     return true
   end
   function F.refresh()
@@ -70,6 +73,7 @@ return function(mod,w,game)
     local dx,dy=x*16-a.px,y*16-a.py
     if dx~=0 then a.facing=dx<0 and 'left'or 'right'elseif dy~=0 then a.facing=dy<0 and 'up'or 'down'end
     a.moving=dx~=0 or dy~=0;a.progress=0;a.animClock=0;a.stepFrames=frames or 16;a.stepFlip=not a.stepFlip
+    a.sliding=F.iceStep and Coll.behavior(a.cellX,a.cellY)==MB.id('ICE')and not a.jumping
     Motion.begin(a,w.followers.motion,(a.stepFrames<=8)and not a.jumping)
     if game._hnsFieldShadows then
       if a.jumping then game._hnsFieldShadows.shadows.leaveShort(a);game._hnsFollowerGround.begin(a,x,y,true)else game._hnsFieldShadows.shadows.step(a,x,y,false)end
@@ -96,19 +100,20 @@ return function(mod,w,game)
       end
     end
     if a.moving then
-      Motion.tick(a)
+      if not a.sliding then Motion.tick(a)end
       a.progress=a.progress+1;local f=math.min(1,a.progress/a.stepFrames)
       a.px=a.startPx+(a.targetX*16-a.startPx)*f;a.py=a.startPy+(a.targetY*16-a.startPy)*f
       if a.jumping then
         local shape=a.jumpStride==1 and w.followers.motion.jumpY or w.followers.motion.jumpNormalY
         a.raiseY=shape[math.floor((a.progress-1)*a.jumpStride/2)+1]or 0
+      elseif a.sliding then a.raiseY=0
       elseif w.followers.motion.bobbing then
         if a.stepFrames==16 then a.raiseY=Motion.walkBob(a.progress)else a.raiseY=math.floor((a.progress+2)/8)%2==0 and -1 or 0 end
       end
       if f==1 then
         local jumped=a.jumping
         if a.jumping and game._hnsFieldShadows then game._hnsFieldShadows.shadows.step(a,a.targetX,a.targetY,true)end
-        a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)
+        a.cellX=a.targetX;a.cellY=a.targetY;a.moving=false;a.jumping=false;a.sliding=false;a.raiseY=0;a.idleClock=0;O.updateElevation(a)
         if game._hnsFieldShadows then game._hnsFieldShadows.shadows.finish(a,a.cellX,a.cellY,jumped)end
         local pending=a.pendingStep;a.pendingStep=nil
         if pending then F.step(pending.x,pending.y,pending.frames,pending.playerJump)end
@@ -155,6 +160,19 @@ return function(mod,w,game)
       if result=='step'or result=='ledge'then F.step(x,y,P.stepFrames,result=='ledge')
       elseif result=='connection'then F.step(P.cellX,P.cellY,P.stepFrames)end
     end;return result
+  end
+  -- Ice uses the native forced-step controller rather than tryMove. Feed its
+  -- old player cell into the same trailing-step queue, preserving actor/ball
+  -- state through the final slide onto ordinary ground.
+  local forcedStep=old.forcedStep or P.forcedStep
+  P.forcedStep=function(dir,frames,opts)
+    local active=Rt._game==game and H.own(Rt.getSession())
+    local x,y=P.cellX,P.cellY
+    local ice=active and Coll.behavior(x,y)==MB.id('ICE')
+    if active then F.iceStep=ice or nil end
+    local result=forcedStep(dir,frames,opts)
+    if ice and result then F.step(x,y,P.stepFrames,opts and opts.ledgeX~=nil)end
+    return result
   end
   -- Seamless loads change the coordinate origin, not follower visibility.
   local mapLoad=old.mapLoad or Map.load
@@ -223,8 +241,8 @@ return function(mod,w,game)
     local result=owDraw(id,px,py,cx,cy,facing,phase,flip,opts);lg.pop();return result
   end
   local collect=old.collect or Fx.collectActors
-  Fx.collectActors=function(actors)
-    collect(actors);local it=F.interaction;local a=F.actor
+  Fx.collectActors=function(actors,...)
+    collect(actors,...);local it=F.interaction;local a=F.actor
     if not(it and a and a.visible)then return end
     local row=F.row(F.mon);local sx,sy=a.px,a.py-math.floor(row.height/2)-8+it.y
     local art=w.followers.emotes;local frame=it.emotion*2+(it.elapsed>=30 and it.elapsed<55 and 1 or 0)
@@ -259,5 +277,5 @@ return function(mod,w,game)
       F.interaction={text=text,emotion=emotion,elapsed=0,y=0,velocity=-5};return true
     end)
   end
-  game._hnsFollower={follower=F,move=move,mapLoad=mapLoad,walkPhase=walkPhase,list=list,at=at,owDraw=owDraw,collect=collect,entrance=entrance,exit=exit,hook=true}
+  game._hnsFollower={follower=F,move=move,forcedStep=forcedStep,mapLoad=mapLoad,walkPhase=walkPhase,list=list,at=at,owDraw=owDraw,collect=collect,entrance=entrance,exit=exit,hook=true}
 end

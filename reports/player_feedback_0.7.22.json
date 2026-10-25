@@ -1,0 +1,41 @@
+{
+  "version": "0.7.22",
+  "workflow": "Replies to TESTING.md plus separately reported bugs.",
+  "confirmed": [
+    {
+      "check": "Infinite TMs",
+      "result": "TMs are infinite; no confirmation of OFF consumption."
+    },
+    {
+      "check": "sand footsteps",
+      "result": "look correct to player knowledge"
+    },
+    {
+      "check": "short grass footsteps",
+      "result": "look correct to player knowledge"
+    },
+    {
+      "check": "shallow water footsteps",
+      "result": "look correct to player knowledge"
+    }
+  ],
+  "bugs": [
+    {
+      "check": "four-move TM teaching",
+      "result": "A on already-four-moves message dismisses TM use instead of asking to delete/replace."
+    },
+    {
+      "check": "ice follower",
+      "result": "Follower enters Pok\u00e9 Ball when player moves on ice; reflection check blocked."
+    },
+    {
+      "check": "sprite shadows",
+      "result": "Shadows draw above sprites, especially moving north with follower behind."
+    }
+  ],
+  "not_inferred": [
+    "No confirmation of successful replacement/cancellation or OFF TM consumption.",
+    "No confirmation of normal/shiny ice reflections while follower recalls.",
+    "No additional weather, pond/bridge or seaweed confirmation."
+  ]
+}

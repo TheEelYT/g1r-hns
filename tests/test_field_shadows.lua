@@ -81,6 +81,19 @@ return function(T,game,w,s,F,keep)
     T.eq(group[2],owner,'short-grass parent follows its ground shadow')
     T.eq(group[3].kind,'hns_follower_short_grass','short grass remains above shadow and parent')
   end end end
+  -- Use the whole installed collector chain. The outer follower wrapper used
+  -- to discard camera coordinates even though S.collect alone sorted correctly.
+  for _,cy in ipairs({0,17,128,257,1024})do for bob=-1,0 do
+    parent.currentElevation=3;parent.py=cy+64;parent.px=32
+    local owner={kind='npc',eventObject=parent,graphicsId=gid,x=32,y=parent.py+bob,sortY=parent.py,elevation=3}
+    local stack={owner};Fx.collectActors(stack,16,cy)
+    local under,over=sort(stack,{}, {},cy);local group=#over>0 and over or under
+    local shadowIndex,ownerIndex,shadow
+    for i,v in ipairs(group)do if v==owner then ownerIndex=i elseif v.kind=='hns_shadow'and v.x==owner.x+8-w.fieldShadows.shadows['1'].width/2 then shadowIndex=i;shadow=v end end
+    T.check(shadowIndex and ownerIndex and shadowIndex<ownerIndex,'installed collectors keep shadow below sprite at world camera '..cy)
+    T.eq(shadow.subpriority,owner.subpriority+1,'installed collector uses actual camera for owner-relative shadow priority '..cy)
+  end end
+  parent.py=64
   -- Composite a source leaf pixel that actually overlaps the shadow mask.
   -- A post-grass 25% shadow would darken this exact pixel in the old ordering.
   local ga=w.fieldShadows.grass.short_grass;local sa=w.fieldShadows.shadows['1']

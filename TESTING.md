@@ -1,26 +1,31 @@
-# Player testing notes — 0.7.22
+# Player testing notes — 0.7.23
 
 Use G1R 0.3.96. These notes are the normal place to reply after an update; report any other bug you notice too. Checks must fit the player's current location and available Pokémon. An inaccessible check is deferred, not a failure and not a confirmation.
 
 ## Current player checks
 
-Optional checks now have a separate practice save. Nothing needs to be tested in your regular Azalea save.
+Use the existing **HnS PRACTICE** slot for these optional checks. Its party and supplies remain separate from the regular save. Access tools at **START → OPTIONS → GEN1RECOMP → PORT TEST TOOLS**.
 
-1. **Save on dry ground, off your bike.** Open **START → OPTIONS → GEN1RECOMP → PORT TEST TOOLS → Create practice copy → YES**. This copies your last SAVED point. It does not include unsaved changes or select the new slot.
-2. Exit to the launcher. Choose the new **HnS PRACTICE** save slot and Continue. Your regular slot is still available with its original name/party/bag.
-3. The test party contains **NORMAL** and **SHINY** Poliwrath, level 25. The Bag has **9 each TM03 Water Pulse, TM17 Protect and TM60 Drain Punch**. NORMAL has one move for immediate learning. SHINY has four to try replacement/cancellation. **Refill TM supplies** restores the three stacks to 9 in this copy only.
-4. Optional TM check: with **Infinite TMs ON**, teach a supplied TM and check it stays at 9. With it OFF, a successful teaching uses one. Changing this requires Custom mode on the source Mode page. Declining replacement should consume none. Use a fresh practice copy if both learners already know the move. No search for another TM is needed.
-5. Optional field check: the practice tools offer **Terrain shortcuts** for sand, short grass, shallow water and ice. Walk **LEFT and RIGHT** across the arrival strip. **Swap first two followers** selects the supplied normal/shiny lead. Ice Path has an icy reflection field; ice may slide you until you reach an edge. **Return to copied point** returns within the practice save.
-6. When finished, exit to the launcher and select your regular save slot again. Test changes may be saved in HnS PRACTICE; they stay in that slot. Deleting the practice slot later is optional.
+- **Four-move TM learning:** use a supplied TM on SHINY. Press A through the already-four-moves message; it should ask whether to delete/replace a move, then open the move-selection summary. Selecting an ordinary move should teach it. Declining or cancelling should keep the original moves and TM count. Infinite TMs is already player-confirmed; no repeat ON/OFF consumption test is requested.
+- **Shadow order:** while walking north with the follower behind, shadows should remain behind their owning sprites. Observe ordinary nearby NPCs too if convenient; no special trip is needed.
+- **Ice follower:** use the Ice shortcut and move left/right. The follower should stay out, slide along and finish its trailing step without recalling into a Poké Ball. Normal/shiny ice reflections can be checked there once movement is working; their live appearance is still unconfirmed.
 
-Please report if creating/selecting the practice copy, the TM counts, a shortcut/return, or one of the supplied terrain effects misbehaves. Synchronize/Cute Charm remain covered by automated checks; no bulk encounter sampling is requested.
+Sand, short-grass and shallow-water footsteps are confirmed by the latest feedback and are removed from active checks. No terrain hunt or backtracking is requested.
 
-Seaweed, bridge/pond reflection test sites, deep sand, puddles and controlled fog are **not supplied yet**. These checks stay deferred. Ice Path supplies an icy reflection field for the normal/shiny presets; pond/bridge sites are still not supplied. No backtracking or shiny hunt is requested.
+## Feedback received for 0.7.22
+
+- Infinite TMs works. The reply does not establish OFF consumption or successful four-move replacement.
+- Sand, short grass and shallow-water footsteps look right to the player's knowledge.
+- Four-move TM teaching cancels after the already-four-moves message instead of offering deletion/replacement.
+- The follower enters its Poké Ball while moving on ice, blocking meaningful ice-reflection testing.
+- Sprite shadows draw above sprites, especially while moving north with the follower behind.
+
+The three reported bugs are repaired in 0.7.23 but await player confirmation. Automated coverage now drives the real TM message/choice/summary input path, the complete camera-aware collector chain and native Ice Path forced movement.
 
 ## Feedback received for 0.7.20
 
 - **Azalea short grass: confirmed correct for both player and follower.** Remove this from active checks. The reply did not separately establish every time-of-day case.
-- **Normal follower pond reflections: confirmed working as intended.** Ice/shiny ice checks now have optional practice access; bridge and shiny pond checks remain deferred.
+- **Normal follower pond reflections: confirmed working as intended.** Ice/shiny ice checks have optional practice access once the reported recall bug is repaired; bridge and shiny pond checks remain deferred.
 - **New cart label: confirmed correct, including the mod version.**
 - **Ordinary ground landing dust: reported unchanged.** No new dust retest is requested.
 - **GB tonal percussion: the same tonal hit is audible in the original romhack, but less prominent.** Its presence is confirmed as source behavior; the difference in prominence remains an audio-fidelity observation. The cause is unconfirmed. Do not remove/change the source percussion or repeat the source-presence comparison.
@@ -37,7 +42,6 @@ These remain unverified in live player testing. Automated evidence is retained s
 | Bridge follower reflections | Normal pond reflections are confirmed; bridge cases have not been confirmed | Verified nearby location or quick test access |
 | Pond/bridge shiny reflection palette | Shiny practice follower supplied; pond/bridge sites still not supplied | Verified reflection location/quick access |
 | Seaweed finish-step bubbles, rising/expiry and cleanup | No known accessible seaweed location from current Azalea play | Verified location and quick access |
-| Species-owned sand/footprint trails, turning, hold/flicker/expiry (now accessible, still unconfirmed) | Previously inaccessible; sand shortcut now supplied in practice copy | Optional practice feedback only; no walk back requested |
 | Deep-sand cover, puddle/ripple/hot-spring effects and water landings | Suitable locations have not been established for the player | Verified location and quick access |
 | Fog/water shadow suppression | Fog has not been encountered | Natural encounter or a controlled weather test |
 | Terrain backgrounds restoring after expiry/removal | Not confirmed by this reply | A relevant encounter during normal play or a supplied test setup |
