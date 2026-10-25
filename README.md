@@ -38,7 +38,7 @@ Save on dry ground first. Open **START → OPTIONS → GEN1RECOMP → PORT TEST 
 
 The practice copy has a separate playthrough identity, copied story flags and PC, a fresh test bag, and two level-25 Poliwrath: NORMAL has one move for immediate TM teaching; SHINY has four for replacement/cancellation. Drain Punch, Water Pulse and Protect are supplied in stacks of nine. Its PORT TEST TOOLS menu can refill those TMs, swap the first two followers, jump to verified terrain strips and return to the copied save point. Test changes can be saved in that slot. Use the launcher to select your regular slot again when finished. No practice supplies, party edits or shortcuts are applied to your regular save.
 
-Only converted, passable five-tile walking strips away from objects/events are offered; walk LEFT and RIGHT. Seaweed, pond/bridge/ice reflections, deep sand, puddles and controlled weather remain deferred where no suitable strip is supplied. Practice conveniences do not add source-parity credit to the progress estimate.
+Only converted, passable five-tile walking strips away from objects/events are offered; walk LEFT and RIGHT. Seaweed, pond/bridge reflections, deep sand, puddles and controlled weather remain deferred where no suitable strip is supplied. Practice conveniences do not add source-parity credit to the progress estimate.
 
 ## Settings and battle coverage
 

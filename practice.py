@@ -37,6 +37,12 @@ def build(maps, raw_maps, pairs):
                     elevation = strip[0][0] >> 12
                     if not all(b == behavior and (word >> 10) & 3 == 0 and word >> 12 == elevation for word, b in strip):
                         continue
+                    if key == 'ice':
+                        # Native reflection projection samples the following
+                        # two rows for a 32px follower.
+                        below = [at(x + dx, y + dy) for dy in (1, 2) for dx in range(-2, 3)]
+                        if not all(b == behavior and (word >> 10) & 3 == 0 and word >> 12 == elevation for word, b in below):
+                            continue
                     if any(abs(bx - x) <= 4 and abs(by - y) <= 2 for bx, by in blocked):
                         continue
                     found = {'id': key, 'label': label, 'behavior': behavior, 'map': mapid,

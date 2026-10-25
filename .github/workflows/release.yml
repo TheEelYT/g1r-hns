@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    branches: [main]
-    paths: [runtime/manifest.json]
+    branches: [main, 'work/**']
+    paths: ['runtime/**', 'tests/**', '*.py', manifest.json, 'release/**', PROGRESS.md, reports/progress.json, .github/workflows/release.yml]
   workflow_dispatch:
     inputs:
       version:
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: hns-release
+  group: hns-release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -73,6 +73,9 @@ jobs:
           python3 tests/render_source_ui.py --engine build/engine --mod build/hns_exploration --luajit /usr/bin/luajit --out build/ui-captures
           test -z "$(git -C build/source status --porcelain)"
           test -z "$(git -C build/engine status --porcelain)"
+      - name: Preserve published 0.7.21 assets and world data
+        run: |
+          python3 tests/check_release_preservation.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --report reports/preservation_0.7.22.json
       - name: Check weighted progress snapshot
         run: python3 progress.py --mod build/hns_exploration --engine build/engine --luajit /usr/bin/luajit --check
       - name: Validate latest G1R installer-compressed assets
@@ -91,8 +94,12 @@ jobs:
             dist/*.zip
             dist/*.g1rcart
             dist/SHA256SUMS
+            dist/release.json
+            reports/*.json
+            build/ui-captures/practice_*.png
           if-no-files-found: error
       - name: Publish immutable release
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           MOD_VERSION: ${{ steps.version.outputs.mod }}

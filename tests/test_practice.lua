@@ -124,6 +124,7 @@ return function(T,game,w)
       T.eq(Collision.elevationAt(d.x+dx,d.y),d.elevation,'native practice strip elevation '..d.id)
       T.eq(Collision.behavior(d.x+dx,d.y),MB.require(d.behavior:sub(4)),'native practice strip behavior '..d.id)
     end
+    if d.id=='ice'then T.eq(require('src.core.game3.field_effects_rse').reflectionType(d.x,d.y,d.x,d.y,32,32),1,'native projection sees an ice reflection field at the supplied strip')end
   end
   local ok,err=L.travel(practiceSession,'return');T.check(ok,'actual native return loads copied point '..tostring(err))
   T.eq(practiceSession.map,source.map,'actual return map');T.eq(practiceSession.x,source.x,'actual return x');T.eq(practiceSession.y,source.y,'actual return y')

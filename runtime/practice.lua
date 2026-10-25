@@ -102,7 +102,7 @@ return function(mod,w,game)
     -- Source underwater/Surf transitions need their own setup; dry strips only.
     if Player.surfing or Player.underwater or Player.biking then return nil,'Stand on dry ground, off your bike first.'end
     L.close()
-    local Options=game._hnsGear.options;if Options.isOpen()then Options.close(false)end
+    local Options=game._hnsGear.options;if Options.isOpen()then Options.close(true)end
     require('src.ui.game3.start_menu').close(true)
     return Warp.request(mod,game,selected.map,selected.x,selected.y,selected.facing,{onDone=function()
       require('src.ui.game3.hud').openMessage(game,destination=='return'and 'Back at the copied save point.'or 'Practice strip: walk LEFT and RIGHT.\nPORT TEST TOOLS can return you.')

@@ -16,8 +16,8 @@ def check(source, mod, world):
         words = struct.unpack('<' + str(len(raw) // 2) + 'H', raw)
         data = (mod / m['hnsLayoutFile']).read_bytes()
         assert data[:4] == b'SVML'
-        for dx in range(-2, 3):
-            x, y = row['x'] + dx, row['y']
+        cells = [(row['x'] + dx, row['y'] + dy) for dy in range(3 if row['id'] == 'ice' else 1) for dx in range(-2, 3)]
+        for x, y in cells:
             assert 0 < x < layout['width'] - 1 and 0 < y < layout['height'] - 1
             pos = y * layout['width'] + x
             word = words[pos]
@@ -29,5 +29,5 @@ def check(source, mod, world):
             checked += 1
         for group in ('objects', 'warps', 'coordEvents', 'bgEvents'):
             assert not any(abs(o['x'] - row['x']) <= 4 and abs(o['y'] - row['y']) <= 2 for o in m.get(group, []))
-    assert {'sand', 'short_grass', 'shallow_water'} <= {d['id'] for d in world['practice']['destinations']}
+    assert {'sand', 'short_grass', 'shallow_water', 'ice'} <= {d['id'] for d in world['practice']['destinations']}
     return {'practice_source_walking_cells': checked, 'practice_destinations': len(world['practice']['destinations'])}

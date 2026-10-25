@@ -9,18 +9,18 @@ Optional checks now have a separate practice save. Nothing needs to be tested in
 1. **Save on dry ground, off your bike.** Open **START → OPTIONS → GEN1RECOMP → PORT TEST TOOLS → Create practice copy → YES**. This copies your last SAVED point. It does not include unsaved changes or select the new slot.
 2. Exit to the launcher. Choose the new **HnS PRACTICE** save slot and Continue. Your regular slot is still available with its original name/party/bag.
 3. The test party contains **NORMAL** and **SHINY** Poliwrath, level 25. The Bag has **9 each TM03 Water Pulse, TM17 Protect and TM60 Drain Punch**. NORMAL has one move for immediate learning. SHINY has four to try replacement/cancellation. **Refill TM supplies** restores the three stacks to 9 in this copy only.
-4. Optional TM check: with **Infinite TMs ON**, teach a supplied TM and check it stays at 9. With it OFF, a successful teaching uses one. Declining replacement should consume none. Use a fresh practice copy if both learners already know the move. No search for another TM is needed.
-5. Optional field check: the practice tools offer **Terrain shortcuts** for sand, short grass and shallow water. Walk **LEFT and RIGHT** across the arrival strip. **Swap first two followers** selects the supplied normal/shiny lead. **Return to copied point** returns within the practice save.
+4. Optional TM check: with **Infinite TMs ON**, teach a supplied TM and check it stays at 9. With it OFF, a successful teaching uses one. Changing this requires Custom mode on the source Mode page. Declining replacement should consume none. Use a fresh practice copy if both learners already know the move. No search for another TM is needed.
+5. Optional field check: the practice tools offer **Terrain shortcuts** for sand, short grass, shallow water and ice. Walk **LEFT and RIGHT** across the arrival strip. **Swap first two followers** selects the supplied normal/shiny lead. Ice Path has an icy reflection field; ice may slide you until you reach an edge. **Return to copied point** returns within the practice save.
 6. When finished, exit to the launcher and select your regular save slot again. Test changes may be saved in HnS PRACTICE; they stay in that slot. Deleting the practice slot later is optional.
 
 Please report if creating/selecting the practice copy, the TM counts, a shortcut/return, or one of the supplied terrain effects misbehaves. Synchronize/Cute Charm remain covered by automated checks; no bulk encounter sampling is requested.
 
-Seaweed, ice/bridge/pond reflection test sites, deep sand, puddles and controlled fog are **not supplied yet**. These checks stay deferred. A shiny test follower alone is not a verified reflection test location. No backtracking or shiny hunt is requested.
+Seaweed, bridge/pond reflection test sites, deep sand, puddles and controlled fog are **not supplied yet**. These checks stay deferred. Ice Path supplies an icy reflection field for the normal/shiny presets; pond/bridge sites are still not supplied. No backtracking or shiny hunt is requested.
 
 ## Feedback received for 0.7.20
 
 - **Azalea short grass: confirmed correct for both player and follower.** Remove this from active checks. The reply did not separately establish every time-of-day case.
-- **Normal follower pond reflections: confirmed working as intended.** Ice/bridge and shiny reflection checks remain deferred.
+- **Normal follower pond reflections: confirmed working as intended.** Ice/shiny ice checks now have optional practice access; bridge and shiny pond checks remain deferred.
 - **New cart label: confirmed correct, including the mod version.**
 - **Ordinary ground landing dust: reported unchanged.** No new dust retest is requested.
 - **GB tonal percussion: the same tonal hit is audible in the original romhack, but less prominent.** Its presence is confirmed as source behavior; the difference in prominence remains an audio-fidelity observation. The cause is unconfirmed. Do not remove/change the source percussion or repeat the source-presence comparison.
@@ -34,8 +34,8 @@ These remain unverified in live player testing. Automated evidence is retained s
 
 | Check | Why deferred | Prerequisite before requesting it |
 |---|---|---|
-| Ice and bridge follower reflections | Normal pond reflections are confirmed; ice/bridge cases have not been confirmed | Verified nearby location or quick test access |
-| Shiny reflection palette | No shiny on the current save | A supplied test preset/save or a naturally obtained shiny; no shiny hunt requested |
+| Bridge follower reflections | Normal pond reflections are confirmed; bridge cases have not been confirmed | Verified nearby location or quick test access |
+| Pond/bridge shiny reflection palette | Shiny practice follower supplied; pond/bridge sites still not supplied | Verified reflection location/quick access |
 | Seaweed finish-step bubbles, rising/expiry and cleanup | No known accessible seaweed location from current Azalea play | Verified location and quick access |
 | Species-owned sand/footprint trails, turning, hold/flicker/expiry (now accessible, still unconfirmed) | Previously inaccessible; sand shortcut now supplied in practice copy | Optional practice feedback only; no walk back requested |
 | Deep-sand cover, puddle/ripple/shallow-water/hot-spring effects and water landings | Suitable locations have not been established for the player | Verified location and quick access |
@@ -44,7 +44,7 @@ These remain unverified in live player testing. Automated evidence is retained s
 
 ## Developer follow-up
 
-The opt-in practice copy supplies a normal/shiny follower, TM kit and three verified terrain strips with return. Keep other terrain/weather/reflection checks deferred until their own quick access is supplied. Practice changes stay within the separate save slot. The documented native developer-console warp is Gen 1-only; it is not a verified Emerald shortcut.
+The opt-in practice copy supplies a normal/shiny follower, TM kit and four verified terrain strips with return. Keep other terrain/weather/reflection checks deferred until their own quick access is supplied. Practice changes stay within the separate save slot. The documented native developer-console warp is Gen 1-only; it is not a verified Emerald shortcut.
 
 Keep the GB mart arrangement and source percussion unchanged. Investigate the remaining difference in prominence at the playback/mixing/filtering/resampling boundary if audio work is resumed. Lower sample rate is a player hypothesis, not an established diagnosis.
 

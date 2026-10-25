@@ -1,0 +1,14 @@
+{
+  "version": "0.7.21",
+  "workflow": "Replies to TESTING.md remain the normal player-feedback workflow.",
+  "location": "Azalea (last supplied location)",
+  "confirmed": [],
+  "unavailable_checks": [
+    {
+      "check": "TM consumption/reuse",
+      "reason": "The player used all available TMs before Infinite TMs was connected. Further testing needs supplied items or convenient test access."
+    }
+  ],
+  "authorization": "Continue with the next update(s).",
+  "response_in_0.7.22": "Opt-in separate practice slot with repeatable TM supplies, normal/shiny followers and audited terrain shortcuts/return. Does not infer player confirmation of 0.7.21 mechanics."
+}
