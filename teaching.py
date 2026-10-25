@@ -73,6 +73,8 @@ def derivatives(engine,stage):
     # leaving native methods and vanilla sessions untouched.
     menu=(engine/'src/ui/game3/party_menu.lua').read_text()
     needle='local PartyMenu = { isMenu = true }';assert menu.count(needle)==1
+    # Method declarations are private; after construction, function values
+    # such as _onMessageDismiss/_yesNoCallback are live native state too.
     proxy='''local constructing=true
 local PartyMenu=setmetatable({}, {__index=NativeMenu,__newindex=function(t,k,v)
   if constructing then rawset(t,k,v)else NativeMenu[k]=v end

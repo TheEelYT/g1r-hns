@@ -1,0 +1,13 @@
+{
+  "result": "pass",
+  "previous_release": "v0.7.22",
+  "previous_zip_sha256": "5d93024a9cd1874fa6a6f9b30c3511bf16c091316bc0e8772bb1c1eb0b779427",
+  "previous_non_code_assets_identical": 7713,
+  "missing_previous_files": [],
+  "changed_previous_non_code_assets": [],
+  "world_datasets_unchanged": 30,
+  "changed_world_datasets": [],
+  "added_world_datasets": [],
+  "maps_preserved": 564,
+  "scripts_preserved": 1789
+}

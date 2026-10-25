@@ -1,8 +1,8 @@
 {
-  "version": "0.7.22",
+  "version": "0.7.23",
   "native_checks": {
-    "default": 127933,
-    "mounted": 127933
+    "default": 128316,
+    "mounted": 128316
   },
   "converter_tests": 19,
   "modkit": {
@@ -12,7 +12,7 @@
   },
   "cpu_ui_captures": 127,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.21",
+  "cart_version": "1.0.22",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -275,21 +275,20 @@
     "Actual follower steps and recall trigger species-owned footprints/turning slither/spot/bug trails, sand cover, puddle/ripple/flow/hot-spring effects and water landing splashes, without changing completed motion/hop/border tests. Spawn and jump covering rules are distinct.",
     "Source lead selectors on 25,920 cases and rejection filtering on 936 common-input RNG cases; native wild creation/capture preserves final PID, gender, nature and stats.",
     "Actual native party-menu immediate and deferred TM learning obeys Infinite TMs, cancellation, unsupported moves, current importance and HM/source-important preservation. Private handler construction preserves live native menu state.",
-    "Opt-in practice save creation through the actual native options descriptor/input path; separate cart/manual slots, original bytes and active slot, independent identity, write-failure rollback, supplied party/TMs, native map arrivals and return, collision/elevation and ice reflection classification."
+    "Opt-in practice save creation through the actual native options descriptor/input path; separate cart/manual slots, original bytes and active slot, independent identity, write-failure rollback, supplied party/TMs, native map arrivals and return, collision/elevation and ice reflection classification.",
+    "Real native TM A/B messages, delete/stop questions and summary selection, including HM refusal, cancellation and both Infinite TMs modes.",
+    "Whole installed effects-collector chain preserves camera X/Y and sorts shadows before their owners across large world-camera coordinates and both bob heights.",
+    "Native Ice Path forced controller retains the same visible follower, holds its sliding pose, queues trailing steps and stops at the actual wall without a ball recall."
   ],
   "tested_build_content_equivalence": {
-    "result": "pass",
-    "packaged_files": 7850,
-    "all_runtime_files_match_repository": true,
-    "preservation_report": "reports/preservation_0.7.22.json",
-    "packaged_files_match_staged_bytes": 7850,
-    "release_readme_testing_progress_match_repository": true
+    "result": "local runtime/probe pass; clean source rebuild and packaging run in publication workflow",
+    "preservation_report": "reports/preservation_0.7.23.json"
   },
   "engine_compatibility": {
     "version": "v0.3.96",
     "revision": "0e92b587468c2db7c386f055fc272e6505b0f401",
-    "raw_native_checks_per_root": 127933,
-    "installer_compressed_checks_per_root": 127933,
+    "raw_native_checks_per_root": 128316,
+    "installer_compressed_checks_per_root": 128316,
     "installer_codec_assets": 5609,
     "strict_modkit": true
   },
@@ -500,7 +499,8 @@
     "detached_tracks_expire": true,
     "jump_departure_tracks": true,
     "spawn_excludes_step_effects": true,
-    "source_ground_sound_effects": 1
+    "source_ground_sound_effects": 1,
+    "live_collector_camera_forwarding": true
   },
   "engine": {
     "version": "v0.3.96",
@@ -509,12 +509,12 @@
   "installer_compressed": {
     "assets": 5609,
     "codec": "actual native CacheBlob encode/decode",
-    "default_checks": 127933,
-    "mounted_checks": 127933,
+    "default_checks": 128316,
+    "mounted_checks": 128316,
     "result": "pass"
   },
   "progress": {
-    "version": "0.7.22",
+    "version": "0.7.23",
     "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
     "complete_percent": 42.23,
     "remaining_percent": 57.77,
@@ -592,16 +592,14 @@
   },
   "preservation": {
     "result": "pass",
-    "previous_release": "v0.7.21",
-    "previous_zip_sha256": "21b689fa96639ad35065ca9bb75b34fcb214bcd5ed3e04f65565d379837b9bd7",
+    "previous_release": "v0.7.22",
+    "previous_zip_sha256": "5d93024a9cd1874fa6a6f9b30c3511bf16c091316bc0e8772bb1c1eb0b779427",
     "previous_non_code_assets_identical": 7713,
     "missing_previous_files": [],
     "changed_previous_non_code_assets": [],
-    "world_datasets_unchanged": 29,
+    "world_datasets_unchanged": 30,
     "changed_world_datasets": [],
-    "added_world_datasets": [
-      "practice"
-    ],
+    "added_world_datasets": [],
     "maps_preserved": 564,
     "scripts_preserved": 1789
   },
@@ -732,7 +730,10 @@
     "cancel_and_failure_preservation": true,
     "source_important_machine_preservation": true,
     "live_menu_state_preserved": true,
-    "vanilla_sessions_delegate": true
+    "vanilla_sessions_delegate": true,
+    "actual_native_four_move_messages_and_yesno": true,
+    "actual_native_summary_selection_HM_refusal_and_cancel": true,
+    "private_callbacks_shared_with_live_menu": true
   },
   "practice": {
     "opt_in_native_options_row": true,
@@ -772,22 +773,59 @@
     "response_in_0.7.22": "Opt-in separate practice slot with repeatable TM supplies, normal/shiny followers and audited terrain shortcuts/return. Does not infer player confirmation of 0.7.21 mechanics."
   },
   "validation_provenance": {
-    "workflow_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40151164646",
-    "commit": "153127fdb1f9838c4a887cbf4370d930bd474904",
-    "result": "success",
-    "prepublication_validation_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40150492959",
-    "published_assets_downloaded_and_verified": true
+    "local_runtime_and_compressed_tests": "pass",
+    "current_publication_workflow": "pending",
+    "source_assets_and_datasets": "byte-identical to v0.7.22; full source audits rerun before publication",
+    "previous_full_ci": "https://github.com/TheEelYT/g1r-hns/actions/runs/40151164646"
   },
-  "release_artifacts": [
-    {
-      "name": "pokemon_heart_soul-1.0.21.g1rcart",
-      "bytes": 896465,
-      "sha256": "51853bb03c0942f4744056cec042922d086b682df272caefa9f06c3f82781b4c"
-    },
-    {
-      "name": "hns_exploration-0.7.22.zip",
-      "bytes": 10334293,
-      "sha256": "5d93024a9cd1874fa6a6f9b30c3511bf16c091316bc0e8772bb1c1eb0b779427"
-    }
-  ]
+  "latest_player_feedback": {
+    "version": "0.7.22",
+    "workflow": "Replies to TESTING.md plus separately reported bugs.",
+    "confirmed": [
+      {
+        "check": "Infinite TMs",
+        "result": "TMs are infinite; no confirmation of OFF consumption."
+      },
+      {
+        "check": "sand footsteps",
+        "result": "look correct to player knowledge"
+      },
+      {
+        "check": "short grass footsteps",
+        "result": "look correct to player knowledge"
+      },
+      {
+        "check": "shallow water footsteps",
+        "result": "look correct to player knowledge"
+      }
+    ],
+    "bugs": [
+      {
+        "check": "four-move TM teaching",
+        "result": "A on already-four-moves message dismisses TM use instead of asking to delete/replace."
+      },
+      {
+        "check": "ice follower",
+        "result": "Follower enters Pok\u00e9 Ball when player moves on ice; reflection check blocked."
+      },
+      {
+        "check": "sprite shadows",
+        "result": "Shadows draw above sprites, especially moving north with follower behind."
+      }
+    ],
+    "not_inferred": [
+      "No confirmation of successful replacement/cancellation or OFF TM consumption.",
+      "No confirmation of normal/shiny ice reflections while follower recalls.",
+      "No additional weather, pond/bridge or seaweed confirmation."
+    ]
+  },
+  "ice_follower": {
+    "native_forced_controller_on_real_Ice_Path": true,
+    "same_visible_actor_no_ball_recall": true,
+    "source_sliding_pose_held": true,
+    "no_walking_bob_while_sliding": true,
+    "final_queued_step_at_native_wall": true,
+    "other_forced_modes_remain_excluded": true,
+    "live_player_confirmation": false
+  }
 }
