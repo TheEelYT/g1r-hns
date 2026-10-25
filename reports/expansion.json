@@ -60,7 +60,9 @@
     "source_field_background_pixels": 163840,
     "source_c_terrain_attack_power_cases": 40960,
     "reviewed_terrain_dependent_attacks": 8,
-    "source_special_move_rows_pending": 87
+    "source_special_move_rows_pending": 87,
+    "practice_source_walking_cells": 30,
+    "practice_destinations": 4
   },
   "limits": [
     "Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pok\u00e9block bonuses remain pending.",

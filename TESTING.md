@@ -38,7 +38,7 @@ These remain unverified in live player testing. Automated evidence is retained s
 | Pond/bridge shiny reflection palette | Shiny practice follower supplied; pond/bridge sites still not supplied | Verified reflection location/quick access |
 | Seaweed finish-step bubbles, rising/expiry and cleanup | No known accessible seaweed location from current Azalea play | Verified location and quick access |
 | Species-owned sand/footprint trails, turning, hold/flicker/expiry (now accessible, still unconfirmed) | Previously inaccessible; sand shortcut now supplied in practice copy | Optional practice feedback only; no walk back requested |
-| Deep-sand cover, puddle/ripple/shallow-water/hot-spring effects and water landings | Suitable locations have not been established for the player | Verified location and quick access |
+| Deep-sand cover, puddle/ripple/hot-spring effects and water landings | Suitable locations have not been established for the player | Verified location and quick access |
 | Fog/water shadow suppression | Fog has not been encountered | Natural encounter or a controlled weather test |
 | Terrain backgrounds restoring after expiry/removal | Not confirmed by this reply | A relevant encounter during normal play or a supplied test setup |
 

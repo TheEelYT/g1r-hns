@@ -1,8 +1,8 @@
 {
-  "version": "0.7.21",
+  "version": "0.7.22",
   "native_checks": {
-    "default": 127759,
-    "mounted": 127759
+    "default": 127933,
+    "mounted": 127933
   },
   "converter_tests": 19,
   "modkit": {
@@ -10,9 +10,9 @@
     "findings": [],
     "notes": []
   },
-  "cpu_ui_captures": 121,
+  "cpu_ui_captures": 127,
   "windows_gpu_verified": false,
-  "cart_version": "1.0.20",
+  "cart_version": "1.0.21",
   "repo": "TheEelYT/g1r-hns",
   "audits": {
     "world": {
@@ -192,7 +192,9 @@
         "source_field_background_pixels": 163840,
         "source_c_terrain_attack_power_cases": 40960,
         "reviewed_terrain_dependent_attacks": 8,
-        "source_special_move_rows_pending": 87
+        "source_special_move_rows_pending": 87,
+        "practice_source_walking_cells": 30,
+        "practice_destinations": 4
       },
       "limits": [
         "Lead selectors/personality filtering use common-input source C oracles; native RNG remains, not HnS SFC32 state matching. Safari/Pok\u00e9block bonuses remain pending.",
@@ -272,18 +274,20 @@
     "Twelve source follower ground sheets compare 7680 palette pixels and 112 C-compiled animation commands; source footprint-fade callbacks produce 57 reference ticks. Native RSE entries check every hold/flicker/expiry frame.",
     "Actual follower steps and recall trigger species-owned footprints/turning slither/spot/bug trails, sand cover, puddle/ripple/flow/hot-spring effects and water landing splashes, without changing completed motion/hop/border tests. Spawn and jump covering rules are distinct.",
     "Source lead selectors on 25,920 cases and rejection filtering on 936 common-input RNG cases; native wild creation/capture preserves final PID, gender, nature and stats.",
-    "Actual native party-menu immediate and deferred TM learning obeys Infinite TMs, cancellation, unsupported moves, current importance and HM/source-important preservation. Private handler construction preserves live native menu state."
+    "Actual native party-menu immediate and deferred TM learning obeys Infinite TMs, cancellation, unsupported moves, current importance and HM/source-important preservation. Private handler construction preserves live native menu state.",
+    "Opt-in practice save creation through the actual native options descriptor/input path; separate cart/manual slots, original bytes and active slot, independent identity, write-failure rollback, supplied party/TMs, native map arrivals and return, collision/elevation and ice reflection classification."
   ],
   "tested_build_content_equivalence": {
     "result": "pass",
-    "packaged_files_match_staged_bytes": 7849,
-    "preservation_report": "reports/preservation_0.7.21.json"
+    "packaged_files": 7850,
+    "all_runtime_files_match_repository": true,
+    "preservation_report": "reports/preservation_0.7.22.json"
   },
   "engine_compatibility": {
     "version": "v0.3.96",
     "revision": "0e92b587468c2db7c386f055fc272e6505b0f401",
-    "raw_native_checks_per_root": 127759,
-    "installer_compressed_checks_per_root": 127759,
+    "raw_native_checks_per_root": 127933,
+    "installer_compressed_checks_per_root": 127933,
     "installer_codec_assets": 5609,
     "strict_modkit": true
   },
@@ -457,8 +461,7 @@
     "source_grass_pixels": 2816,
     "follower_grass_sequences": 3,
     "remaining": [
-      "Reflections",
-      "Seaweed bubbles",
+      "Reflection transition affine/blend behavior",
       "Ash and further map-specific follower effects",
       "Full weather parity"
     ],
@@ -504,12 +507,12 @@
   "installer_compressed": {
     "assets": 5609,
     "codec": "actual native CacheBlob encode/decode",
-    "default_checks": 127759,
-    "mounted_checks": 127759,
+    "default_checks": 127933,
+    "mounted_checks": 127933,
     "result": "pass"
   },
   "progress": {
-    "version": "0.7.21",
+    "version": "0.7.22",
     "method": "Weighted feature-parity estimate. Editorial scope weights; partial defaults to half credit unless measured. Not binary matching, hours, or a schedule. Revise weights when new scope is found.",
     "complete_percent": 42.23,
     "remaining_percent": 57.77,
@@ -587,18 +590,16 @@
   },
   "preservation": {
     "result": "pass",
-    "previous_release": "v0.7.20",
-    "previous_zip_sha256": "6a976ae8f2dbe4bb9522eeb8dd5258bb823e5c80f175ca7a9132efcbbe77e26c",
-    "previous_non_code_assets_identical": 7712,
+    "previous_release": "v0.7.21",
+    "previous_zip_sha256": "21b689fa96639ad35065ca9bb75b34fcb214bcd5ed3e04f65565d379837b9bd7",
+    "previous_non_code_assets_identical": 7713,
     "missing_previous_files": [],
     "changed_previous_non_code_assets": [],
-    "world_datasets_unchanged": 26,
-    "changed_world_datasets": [
-      "abilities",
-      "audio",
-      "startup"
+    "world_datasets_unchanged": 29,
+    "changed_world_datasets": [],
+    "added_world_datasets": [
+      "practice"
     ],
-    "audio_metadata_only_change": "sourceFingerprint incorporates the pinned engine extractor/LuaWriter; all audio payloads and other audio metadata are byte-identical.",
     "maps_preserved": 564,
     "scripts_preserved": 1789
   },
@@ -730,16 +731,47 @@
     "live_menu_state_preserved": true,
     "vanilla_sessions_delegate": true
   },
-  "release_artifacts": [
-    {
-      "name": "pokemon_heart_soul-1.0.20.g1rcart",
-      "bytes": 896473,
-      "sha256": "e9029dc2235401c563045d0819a59137f918faacd505f1b00b2fdd12da3e6dc8"
+  "practice": {
+    "opt_in_native_options_row": true,
+    "separate_native_cart_and_manual_slots": true,
+    "original_save_bytes_and_active_slot_preserved": true,
+    "live_party_bag_flags_and_rng_preserved": true,
+    "unique_playthrough_identity": true,
+    "failed_copy_write_rollback": true,
+    "normal_shiny_poliwrath": 2,
+    "practice_TM_stacks": {
+      "TM03_WATER_PULSE": 9,
+      "TM17_PROTECT": 9,
+      "TM60_DRAIN_PUNCH": 9
     },
-    {
-      "name": "hns_exploration-0.7.21.zip",
-      "bytes": 10328035,
-      "sha256": "21b689fa96639ad35065ca9bb75b34fcb214bcd5ed3e04f65565d379837b9bd7"
-    }
-  ]
+    "one_and_four_move_presets": true,
+    "native_schema_marker_roundtrip": true,
+    "native_map_load_arrival_return": true,
+    "native_collision_and_elevation": true,
+    "native_ice_reflection_classification": true,
+    "audited_source_cells": 30,
+    "destinations": 4,
+    "ordinary_session_guard": true,
+    "windows_gpu_player_confirmed": false
+  },
+  "testing_access_feedback": {
+    "version": "0.7.21",
+    "workflow": "Replies to TESTING.md remain the normal player-feedback workflow.",
+    "location": "Azalea (last supplied location)",
+    "confirmed": [],
+    "unavailable_checks": [
+      {
+        "check": "TM consumption/reuse",
+        "reason": "The player used all available TMs before Infinite TMs was connected. Further testing needs supplied items or convenient test access."
+      }
+    ],
+    "authorization": "Continue with the next update(s).",
+    "response_in_0.7.22": "Opt-in separate practice slot with repeatable TM supplies, normal/shiny followers and audited terrain shortcuts/return. Does not infer player confirmation of 0.7.21 mechanics."
+  },
+  "validation_provenance": {
+    "workflow_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40150492959",
+    "commit": "9debb71f805588453ffb48722b192f0f0293e4cb",
+    "result": "success",
+    "note": "Release publication rebuilds and reruns the full suite on main; final TESTING wording omits supplied shallow water from deferred checks."
+  }
 }
