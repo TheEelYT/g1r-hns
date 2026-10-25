@@ -6,6 +6,8 @@ Opt-in PORT TEST TOOLS in the loaded OPTIONS → GEN1RECOMP tab creates a separa
 
 Terrain targets are source-derived, passable five-tile strips, away from converted objects/events; no source maps/scripts are edited. The practice menu supplies a return to the copied save point. Unsupplied terrain/weather checks stay deferred. No music, story gates or source mechanics changed; the 42.23% complete / 57.77% remaining scope estimate is unchanged because testing tools do not implement romhack features.
 
+Published v0.7.22 from `153127fdb1f9838c4a887cbf4370d930bd474904`. Main release workflow `40151164646` and Cart label workflow `40151164653` passed. Native integration: 127,933 checks per raw/compressed cache root; strict Modkit, seven source audits and 127 UI captures pass. All 7,713 prior non-code assets and all 29 prior world datasets are preserved; 564 maps / 1,789 scripts unchanged. Uploaded ZIP/cart hashes and source label are verified in reports/validation.json.
+
 # Historical handoff — 0.7.21
 
 Mod 0.7.21 / cart 1.0.20 / G1R v0.3.96 (`0e92b587468c2db7c386f055fc272e6505b0f401`). HnS source remains pinned to `167aa6d537b109bb229c231ddce4616974c4da71`.

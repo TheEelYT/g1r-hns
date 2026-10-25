@@ -281,7 +281,9 @@
     "result": "pass",
     "packaged_files": 7850,
     "all_runtime_files_match_repository": true,
-    "preservation_report": "reports/preservation_0.7.22.json"
+    "preservation_report": "reports/preservation_0.7.22.json",
+    "packaged_files_match_staged_bytes": 7850,
+    "release_readme_testing_progress_match_repository": true
   },
   "engine_compatibility": {
     "version": "v0.3.96",
@@ -632,7 +634,8 @@
     "fixed_point_linear_text_compositing": true,
     "reviewed_version_box_background": true,
     "repeat_same_version_renders": 5,
-    "source_xcf_unchanged": true
+    "source_xcf_unchanged": true,
+    "png_sha256": "d81011245bb335d3d5b7bdc39cdb99b94db88dff1ef5e1be0c05256f9f872b83"
   },
   "player_feedback": {
     "version": "0.7.20",
@@ -769,9 +772,22 @@
     "response_in_0.7.22": "Opt-in separate practice slot with repeatable TM supplies, normal/shiny followers and audited terrain shortcuts/return. Does not infer player confirmation of 0.7.21 mechanics."
   },
   "validation_provenance": {
-    "workflow_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40150492959",
-    "commit": "9debb71f805588453ffb48722b192f0f0293e4cb",
+    "workflow_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40151164646",
+    "commit": "153127fdb1f9838c4a887cbf4370d930bd474904",
     "result": "success",
-    "note": "Release publication rebuilds and reruns the full suite on main; final TESTING wording omits supplied shallow water from deferred checks."
-  }
+    "prepublication_validation_run": "https://github.com/TheEelYT/g1r-hns/actions/runs/40150492959",
+    "published_assets_downloaded_and_verified": true
+  },
+  "release_artifacts": [
+    {
+      "name": "pokemon_heart_soul-1.0.21.g1rcart",
+      "bytes": 896465,
+      "sha256": "51853bb03c0942f4744056cec042922d086b682df272caefa9f06c3f82781b4c"
+    },
+    {
+      "name": "hns_exploration-0.7.22.zip",
+      "bytes": 10334293,
+      "sha256": "5d93024a9cd1874fa6a6f9b30c3511bf16c091316bc0e8772bb1c1eb0b779427"
+    }
+  ]
 }
