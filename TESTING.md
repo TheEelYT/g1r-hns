@@ -81,9 +81,15 @@ Instructions for future maintainers and assistants:
 - Checking a box must never commit this file. Export a report and review it before
   deliberately publishing feedback to GitHub. Definition edits are ordinary
   reviewed project changes.
-- The dashboard currently imports a local file explicitly; it does not poll GitHub.
-  Pull the repo while online before importing if the latest definitions are needed.
-  Offline testing uses the last imported snapshot.
+- The viewed project is checked every minute while the dashboard is online,
+  visible and idle. Changed upstream definitions are archived and merged without
+  discarding local results. Offline testing uses the last saved snapshot.
+- Local changes save to a separate TESTING.local.md draft. Submit results requires
+  an explicit review and confirmation and writes one version-scoped results
+  section, using the current file SHA to reject concurrent GitHub edits. Keep the
+  project-lab-results markers and test-dashboard-results block intact. Hosted
+  direct submission is currently unavailable; use the local app with GitHub CLI
+  or download the draft for review. Never auto-submit on a checkbox or poll.
 - Validate strict JSON (no comments/trailing commas), unique check IDs, and the
   dashboard import preview before accepting a format change. Keep exactly one
   `test-dashboard` block. Use the dashboard's Export check definitions action
